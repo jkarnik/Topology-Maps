@@ -1,0 +1,171 @@
+<h2>L3 Logical View & Edit Mode</h2>
+<p class="subtitle">The two other key views beyond the L2 physical topology</p>
+
+<div class="split" style="margin-bottom: 32px;">
+
+  <!-- L3 View -->
+  <div class="mockup">
+    <div class="mockup-header">L3 Logical View — Subnet & VLAN Map</div>
+    <div class="mockup-body" style="padding: 24px; background: #0d1117; min-height: 380px;">
+
+      <!-- Internet cloud -->
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="display: inline-block; background: #1c2333; border: 1px dashed #484f58; border-radius: 20px; padding: 8px 24px;">
+          <span style="font-size: 13px; color: #8b949e;">☁ Internet / WAN</span>
+        </div>
+      </div>
+      <div style="width: 2px; height: 16px; background: #484f58; margin: 0 auto;"></div>
+
+      <!-- FortiGate Router -->
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="display: inline-block; background: #1c2333; border: 2px solid #da3633; border-radius: 10px; padding: 10px 20px;">
+          <div style="font-size: 12px; color: #da3633; font-weight: 600;">GATEWAY</div>
+          <div style="font-size: 13px; color: #e6edf3; font-weight: 600;">FortiGate 200G</div>
+          <div style="font-size: 11px; color: #8b949e;">10.0.0.1/24</div>
+        </div>
+      </div>
+      <div style="width: 2px; height: 12px; background: #484f58; margin: 0 auto;"></div>
+
+      <!-- VLAN Subnets -->
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+        <div style="background: #1a0e0e; border: 1px solid #da3633; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #da3633; font-weight: 700;">VLAN 10</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">PCI / Payment</div>
+          <div style="font-size: 11px; color: #8b949e;">10.10.10.0/24</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">30-50 devices</div>
+        </div>
+        <div style="background: #0e1a14; border: 1px solid #3fb950; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #3fb950; font-weight: 700;">VLAN 20</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">Operations</div>
+          <div style="font-size: 11px; color: #8b949e;">10.10.20.0/24</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">10-15 devices</div>
+        </div>
+        <div style="background: #0e1420; border: 1px solid #388bfd; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #388bfd; font-weight: 700;">VLAN 30</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">Employee Wi-Fi</div>
+          <div style="font-size: 11px; color: #8b949e;">10.10.30.0/23</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">90 devices</div>
+        </div>
+        <div style="background: #1a160e; border: 1px solid #d29922; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #d29922; font-weight: 700;">VLAN 40</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">Security</div>
+          <div style="font-size: 11px; color: #8b949e;">10.10.40.0/24</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">40-60 devices</div>
+        </div>
+        <div style="background: #170e1a; border: 1px solid #a371f7; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #a371f7; font-weight: 700;">VLAN 50</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">Retail IoT</div>
+          <div style="font-size: 11px; color: #8b949e;">10.10.50.0/23</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">100+ devices</div>
+        </div>
+        <div style="background: #1a1a0e; border: 1px solid #d2a822; border-radius: 8px; padding: 10px; min-width: 110px; text-align: center;">
+          <div style="font-size: 11px; color: #d2a822; font-weight: 700;">VLAN 60</div>
+          <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">Guest Wi-Fi</div>
+          <div style="font-size: 11px; color: #8b949e;">172.16.0.0/20</div>
+          <div style="font-size: 10px; color: #8b949e; margin-top: 4px;">~10,000 peak</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; padding: 8px 12px; background: #161b22; border-radius: 6px; font-size: 11px; color: #484f58;">
+        Click any VLAN block to see its member devices, which ports they're on, and inter-VLAN routing paths
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Mode -->
+  <div class="mockup">
+    <div class="mockup-header">Edit Mode — Rewire Connections</div>
+    <div class="mockup-body" style="padding: 24px; background: #0d1117; min-height: 380px;">
+
+      <!-- Edit mode banner -->
+      <div style="background: #2a1a00; border: 1px solid #d29922; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 16px;">✏️</span>
+        <div>
+          <div style="font-size: 13px; color: #d29922; font-weight: 600;">Edit Mode Active</div>
+          <div style="font-size: 11px; color: #8b949e;">Drag between ports to connect · Click a link to disconnect</div>
+        </div>
+      </div>
+
+      <!-- Two switches being edited -->
+      <div style="display: flex; gap: 20px; justify-content: center; align-items: flex-start;">
+
+        <!-- Switch 1 -->
+        <div style="background: #1c2333; border: 2px solid #d29922; border-radius: 10px; padding: 12px; min-width: 150px;">
+          <div style="font-size: 11px; color: #d29922; font-weight: 600;">FLOOR 1 SWITCH</div>
+          <div style="font-size: 13px; color: #e6edf3; font-weight: 600; margin-bottom: 8px;">FS-448E</div>
+          <div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">Ports:</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 3px;">
+            <span style="width: 24px; height: 20px; background: #3fb950; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #0d1117; font-weight: 700;">1</span>
+            <span style="width: 24px; height: 20px; background: #3fb950; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #0d1117; font-weight: 700;">2</span>
+            <span style="width: 24px; height: 20px; background: #3fb950; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #0d1117; font-weight: 700;">3</span>
+            <span style="width: 24px; height: 20px; background: #21262d; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #484f58;">4</span>
+            <span style="width: 24px; height: 20px; background: #21262d; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #484f58;">5</span>
+            <span style="width: 24px; height: 20px; background: #388bfd; border: 2px solid #58a6ff; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; cursor: pointer;">6</span>
+          </div>
+          <div style="font-size: 10px; color: #58a6ff; margin-top: 6px;">⬤ Port 6 selected — drag to target</div>
+        </div>
+
+        <!-- Drag arrow -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 40px;">
+          <div style="font-size: 11px; color: #58a6ff; margin-bottom: 4px;">dragging...</div>
+          <div style="width: 60px; height: 2px; background: #58a6ff; position: relative;">
+            <div style="position: absolute; right: -6px; top: -4px; width: 0; height: 0; border-left: 8px solid #58a6ff; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+          </div>
+        </div>
+
+        <!-- AP target -->
+        <div style="background: #1c2333; border: 2px dashed #58a6ff; border-radius: 10px; padding: 12px; min-width: 150px;">
+          <div style="font-size: 11px; color: #a371f7; font-weight: 600;">ACCESS POINT</div>
+          <div style="font-size: 13px; color: #e6edf3; font-weight: 600; margin-bottom: 8px;">FortiAP-15</div>
+          <div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">Currently on:</div>
+          <div style="font-size: 11px; color: #da3633; text-decoration: line-through;">Floor 2 Switch · port 12</div>
+          <div style="font-size: 11px; color: #58a6ff; margin-top: 6px;">⬤ Drop here to reconnect</div>
+        </div>
+      </div>
+
+      <!-- Change preview -->
+      <div style="margin-top: 20px; background: #161b22; border-radius: 8px; padding: 12px;">
+        <div style="font-size: 12px; color: #e6edf3; font-weight: 600; margin-bottom: 8px;">Pending Change Preview</div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+          <span style="color: #da3633;">✕ Disconnect</span>
+          <span style="color: #8b949e;">FortiAP-15 ↔ Floor 2 Switch (port 12)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 4px;">
+          <span style="color: #3fb950;">✓ Connect</span>
+          <span style="color: #8b949e;">FortiAP-15 ↔ Floor 1 Switch (port 6)</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <span style="padding: 5px 14px; background: #238636; border-radius: 6px; font-size: 12px; color: #fff; cursor: pointer;">Apply Change</span>
+          <span style="padding: 5px 14px; background: #21262d; border-radius: 6px; font-size: 12px; color: #8b949e; cursor: pointer; border: 1px solid #30363d;">Cancel</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; font-size: 11px; color: #484f58;">
+        On "Apply": updates simulator SNMP data → collector rediscovers → topology refreshes in ~5 seconds
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h3>How the two views differ</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #388bfd; margin-bottom: 6px;">L2 Physical View</div>
+    <ul style="font-size: 13px; color: #8b949e; padding-left: 18px; margin: 0;">
+      <li>Shows actual device-to-device cable connections</li>
+      <li>Hierarchical: Firewalls → Core → Floor → APs → Endpoints</li>
+      <li>Port-level detail on drill-down</li>
+      <li>Edit mode works here — rewire physical connections</li>
+    </ul>
+  </div>
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #a371f7; margin-bottom: 6px;">L3 Logical View</div>
+    <ul style="font-size: 13px; color: #8b949e; padding-left: 18px; margin: 0;">
+      <li>Shows subnets, VLANs, and IP routing relationships</li>
+      <li>Grouped by network segment, not physical location</li>
+      <li>Click a VLAN to see its member devices</li>
+      <li>Shows inter-VLAN routing through the FortiGate</li>
+    </ul>
+  </div>
+</div>

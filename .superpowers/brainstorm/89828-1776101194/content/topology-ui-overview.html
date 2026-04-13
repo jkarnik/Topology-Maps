@@ -1,0 +1,171 @@
+<h2>Topology Map UI — Layout Concept</h2>
+<p class="subtitle">Three main areas: view switcher, interactive canvas, and detail panel</p>
+
+<div class="mockup" style="margin-bottom: 24px;">
+  <div class="mockup-header">Main Application Layout</div>
+  <div class="mockup-body" style="padding: 0; min-height: 500px; display: flex; flex-direction: column; background: #0d1117;">
+
+    <!-- Top Bar -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #161b22; border-bottom: 1px solid #30363d;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-weight: 700; font-size: 16px; color: #e6edf3;">🌐 Topology Maps</span>
+        <div style="display: flex; gap: 4px; background: #21262d; border-radius: 8px; padding: 3px;">
+          <span style="padding: 6px 14px; background: #388bfd; border-radius: 6px; font-size: 13px; color: #fff; font-weight: 600;">L2 Physical</span>
+          <span style="padding: 6px 14px; border-radius: 6px; font-size: 13px; color: #8b949e;">L3 Logical</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span style="padding: 5px 12px; background: #21262d; border-radius: 6px; font-size: 12px; color: #58a6ff; border: 1px solid #30363d;">● Live — Polling every 5s</span>
+        <span style="padding: 6px 14px; background: #238636; border-radius: 6px; font-size: 13px; color: #fff; font-weight: 600; cursor: pointer;">✏️ Edit Mode</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="display: flex; flex: 1;">
+
+      <!-- Canvas Area -->
+      <div style="flex: 1; padding: 30px; position: relative;">
+
+        <!-- FortiGate HA Pair -->
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 8px;">
+          <div style="background: #1c2333; border: 2px solid #da3633; border-radius: 10px; padding: 12px 20px; text-align: center; min-width: 140px;">
+            <div style="font-size: 11px; color: #da3633; font-weight: 600; margin-bottom: 4px;">FIREWALL</div>
+            <div style="font-size: 14px; color: #e6edf3; font-weight: 600;">FortiGate 200G</div>
+            <div style="font-size: 11px; color: #3fb950; margin-top: 4px;">● Primary</div>
+          </div>
+          <div style="background: #1c2333; border: 2px solid #da3633; border-radius: 10px; padding: 12px 20px; text-align: center; min-width: 140px;">
+            <div style="font-size: 11px; color: #da3633; font-weight: 600; margin-bottom: 4px;">FIREWALL</div>
+            <div style="font-size: 14px; color: #e6edf3; font-weight: 600;">FortiGate 200G</div>
+            <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">○ Standby</div>
+          </div>
+        </div>
+
+        <!-- Connection line -->
+        <div style="text-align: center; padding: 4px 0;">
+          <div style="width: 2px; height: 25px; background: #388bfd; margin: 0 auto;"></div>
+          <div style="font-size: 10px; color: #8b949e;">10G SFP+</div>
+          <div style="width: 2px; height: 15px; background: #388bfd; margin: 0 auto;"></div>
+        </div>
+
+        <!-- Core Switch -->
+        <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+          <div style="background: #1c2333; border: 2px solid #388bfd; border-radius: 10px; padding: 12px 24px; text-align: center; min-width: 180px;">
+            <div style="font-size: 11px; color: #388bfd; font-weight: 600; margin-bottom: 4px;">CORE SWITCH</div>
+            <div style="font-size: 14px; color: #e6edf3; font-weight: 600;">FortiSwitch 1024E</div>
+            <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">24 ports · 10G Aggregation</div>
+          </div>
+        </div>
+
+        <!-- Connection lines to floor switches -->
+        <div style="display: flex; justify-content: center; gap: 100px; padding: 4px 0;">
+          <div style="text-align: center;"><div style="width: 2px; height: 30px; background: #388bfd; margin: 0 auto;"></div></div>
+          <div style="text-align: center;"><div style="width: 2px; height: 30px; background: #388bfd; margin: 0 auto;"></div></div>
+          <div style="text-align: center;"><div style="width: 2px; height: 30px; background: #388bfd; margin: 0 auto;"></div></div>
+          <div style="text-align: center;"><div style="width: 2px; height: 30px; background: #388bfd; margin: 0 auto;"></div></div>
+        </div>
+
+        <!-- Floor Switches -->
+        <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 8px;">
+          <div style="background: #1c2333; border: 2px solid #d29922; border-radius: 10px; padding: 10px 14px; text-align: center; min-width: 120px; cursor: pointer;">
+            <div style="font-size: 10px; color: #d29922; font-weight: 600; margin-bottom: 3px;">FLOOR 1</div>
+            <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">FS-448E</div>
+            <div style="font-size: 10px; color: #8b949e; margin-top: 3px;">14 APs · 38 endpoints</div>
+            <div style="font-size: 10px; color: #58a6ff; margin-top: 2px;">▸ Click to expand</div>
+          </div>
+          <div style="background: #1c2333; border: 2px solid #d29922; border-radius: 10px; padding: 10px 14px; text-align: center; min-width: 120px; cursor: pointer;">
+            <div style="font-size: 10px; color: #d29922; font-weight: 600; margin-bottom: 3px;">FLOOR 2</div>
+            <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">FS-448E</div>
+            <div style="font-size: 10px; color: #8b949e; margin-top: 3px;">14 APs · 42 endpoints</div>
+            <div style="font-size: 10px; color: #58a6ff; margin-top: 2px;">▸ Click to expand</div>
+          </div>
+          <div style="background: #1c2333; border: 2px solid #d29922; border-radius: 10px; padding: 10px 14px; text-align: center; min-width: 120px; cursor: pointer;">
+            <div style="font-size: 10px; color: #d29922; font-weight: 600; margin-bottom: 3px;">FLOOR 3</div>
+            <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">FS-448E</div>
+            <div style="font-size: 10px; color: #8b949e; margin-top: 3px;">14 APs · 35 endpoints</div>
+            <div style="font-size: 10px; color: #58a6ff; margin-top: 2px;">▸ Click to expand</div>
+          </div>
+          <div style="background: #1c2333; border: 2px solid #d29922; border-radius: 10px; padding: 10px 14px; text-align: center; min-width: 120px; cursor: pointer;">
+            <div style="font-size: 10px; color: #d29922; font-weight: 600; margin-bottom: 3px;">FLOOR 4</div>
+            <div style="font-size: 12px; color: #e6edf3; font-weight: 600;">FS-448E</div>
+            <div style="font-size: 10px; color: #8b949e; margin-top: 3px;">14 APs · 40 endpoints</div>
+            <div style="font-size: 10px; color: #58a6ff; margin-top: 2px;">▸ Click to expand</div>
+          </div>
+        </div>
+
+        <!-- Breadcrumb hint -->
+        <div style="position: absolute; bottom: 12px; left: 20px; font-size: 11px; color: #484f58;">
+          📍 Store Overview › All Floors
+        </div>
+
+        <!-- Zoom controls hint -->
+        <div style="position: absolute; bottom: 12px; right: 20px; display: flex; gap: 4px;">
+          <span style="width: 28px; height: 28px; background: #21262d; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8b949e; font-size: 16px; border: 1px solid #30363d;">+</span>
+          <span style="width: 28px; height: 28px; background: #21262d; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8b949e; font-size: 16px; border: 1px solid #30363d;">−</span>
+          <span style="width: 28px; height: 28px; background: #21262d; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8b949e; font-size: 14px; border: 1px solid #30363d;">⊡</span>
+        </div>
+      </div>
+
+      <!-- Detail Panel (right side) -->
+      <div style="width: 280px; background: #161b22; border-left: 1px solid #30363d; padding: 16px; overflow-y: auto;">
+        <div style="font-size: 12px; color: #8b949e; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">Device Details</div>
+
+        <div style="background: #21262d; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+          <div style="font-size: 14px; color: #e6edf3; font-weight: 600;">FortiSwitch 1024E</div>
+          <div style="font-size: 12px; color: #8b949e; margin-top: 4px;">Core Switch · 10.0.1.1</div>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <span style="padding: 2px 8px; background: #0d1117; border-radius: 4px; font-size: 11px; color: #3fb950;">● Up</span>
+            <span style="padding: 2px 8px; background: #0d1117; border-radius: 4px; font-size: 11px; color: #8b949e;">SNMP v2c</span>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: #8b949e; font-weight: 600; margin-bottom: 8px;">INTERFACES</div>
+        <div style="font-size: 12px; color: #e6edf3; padding: 6px 0; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between;">
+          <span>port1 (10G)</span><span style="color: #3fb950;">↑ 2.4 Gbps</span>
+        </div>
+        <div style="font-size: 12px; color: #e6edf3; padding: 6px 0; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between;">
+          <span>port2 (10G)</span><span style="color: #3fb950;">↑ 1.8 Gbps</span>
+        </div>
+        <div style="font-size: 12px; color: #e6edf3; padding: 6px 0; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between;">
+          <span>port3 (1G)</span><span style="color: #3fb950;">↑ 0.6 Gbps</span>
+        </div>
+        <div style="font-size: 12px; color: #e6edf3; padding: 6px 0; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between;">
+          <span>port4 (1G)</span><span style="color: #3fb950;">↑ 0.4 Gbps</span>
+        </div>
+
+        <div style="font-size: 12px; color: #8b949e; font-weight: 600; margin-top: 16px; margin-bottom: 8px;">CONNECTED DEVICES</div>
+        <div style="font-size: 12px; padding: 6px 0; border-bottom: 1px solid #30363d;">
+          <span style="color: #e6edf3;">FortiGate 200G (Primary)</span><br>
+          <span style="color: #484f58;">port1 ↔ port5 · LLDP</span>
+        </div>
+        <div style="font-size: 12px; padding: 6px 0; border-bottom: 1px solid #30363d;">
+          <span style="color: #e6edf3;">Floor Switch 1 (448E)</span><br>
+          <span style="color: #484f58;">port3 ↔ port49 · LLDP</span>
+        </div>
+        <div style="font-size: 12px; padding: 6px 0; border-bottom: 1px solid #30363d;">
+          <span style="color: #e6edf3;">Floor Switch 2 (448E)</span><br>
+          <span style="color: #484f58;">port4 ↔ port49 · LLDP</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top: 32px;">Key UI Features</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #e6edf3; margin-bottom: 6px;">L2 / L3 Toggle</div>
+    <div style="font-size: 13px; color: #8b949e;">Switch between physical cable view (L2) and logical subnet/VLAN view (L3) with one click</div>
+  </div>
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #e6edf3; margin-bottom: 6px;">Drill-Down</div>
+    <div style="font-size: 13px; color: #8b949e;">Click any floor switch to see its 48 ports, connected APs, and endpoints. Breadcrumb navigation back up.</div>
+  </div>
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #e6edf3; margin-bottom: 6px;">Edit Mode</div>
+    <div style="font-size: 13px; color: #8b949e;">Toggle edit mode to drag connections between ports. Changes propagate through the full SNMP loop.</div>
+  </div>
+  <div style="background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px;">
+    <div style="font-size: 14px; font-weight: 600; color: #e6edf3; margin-bottom: 6px;">Live Status</div>
+    <div style="font-size: 13px; color: #8b949e;">Green/red/amber indicators on every device and link. Metrics like throughput shown on hover.</div>
+  </div>
+</div>

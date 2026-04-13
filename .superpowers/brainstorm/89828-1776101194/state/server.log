@@ -1,0 +1,4 @@
+{"type":"server-started","port":50483,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50483","screen_dir":"/Users/jkarnik/Code/Topology Maps/.superpowers/brainstorm/89828-1776101194/content","state_dir":"/Users/jkarnik/Code/Topology Maps/.superpowers/brainstorm/89828-1776101194/state"}
+{"type":"screen-added","file":"/Users/jkarnik/Code/Topology Maps/.superpowers/brainstorm/89828-1776101194/content/topology-ui-overview.html"}
+{"type":"screen-added","file":"/Users/jkarnik/Code/Topology Maps/.superpowers/brainstorm/89828-1776101194/content/l3-and-edit-mode.html"}
+{"type":"server-stopped","reason":"idle timeout"}
