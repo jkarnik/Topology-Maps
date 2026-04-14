@@ -20,6 +20,7 @@ class DeviceStatus(str, Enum):
     UP = "up"
     DOWN = "down"
     DEGRADED = "degraded"
+    ALERTING = "alerting"
 
 
 class EndpointCategory(str, Enum):
