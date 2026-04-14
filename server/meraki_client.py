@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Optional
+from typing import Optional, Union
 import httpx
 from server.rate_limiter import RateLimiter
 
@@ -21,7 +21,7 @@ class MerakiClient:
     def is_configured(self) -> bool:
         return bool(self.api_key)
 
-    async def _get(self, path: str, params: Optional[dict] = None) -> dict | list:
+    async def _get(self, path: str, params: Optional[dict] = None) -> Union[dict, list]:
         await self._limiter.acquire()
         logger.debug("Meraki API GET %s", path)
         resp = await self._client.get(path, params=params)
