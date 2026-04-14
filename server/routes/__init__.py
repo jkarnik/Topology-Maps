@@ -1,5 +1,5 @@
 """Server route modules."""
 
-from server.routes import topology, devices, connections, system
+from server.routes import topology, devices, system, simulation
 
-__all__ = ["topology", "devices", "connections", "system"]
+__all__ = ["topology", "devices", "system", "simulation"]

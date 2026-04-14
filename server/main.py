@@ -16,7 +16,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.websocket import WebSocketManager
-from server.routes import topology, devices, system
+from server.routes import topology, devices, system, simulation
 from collector.main import create_poller
 
 logger = logging.getLogger(__name__)
@@ -41,13 +41,13 @@ async def lifespan(app: FastAPI):
         })
 
     poller.on_change(on_topology_change)
-    await poller.start()
-    logger.info("Collector poller started")
+    logger.info("Collector poller created (waiting for simulation start)")
 
     yield
 
     # Shutdown
-    await poller.stop()
+    if poller.is_running:
+        await poller.stop()
     logger.info("Server shutdown complete")
 
 
@@ -69,6 +69,7 @@ app.add_middleware(
 app.include_router(topology.router)
 app.include_router(devices.router)
 app.include_router(system.router)
+app.include_router(simulation.router)
 
 
 # --------------------------------------------------------------------------- #
