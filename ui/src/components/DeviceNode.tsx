@@ -209,6 +209,7 @@ const statusColor: Record<DeviceStatus, string> = {
   up: 'var(--accent-green)',
   down: 'var(--accent-red)',
   degraded: 'var(--accent-amber)',
+  alerting: 'var(--accent-amber)',
 };
 
 const deviceIcon: Record<Exclude<DeviceType, 'endpoint'>, React.FC> = {

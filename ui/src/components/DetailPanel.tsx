@@ -23,18 +23,21 @@ const statusLabel: Record<DeviceStatus, string> = {
   up: 'UP',
   down: 'DOWN',
   degraded: 'DEGRADED',
+  alerting: 'ALERTING',
 };
 
 const statusColor: Record<DeviceStatus, string> = {
   up: 'var(--accent-green)',
   down: 'var(--accent-red)',
   degraded: 'var(--accent-amber)',
+  alerting: 'var(--accent-amber)',
 };
 
 const statusGlow: Record<DeviceStatus, string> = {
   up: 'rgba(0, 214, 143, 0.25)',
   down: 'rgba(255, 71, 87, 0.25)',
   degraded: 'rgba(245, 166, 35, 0.25)',
+  alerting: 'rgba(245, 166, 35, 0.25)',
 };
 
 const typeLabel: Record<DeviceType, string> = {

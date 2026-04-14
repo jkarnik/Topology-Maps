@@ -27,6 +27,7 @@ services:
     environment:
       - SIMULATOR_HOST=simulator
       - SIMULATOR_REST_PORT=8001
+      - MERAKI_API_KEY=${MERAKI_API_KEY:-}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/status')"]
       interval: 10s

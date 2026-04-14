@@ -49,7 +49,9 @@ export const TopBar: React.FC<TopBarProps> = ({
   onDataSourceChange,
   viewMode,
   onViewModeChange,
-  isConnected,
+  // isConnected is kept in the props interface for future use (e.g. connection badge)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isConnected: _isConnected,
   pollCount,
   simulationRunning,
   simulationRemaining,
@@ -63,10 +65,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   onRefresh,
 }) => {
   const accentColor = dataSource === 'simulated' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
-  const accentBg =
-    dataSource === 'simulated'
-      ? 'rgba(0, 229, 200, 0.15)'
-      : 'rgba(245, 166, 35, 0.15)';
 
   return (
     <header
