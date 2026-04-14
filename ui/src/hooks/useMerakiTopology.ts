@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { L2Topology, L3Topology, ViewMode, Device, DrillDownState } from '../types/topology';
-import { MerakiNetwork, MerakiStatus, RefreshPhase, RefreshProgress } from '../types/meraki';
+import { MerakiNetwork, MerakiStatus, RefreshPhase } from '../types/meraki';
 
 // ---------------------------------------------------------------------------
 // Return type
@@ -71,7 +71,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   const [refreshTotal, setRefreshTotal] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [clientCounts, setClientCounts] = useState<Record<string, number>>({});
+  const [clientCounts] = useState<Record<string, number>>({});
 
   // --- Config state ---------------------------------------------------------
   const [isConfigured, setIsConfigured] = useState(false);
@@ -128,7 +128,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   }, []);
 
   // -------------------------------------------------------------------------
-  // refresh — POST /api/meraki/refresh with streaming SSE body
+  // refresh — fetch L2 + L3 topology via REST endpoints
   // -------------------------------------------------------------------------
 
   const refresh = useCallback(async (networkId?: string) => {
@@ -142,119 +142,49 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     abortControllerRef.current = controller;
 
     setIsRefreshing(true);
-    setRefreshPhase(null);
+    setRefreshPhase('discovery');
     setRefreshProgress(0);
-    setRefreshTotal(0);
+    setRefreshTotal(2);
     setRemainingSeconds(null);
     setError(null);
 
     try {
-      const url = targetNetwork
-        ? `/api/meraki/refresh?network=${encodeURIComponent(targetNetwork)}`
-        : '/api/meraki/refresh';
-      const resp = await fetch(url, {
-        method: 'POST',
+      const networkParam = targetNetwork ? `?network=${encodeURIComponent(targetNetwork)}` : '';
+
+      // Fetch L2 topology
+      setRefreshPhase('topology');
+      setRefreshProgress(1);
+      const l2Resp = await fetch(`/api/meraki/topology/l2${networkParam}`, {
         signal: controller.signal,
       });
-
-      if (!resp.ok) {
-        throw new Error(`Refresh request failed: ${resp.status} ${resp.statusText}`);
+      if (!l2Resp.ok) {
+        throw new Error(`L2 fetch failed: ${l2Resp.status} ${l2Resp.statusText}`);
       }
+      const l2Data = await l2Resp.json() as L2Topology;
+      setL2Topology(l2Data);
 
-      if (!resp.body) {
-        throw new Error('No response body for SSE stream');
+      // Fetch L3 topology
+      setRefreshProgress(2);
+      const l3Resp = await fetch(`/api/meraki/topology/l3${networkParam}`, {
+        signal: controller.signal,
+      });
+      if (!l3Resp.ok) {
+        throw new Error(`L3 fetch failed: ${l3Resp.status} ${l3Resp.statusText}`);
       }
+      const l3Data = await l3Resp.json() as L3Topology;
+      setL3Topology(l3Data);
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        // SSE format: blocks separated by double newline
-        // Each block may contain:
-        //   event: message\n
-        //   data: {...}\n
-        //   \n
-        const blocks = buffer.split(/\n\n/);
-        // Keep the last (potentially incomplete) block in the buffer
-        buffer = blocks.pop() ?? '';
-
-        for (const block of blocks) {
-          if (!block.trim()) continue;
-
-          let dataLine = '';
-          for (const line of block.split('\n')) {
-            if (line.startsWith('data: ')) {
-              dataLine = line.slice('data: '.length);
-            }
-          }
-
-          if (!dataLine) continue;
-
-          let payload: RefreshProgress;
-          try {
-            payload = JSON.parse(dataLine) as RefreshProgress;
-          } catch {
-            continue; // skip malformed lines
-          }
-
-          // Update state based on phase
-          setRefreshPhase(payload.phase);
-
-          switch (payload.phase) {
-            case 'discovery':
-              if (payload.estimated_seconds != null) {
-                setRemainingSeconds(payload.estimated_seconds);
-              }
-              break;
-
-            case 'topology':
-              if (payload.progress != null) setRefreshProgress(payload.progress);
-              if (payload.total != null) setRefreshTotal(payload.total);
-              if (payload.remaining_seconds != null) setRemainingSeconds(payload.remaining_seconds);
-              // Stream partial L2 topology as it arrives (nodes/edges are raw objects)
-              if (payload.nodes && payload.edges) {
-                setL2Topology({
-                  nodes: payload.nodes as unknown as L2Topology['nodes'],
-                  edges: payload.edges as unknown as L2Topology['edges'],
-                });
-              }
-              break;
-
-            case 'clients':
-              if (payload.client_counts) {
-                setClientCounts(payload.client_counts);
-              }
-              if (payload.remaining_seconds != null) setRemainingSeconds(payload.remaining_seconds);
-              break;
-
-            case 'complete':
-              if (payload.l2) {
-                setL2Topology(payload.l2 as unknown as L2Topology);
-              }
-              if (payload.l3) {
-                setL3Topology(payload.l3 as unknown as L3Topology);
-              }
-              setLastUpdated(new Date());
-              setRemainingSeconds(0);
-              break;
-          }
-        }
-      }
+      setRefreshPhase('complete');
+      setLastUpdated(new Date());
+      setRemainingSeconds(0);
     } catch (err) {
       if ((err as Error).name === 'AbortError') {
-        // Intentionally cancelled — not an error
         return;
       }
       setError(err instanceof Error ? err.message : 'Refresh failed');
     } finally {
       setIsRefreshing(false);
+      setRefreshPhase(null);
       abortControllerRef.current = null;
     }
   }, [selectedNetwork]);
