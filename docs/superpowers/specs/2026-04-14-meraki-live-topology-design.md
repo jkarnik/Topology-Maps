@@ -16,7 +16,7 @@ The header bar is restructured into a compact single-row layout:
 
 When "Simulated" is selected:
 - Cyan accent color (unchanged from current)
-- LIVE indicator with WebSocket update count
+- Start/Stop simulation button. When running: green LIVE indicator with update count + countdown timer (10-minute auto-shutdown). When stopped: "Start Simulation" button.
 - L2/L3/Hybrid pills in cyan
 
 When "Meraki Live" is selected:
@@ -84,6 +84,14 @@ This means the frontend reuses all existing visualization components (React Flow
 | Connected clients | `GET /devices/{serial}/clients` |
 | Switch ports | `GET /devices/{serial}/switch/ports` |
 | Wireless SSIDs | `GET /networks/{networkId}/wireless/ssids` |
+
+### Rate Limiting
+
+The server implements a rate limiter for all outbound Meraki API calls, capped at **5 requests per second** to stay within Meraki's documented limit and prevent 429 responses even for large organizations.
+
+- Uses an async token-bucket rate limiter — all Meraki API calls pass through it before executing
+- For a large org refresh (e.g., 20 networks × 4 API calls each = 80 calls), requests are queued and dispatched at 5/sec, taking ~16 seconds total
+- The server reports progress back to the frontend via the refresh response (see Loading Visualization below)
 
 ### Organization Discovery
 
@@ -170,12 +178,51 @@ The detail panel adapts its sections based on device type. All types share a com
 
 ## Data Refresh
 
-- **Simulated source**: Unchanged — WebSocket live updates every 5 seconds
-- **Meraki source**: Manual refresh only
-  - Data fetched on initial tab switch to Meraki
-  - Refresh button triggers a fresh pull from the Meraki API
-  - "Updated Xm ago" timestamp shows data age
-  - No automatic polling — respects API rate limits and user preference
+### Meraki Source — Manual Refresh with Loading Visualization
+
+- Data fetched on initial tab switch to Meraki
+- Refresh button triggers a fresh pull from the Meraki API
+- "Updated Xm ago" timestamp shows data age
+- No automatic polling — respects API rate limits and user preference
+
+**Progressive rendering with countdown during refresh:**
+
+When the user clicks Refresh (or first switches to the Meraki tab), the topology canvas progressively populates with real data as it arrives from the rate-limited API:
+
+1. **Discovery phase** (~1s): "Discovering organization..." message. Server fetches org info + device list.
+2. **Placeholder phase**: All discovered devices appear on the canvas as **gray placeholder nodes** — correct names and type-shapes (hexagon for MX, rectangle for MS, circle for MR) but no color, no edges. A small status bar appears at the top of the canvas: "Refreshing — ~14s remaining" with a progress bar.
+3. **Topology phase**: As each network's link-layer topology and VLAN data returns, those devices **transition from gray to their full color** (red for MX, amber for MS, purple for MR) and edges animate in between them. The progress bar and countdown update with each completed network.
+4. **Client phase**: As per-device client data arrives, client count badges appear on each device node. Devices that have received full data get a subtle checkmark or full-brightness indicator.
+5. **Complete**: The status bar fades out. Refresh button returns to normal. "Updated just now" timestamp appears.
+
+The Refresh button shows a spinner and "Refreshing..." (disabled) throughout.
+
+**Implementation:** The refresh endpoint uses Server-Sent Events (SSE) to stream incremental topology data:
+- `POST /api/meraki/refresh` returns an SSE stream
+- Phase 1 event: `{"phase": "discovery", "device_count": 45, "network_count": 7, "estimated_seconds": 14}`
+- Phase 2 event (per device batch): `{"phase": "devices", "nodes": [...placeholder devices...]}`
+- Phase 3 events (per network): `{"phase": "topology", "network": "HQ-Main", "nodes": [...updated devices...], "edges": [...], "progress": 3, "total": 7, "remaining_seconds": 10}`
+- Phase 4 events (per device batch): `{"phase": "clients", "device_serial": "Q2KN-...", "clients": [...], "remaining_seconds": 4}`
+- Final event: `{"phase": "complete"}`
+- Frontend applies each event incrementally — updating node colors, drawing edges, adding client badges as data streams in
+
+### Simulated Source — Start/Stop Simulation
+
+The Simulated source gets a **Start/Stop** toggle button in the header bar (where the LIVE indicator currently is):
+
+- **Stopped state**: Button shows "Start Simulation". The topology canvas shows an idle message: "Simulation stopped. Click Start to begin." No SNMP polling, no WebSocket updates. Simulator and collector services are not running.
+- **Running state**: Button shows "Stop Simulation" with the existing green LIVE indicator and update count. SNMP polling and WebSocket updates are active as they are today.
+- **Auto-shutdown**: The simulation automatically stops after **10 minutes** of running. A countdown timer appears next to the LIVE indicator (e.g., "LIVE #42 — 7:23 remaining"). When the timer reaches zero, the simulation stops gracefully and the UI returns to the stopped state.
+- **On app load**: Simulation starts in the stopped state by default. The user must explicitly start it.
+
+**Implementation:**
+- New server routes:
+  - `POST /api/simulation/start` — starts the SNMP simulator and collector polling loop, records start time
+  - `POST /api/simulation/stop` — stops the simulator and collector, clears the timer
+  - `GET /api/simulation/status` — returns running/stopped state and remaining time (if running)
+- The server manages a 10-minute timer. When it expires, the server stops the simulator/collector and broadcasts a `simulation_stopped` WebSocket event
+- The frontend shows the countdown by polling `/api/simulation/status` every second (or receiving WebSocket updates with remaining time)
+- When stopped, the existing topology data remains on screen (not cleared) but is static — no live updates
 
 ## Error Handling
 
@@ -187,9 +234,11 @@ The detail panel adapts its sections based on device type. All types share a com
 
 ## Testing
 
-- **Backend**: Unit tests for Meraki data transformation (Meraki API response → L2Topology/L3Topology format). Mock Meraki API responses.
+- **Backend**: Unit tests for Meraki data transformation (Meraki API response → L2Topology/L3Topology format). Mock Meraki API responses. Tests for rate limiter (verify max 5 calls/sec). Tests for simulation start/stop/auto-shutdown lifecycle.
 - **Frontend**: The visualization layer is already tested via the Simulated source. New tests focus on:
   - Source selector state management
   - Network filter dropdown
-  - Refresh button and timestamp display
+  - Refresh button, SSE progress stream, and loading overlay
   - Error states (no API key, API down, empty data)
+  - Simulation start/stop button states and countdown timer
+  - Auto-shutdown transition (running → stopped after timeout)
