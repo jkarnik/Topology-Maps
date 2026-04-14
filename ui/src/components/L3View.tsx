@@ -18,6 +18,7 @@ import type { L3Topology, Subnet } from '../types/topology';
 interface L3ViewProps {
   topology: L3Topology | null;
   onSelectVlan?: (vlanId: number) => void;
+  gatewayLabel?: string;
 }
 
 /* ---------- VLAN color map ---------- */
@@ -266,6 +267,7 @@ const nodeTypes = {
 function buildL3Graph(
   topology: L3Topology,
   onSelectVlan?: (vlanId: number) => void,
+  gatewayLabel: string = 'FortiGate',
 ): { nodes: RFNode[]; edges: RFEdge[] } {
   const nodes: RFNode[] = [];
   const edges: RFEdge[] = [];
@@ -279,7 +281,7 @@ function buildL3Graph(
     id: 'gateway',
     type: 'gatewayNode',
     position: { x: totalWidth / 2 - 80, y: 0 },
-    data: { label: 'FortiGate' },
+    data: { label: gatewayLabel },
     draggable: true,
   });
 
@@ -354,11 +356,11 @@ function buildL3Graph(
 
 /* ---------- Main Component ---------- */
 
-const L3View: React.FC<L3ViewProps> = ({ topology, onSelectVlan }) => {
+const L3View: React.FC<L3ViewProps> = ({ topology, onSelectVlan, gatewayLabel = 'FortiGate' }) => {
   const graph = useMemo(() => {
     if (!topology) return { nodes: [], edges: [] };
-    return buildL3Graph(topology, onSelectVlan);
-  }, [topology, onSelectVlan]);
+    return buildL3Graph(topology, onSelectVlan, gatewayLabel);
+  }, [topology, onSelectVlan, gatewayLabel]);
 
   const handlePaneClick = useCallback(() => {
     // no-op, could deselect in future

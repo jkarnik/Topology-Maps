@@ -29,6 +29,7 @@ interface HybridViewProps {
   l3Topology: L3Topology | null;
   onSelectDevice?: (device: Device | null) => void;
   onSelectVlan?: (vlanId: number) => void;
+  gatewayLabel?: string;
 }
 
 /* ================================================================
@@ -605,6 +606,7 @@ const HybridView: React.FC<HybridViewProps> = ({
   l3Topology,
   onSelectDevice,
   onSelectVlan,
+  gatewayLabel: _gatewayLabel,
 }) => {
   const graph = useMemo(() => {
     if (!l2Topology || !l3Topology) return { nodes: [], edges: [] };

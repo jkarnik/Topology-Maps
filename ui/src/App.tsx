@@ -27,6 +27,13 @@ function App() {
     }
   }, [dataSource, merakiInitialized]);
 
+  // Re-fetch when network filter changes
+  useEffect(() => {
+    if (dataSource === 'meraki' && merakiInitialized) {
+      meraki.refresh();
+    }
+  }, [meraki.selectedNetwork]);
+
   const isSimulated = dataSource === 'simulated';
   const l2 = isSimulated ? topo.l2Topology : meraki.l2Topology;
   const l3 = isSimulated ? topo.l3Topology : meraki.l3Topology;
@@ -90,11 +97,11 @@ function App() {
           </ReactFlowProvider>
         ) : viewMode === 'hybrid' ? (
           <ReactFlowProvider>
-            <HybridView l2Topology={l2} l3Topology={l3} onSelectDevice={setSelectedDevice} onSelectVlan={() => {}} />
+            <HybridView l2Topology={l2} l3Topology={l3} onSelectDevice={setSelectedDevice} onSelectVlan={() => {}} gatewayLabel={isSimulated ? 'FortiGate' : 'Meraki Gateway'} />
           </ReactFlowProvider>
         ) : (
           <ReactFlowProvider>
-            <L3View topology={l3} onSelectVlan={() => {}} />
+            <L3View topology={l3} onSelectVlan={() => {}} gatewayLabel={isSimulated ? 'FortiGate' : 'Meraki Gateway'} />
           </ReactFlowProvider>
         )}
 
