@@ -1,6 +1,6 @@
 // Device types
 export type DeviceType = 'firewall' | 'core_switch' | 'floor_switch' | 'access_point' | 'endpoint';
-export type DeviceStatus = 'up' | 'down' | 'degraded';
+export type DeviceStatus = 'up' | 'down' | 'degraded' | 'alerting';
 export type EndpointCategory = 'payment' | 'operations' | 'employee' | 'security' | 'iot' | 'guest';
 export type LinkProtocol = 'LLDP' | 'ARP' | 'wireless';
 export type RoutingPolicy = 'allow' | 'deny';
@@ -67,7 +67,7 @@ export interface L3Topology {
 }
 
 export interface WSEvent {
-  type: 'topology_update' | 'device_status' | 'connection_change' | 'metrics_update';
+  type: 'topology_update' | 'device_status' | 'connection_change' | 'metrics_update' | 'simulation_stopped';
   data: Record<string, unknown>;
 }
 
@@ -75,6 +75,8 @@ export interface TopologyUpdate {
   l2: L2Topology | null;
   l3: L3Topology | null;
 }
+
+export type DataSource = 'simulated' | 'meraki';
 
 // View modes
 export type ViewMode = 'l2' | 'l3' | 'hybrid';
