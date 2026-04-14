@@ -16,7 +16,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.websocket import WebSocketManager
-from server.routes import topology, devices, connections, system
+from server.routes import topology, devices, system
 from collector.main import create_poller
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,6 @@ app.add_middleware(
 # Include route modules
 app.include_router(topology.router)
 app.include_router(devices.router)
-app.include_router(connections.router)
 app.include_router(system.router)
 
 

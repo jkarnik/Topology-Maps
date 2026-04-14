@@ -5,8 +5,6 @@ interface TopBarProps {
   onViewModeChange: (mode: 'l2' | 'l3' | 'hybrid') => void;
   isConnected: boolean;
   pollCount: number;
-  editMode: boolean;
-  onEditModeToggle: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -14,8 +12,6 @@ export const TopBar: React.FC<TopBarProps> = ({
   onViewModeChange,
   isConnected,
   pollCount,
-  editMode,
-  onEditModeToggle,
 }) => {
   return (
     <header
@@ -97,7 +93,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         })}
       </div>
 
-      {/* Right: Live Indicator + Edit Mode */}
+      {/* Right: Live Indicator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Live Polling Indicator */}
         <div
@@ -134,36 +130,6 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span style={{ color: 'var(--accent-red)', fontWeight: 600 }}>OFFLINE</span>
           )}
         </div>
-
-        {/* Divider */}
-        <div
-          style={{
-            width: '1px',
-            height: '20px',
-            background: 'var(--border-subtle)',
-          }}
-        />
-
-        {/* Edit Mode Button */}
-        <button
-          onClick={onEditModeToggle}
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '11px',
-            fontWeight: editMode ? 700 : 600,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            padding: '6px 14px',
-            borderRadius: '4px',
-            border: `1px solid ${editMode ? 'var(--accent-amber)' : 'var(--border-subtle)'}`,
-            background: editMode ? 'var(--accent-amber)' : 'transparent',
-            color: editMode ? 'var(--bg-primary)' : 'var(--text-secondary)',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          EDIT
-        </button>
       </div>
     </header>
   );

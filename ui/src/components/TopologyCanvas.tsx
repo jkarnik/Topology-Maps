@@ -8,8 +8,6 @@ import {
   useNodesState,
   useEdgesState,
   type NodeMouseHandler,
-  type OnConnect,
-  type EdgeMouseHandler,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -31,9 +29,6 @@ interface TopologyCanvasProps {
   onDrillInto: (deviceId: string, label: string) => void;
   onDrillBack: (index: number) => void;
   onDrillReset: () => void;
-  editMode?: boolean;
-  onEditConnect?: (source: string, target: string) => void;
-  onEditDisconnect?: (edgeId: string, source: string, target: string) => void;
   deviceAnimations?: Map<string, 'new' | 'removing'>;
   pinnedDeviceIds?: Set<string>;
 }
@@ -57,9 +52,6 @@ export default function TopologyCanvas({
   onDrillInto,
   onDrillBack,
   onDrillReset,
-  editMode = false,
-  onEditConnect,
-  onEditDisconnect,
   deviceAnimations,
   pinnedDeviceIds,
 }: TopologyCanvasProps) {
@@ -119,26 +111,6 @@ export default function TopologyCanvas({
     onSelectDevice(null);
   }, [onSelectDevice]);
 
-  // Edit mode: handle new connection via drag between handles
-  const handleConnect: OnConnect = useCallback(
-    (connection) => {
-      if (!editMode || !onEditConnect) return;
-      if (connection.source && connection.target) {
-        onEditConnect(connection.source, connection.target);
-      }
-    },
-    [editMode, onEditConnect],
-  );
-
-  // Edit mode: click edge to disconnect
-  const handleEdgeClick: EdgeMouseHandler = useCallback(
-    (_event, edge) => {
-      if (!editMode || !onEditDisconnect) return;
-      onEditDisconnect(edge.id, edge.source, edge.target);
-    },
-    [editMode, onEditDisconnect],
-  );
-
   // MiniMap node color by device type
   const miniMapNodeColor = useCallback((node: { data: Record<string, unknown> }) => {
     const device = node.data.device as Device | undefined;
@@ -157,7 +129,7 @@ export default function TopologyCanvas({
 
   return (
     <div
-      className={`topology-canvas${editMode ? ' edit-mode-active' : ''}`}
+      className="topology-canvas"
       style={{ width: '100%', height: '100%' }}
     >
       <ReactFlow
@@ -170,8 +142,6 @@ export default function TopologyCanvas({
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleNodeDoubleClick}
         onPaneClick={handlePaneClick}
-        onConnect={handleConnect}
-        onEdgeClick={handleEdgeClick}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.15}
