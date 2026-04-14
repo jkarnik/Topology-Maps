@@ -17,4 +17,5 @@ jobs:
           script: |
             cd ~/topology-maps
             git pull origin master
+            export MERAKI_API_KEY=${{ secrets.MERAKI_API_KEY }}
             docker compose up -d --build
