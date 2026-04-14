@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* NOC Dark Theme */
+  --bg-primary: #0a0e14;
+  --bg-secondary: #111822;
+  --bg-tertiary: #1a2332;
+  --bg-surface: #141c28;
+  --bg-elevated: #1e2a3a;
+
+  /* Accent Colors */
+  --accent-cyan: #00e5c8;
+  --accent-cyan-dim: #00b39e;
+  --accent-cyan-glow: rgba(0, 229, 200, 0.15);
+  --accent-amber: #f5a623;
+  --accent-amber-dim: #c4841c;
+  --accent-amber-glow: rgba(245, 166, 35, 0.15);
+  --accent-red: #ff4757;
+  --accent-red-dim: #cc3945;
+  --accent-red-glow: rgba(255, 71, 87, 0.15);
+  --accent-blue: #4c9aff;
+  --accent-purple: #b07aff;
+  --accent-green: #00d68f;
+
+  /* Text */
+  --text-primary: #e4eaf5;
+  --text-secondary: #8899aa;
+  --text-muted: #556677;
+
+  /* Borders */
+  --border-subtle: rgba(136, 153, 170, 0.12);
+  --border-active: rgba(0, 229, 200, 0.3);
+
+  /* Device type colors */
+  --device-firewall: #ff4757;
+  --device-core-switch: #4c9aff;
+  --device-floor-switch: #f5a623;
+  --device-ap: #b07aff;
+  --device-endpoint: #556677;
+
+  /* Endpoint category colors (from Retail Endpoints & IoT Peripherals) */
+  --ep-payment: #ff6b6b;      /* PCI / Payment — warm red (POS, receipt printers) */
+  --ep-operations: #4ecdc4;   /* Operations — teal (inventory PCs, printers) */
+  --ep-employee: #45b7d1;     /* Employee Mobility — sky blue (Zebra scanners, Vocera) */
+  --ep-security: #f7b731;     /* Security & Safety — gold (IP cameras, NVRs) */
+  --ep-iot: #26de81;          /* Retail IoT — green (signage, sensors, ESL) */
+  --ep-guest: #a55eea;        /* Guest Wi-Fi — violet (customer phones, tablets) */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* React Flow overrides */
+.react-flow__background {
+  background: var(--bg-primary) !important;
+}
+
+.react-flow__minimap {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__controls {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__controls-button {
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
+  fill: var(--text-secondary) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--bg-tertiary) !important;
+  color: var(--accent-cyan) !important;
+  fill: var(--accent-cyan) !important;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Subtle grid pattern for canvas background */
+.topology-canvas {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(136, 153, 170, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Glow effects */
+.glow-cyan {
+  box-shadow: 0 0 12px rgba(0, 229, 200, 0.2), 0 0 4px rgba(0, 229, 200, 0.1);
+}
+
+.glow-amber {
+  box-shadow: 0 0 12px rgba(245, 166, 35, 0.2), 0 0 4px rgba(245, 166, 35, 0.1);
+}
+
+.glow-red {
+  box-shadow: 0 0 12px rgba(255, 71, 87, 0.2), 0 0 4px rgba(255, 71, 87, 0.1);
+}
+
+/* Pulse animation for live indicator */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Spinner for edit mode apply */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Edit mode canvas overrides ---------- */
+
+/* Make handles visible when edit mode is active */
+.edit-mode-active .react-flow__handle {
+  opacity: 1 !important;
+  width: 8px !important;
+  height: 8px !important;
+  border: 2px solid var(--accent-amber) !important;
+  background: var(--bg-elevated) !important;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.edit-mode-active .react-flow__handle:hover {
+  background: var(--accent-amber) !important;
+  transform: scale(1.4);
+}
+
+/* Edge hover effect in edit mode — red highlight for disconnect */
+.edit-mode-active .react-flow__edge-path {
+  cursor: pointer;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+
+.edit-mode-active .react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--accent-red) !important;
+  stroke-width: 3 !important;
+  stroke-opacity: 1 !important;
+}
+
+/* Connection line style in edit mode */
+.edit-mode-active .react-flow__connection-path {
+  stroke: var(--accent-amber) !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: 6 4 !important;
+}
