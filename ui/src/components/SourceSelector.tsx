@@ -8,18 +8,18 @@ interface SourceSelectorProps {
 
 const SOURCES: { id: DataSource; label: string; tag: string; accent: string; tagBg: string }[] = [
   {
-    id: 'simulated',
-    label: 'Simulated',
-    tag: 'SNMP',
-    accent: 'var(--accent-cyan)',
-    tagBg: 'rgba(0, 229, 200, 0.12)',
-  },
-  {
     id: 'meraki',
     label: 'Meraki Live',
     tag: 'API',
     accent: 'var(--accent-amber)',
     tagBg: 'rgba(245, 166, 35, 0.12)',
+  },
+  {
+    id: 'simulated',
+    label: 'Simulated',
+    tag: 'SNMP',
+    accent: 'var(--accent-cyan)',
+    tagBg: 'rgba(0, 229, 200, 0.12)',
   },
 ];
 

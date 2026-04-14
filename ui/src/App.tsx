@@ -13,7 +13,7 @@ import HybridView from './components/HybridView';
 import type { DataSource } from './types/topology';
 
 function App() {
-  const [dataSource, setDataSource] = useState<DataSource>('simulated');
+  const [dataSource, setDataSource] = useState<DataSource>('meraki');
   const sim = useSimulation();
   const topo = useTopology();
   const meraki = useMerakiTopology();
