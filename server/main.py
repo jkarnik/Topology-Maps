@@ -16,7 +16,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.websocket import WebSocketManager
-from server.routes import topology, devices, system, simulation
+from server.routes import topology, devices, system, simulation, meraki
 from collector.main import create_poller
 
 logger = logging.getLogger(__name__)
@@ -70,6 +70,7 @@ app.include_router(topology.router)
 app.include_router(devices.router)
 app.include_router(system.router)
 app.include_router(simulation.router)
+app.include_router(meraki.router)
 
 
 # --------------------------------------------------------------------------- #

@@ -4,3 +4,4 @@ websockets==15.0.1
 pydantic==2.11.1
 aiosqlite==0.21.0
 httpx==0.28.1
+sse-starlette==2.2.1
