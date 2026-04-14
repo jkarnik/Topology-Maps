@@ -216,22 +216,24 @@ class MerakiTransformer:
 
 def _extract_serial(end: dict) -> Optional[str]:
     """Return the device serial from a link-layer end object."""
-    return end.get("device", {}).get("serial")
+    device = end.get("device") or {}
+    return device.get("serial")
 
 
 def _extract_port(end: dict) -> Optional[str]:
     """Return the port ID from a link-layer end object (LLDP preferred, then CDP)."""
-    discovered = end.get("discovered", {})
-    lldp_port = discovered.get("lldp", {}).get("portId")
+    discovered = end.get("discovered") or {}
+    lldp = discovered.get("lldp") or {}
+    lldp_port = lldp.get("portId")
     if lldp_port:
         return lldp_port
-    cdp_port = discovered.get("cdp", {}).get("portId")
-    return cdp_port
+    cdp = discovered.get("cdp") or {}
+    return cdp.get("portId")
 
 
 def _detect_protocol(end_a: dict, end_b: dict) -> LinkProtocol:
     """Detect the link protocol used — LLDP if either end has LLDP data."""
     for end in (end_a, end_b):
-        if end.get("discovered", {}).get("lldp"):
+        if (end.get("discovered") or {}).get("lldp"):
             return LinkProtocol.LLDP
     return LinkProtocol.LLDP  # default to LLDP for wired links

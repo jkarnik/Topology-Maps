@@ -18,12 +18,12 @@ function App() {
   const topo = useTopology();
   const meraki = useMerakiTopology();
 
-  // First-switch trigger for Meraki
+  // First-switch trigger for Meraki: fetch networks then refresh
   const [merakiInitialized, setMerakiInitialized] = useState(false);
   useEffect(() => {
     if (dataSource === 'meraki' && !merakiInitialized) {
       setMerakiInitialized(true);
-      meraki.refresh();
+      meraki.fetchNetworks().then(() => meraki.refresh());
     }
   }, [dataSource, merakiInitialized]);
 

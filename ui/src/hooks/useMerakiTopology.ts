@@ -133,10 +133,6 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
 
   const refresh = useCallback(async (networkId?: string) => {
     const targetNetwork = networkId ?? selectedNetwork;
-    if (!targetNetwork) {
-      setError('No network selected for refresh');
-      return;
-    }
 
     // Cancel any previous in-flight refresh
     if (abortControllerRef.current) {
@@ -153,7 +149,9 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     setError(null);
 
     try {
-      const url = `/api/meraki/refresh?network=${encodeURIComponent(targetNetwork)}`;
+      const url = targetNetwork
+        ? `/api/meraki/refresh?network=${encodeURIComponent(targetNetwork)}`
+        : '/api/meraki/refresh';
       const resp = await fetch(url, {
         method: 'POST',
         signal: controller.signal,

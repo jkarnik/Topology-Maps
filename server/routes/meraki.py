@@ -125,16 +125,15 @@ async def get_networks():
 
 
 @router.get("/topology/l2")
-async def get_l2_topology(network: str = Query(..., description="Network ID")):
+async def get_l2_topology(network: Optional[str] = Query(None, description="Network ID")):
     """Return L2 topology for a specific network."""
     org_id = await _get_org_id()
     client = _get_client()
 
     try:
-        devices, statuses, link_layer = await asyncio.gather(
+        devices, statuses = await asyncio.gather(
             client.get_org_devices(org_id),
             client.get_org_device_statuses(org_id),
-            client.get_network_topology(network),
         )
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
@@ -142,9 +141,23 @@ async def get_l2_topology(network: str = Query(..., description="Network ID")):
             detail=f"Meraki API error: {exc.response.text}",
         ) from exc
 
-    # Filter devices to this network
-    net_devices = [d for d in devices if d.get("networkId") == network]
-    l2 = _transformer.build_l2(net_devices, statuses, [link_layer])
+    # Filter devices to network if specified
+    if network:
+        devices = [d for d in devices if d.get("networkId") == network]
+        network_ids = [network]
+    else:
+        network_ids = list({d.get("networkId") for d in devices if d.get("networkId")})
+
+    # Fetch link-layer topology per network
+    all_link_layer = []
+    for nid in network_ids:
+        try:
+            ll = await client.get_network_topology(nid)
+            all_link_layer.append(ll)
+        except Exception:
+            logger.warning("Failed to get link-layer for network %s", nid)
+
+    l2 = _transformer.build_l2(devices, statuses, all_link_layer)
     return l2.model_dump()
 
 
@@ -154,24 +167,35 @@ async def get_l2_topology(network: str = Query(..., description="Network ID")):
 
 
 @router.get("/topology/l3")
-async def get_l3_topology(network: str = Query(..., description="Network ID")):
+async def get_l3_topology(network: Optional[str] = Query(None, description="Network ID")):
     """Return L3 topology for a specific network."""
     org_id = await _get_org_id()
     client = _get_client()
 
     try:
-        devices, vlans = await asyncio.gather(
-            client.get_org_devices(org_id),
-            client.get_network_vlans(network),
-        )
+        devices = await client.get_org_devices(org_id)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=exc.response.status_code,
             detail=f"Meraki API error: {exc.response.text}",
         ) from exc
 
-    net_devices = [d for d in devices if d.get("networkId") == network]
-    l3 = _transformer.build_l3({network: vlans}, net_devices)
+    if network:
+        devices = [d for d in devices if d.get("networkId") == network]
+        network_ids = [network]
+    else:
+        network_ids = list({d.get("networkId") for d in devices if d.get("networkId")})
+
+    vlans_by_network = {}
+    for nid in network_ids:
+        try:
+            vlans = await client.get_network_vlans(nid)
+            if vlans:
+                vlans_by_network[nid] = vlans
+        except Exception:
+            logger.warning("Failed to get VLANs for network %s", nid)
+
+    l3 = _transformer.build_l3(vlans_by_network, devices)
     return l3.model_dump()
 
 
@@ -211,7 +235,7 @@ async def get_device_detail(serial: str):
 
 
 @router.post("/refresh")
-async def refresh_topology(network: str = Query(..., description="Network ID")):
+async def refresh_topology(network: Optional[str] = Query(None, description="Network ID")):
     """Stream a progressive topology refresh over Server-Sent Events.
 
     Phases emitted:
@@ -257,10 +281,12 @@ async def refresh_topology(network: str = Query(..., description="Network ID")):
             }),
         }
 
-        # Narrow to the requested network (or all if matching)
-        target_networks = [n for n in networks_list if n.get("id") == network]
-        if not target_networks:
-            # Fall back to all networks so the response is still useful
+        # Narrow to the requested network, or use all
+        if network:
+            target_networks = [n for n in networks_list if n.get("id") == network]
+            if not target_networks:
+                target_networks = networks_list
+        else:
             target_networks = networks_list
 
         # ------------------------------------------------------------------ #
@@ -307,7 +333,8 @@ async def refresh_topology(network: str = Query(..., description="Network ID")):
         # ------------------------------------------------------------------ #
         # Phase 3: clients
         # ------------------------------------------------------------------ #
-        net_devices_flat = [d for d in devices if d.get("networkId") == network]
+        target_network_ids = {n.get("id") for n in target_networks}
+        net_devices_flat = [d for d in devices if d.get("networkId") in target_network_ids]
         client_counts: dict[str, int] = {}
 
         for dev in net_devices_flat:
@@ -335,9 +362,9 @@ async def refresh_topology(network: str = Query(..., description="Network ID")):
         # ------------------------------------------------------------------ #
         # Phase 4: complete — full L2 + L3
         # ------------------------------------------------------------------ #
-        net_devices_for_target = [d for d in devices if d.get("networkId") == network]
-        final_l2 = _transformer.build_l2(net_devices_for_target, statuses, all_link_layer)
-        final_l3 = _transformer.build_l3(vlans_by_network, net_devices_for_target)
+        final_devices = [d for d in devices if d.get("networkId") in target_network_ids]
+        final_l2 = _transformer.build_l2(final_devices, statuses, all_link_layer)
+        final_l3 = _transformer.build_l3(vlans_by_network, final_devices)
 
         yield {
             "event": "message",
