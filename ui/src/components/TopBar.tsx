@@ -1,18 +1,73 @@
 import React from 'react';
+import { DataSource, ViewMode } from '../types/topology';
+import { MerakiNetwork } from '../types/meraki';
+import { SourceSelector } from './SourceSelector';
+import { NetworkFilter } from './NetworkFilter';
 
 interface TopBarProps {
-  viewMode: 'l2' | 'l3' | 'hybrid';
-  onViewModeChange: (mode: 'l2' | 'l3' | 'hybrid') => void;
+  dataSource: DataSource;
+  onDataSourceChange: (source: DataSource) => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
   isConnected: boolean;
   pollCount: number;
+  simulationRunning: boolean;
+  simulationRemaining: number;
+  onSimulationStart: () => void;
+  onSimulationStop: () => void;
+  merakiNetworks: MerakiNetwork[];
+  selectedNetwork: string | null;
+  onNetworkChange: (id: string | null) => void;
+  isRefreshing: boolean;
+  lastUpdated: Date | null;
+  onRefresh: () => void;
 }
 
+/** Convert seconds to "M:SS" format */
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+/** Convert a past Date to "Xm ago" or "just now" */
+function formatAgo(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1) return 'just now';
+  return `${diffMin}m ago`;
+}
+
+const VIEW_MODES: { id: ViewMode; label: string }[] = [
+  { id: 'l2', label: 'L2' },
+  { id: 'hybrid', label: 'L2+L3' },
+  { id: 'l3', label: 'L3' },
+];
+
 export const TopBar: React.FC<TopBarProps> = ({
+  dataSource,
+  onDataSourceChange,
   viewMode,
   onViewModeChange,
   isConnected,
   pollCount,
+  simulationRunning,
+  simulationRemaining,
+  onSimulationStart,
+  onSimulationStop,
+  merakiNetworks,
+  selectedNetwork,
+  onNetworkChange,
+  isRefreshing,
+  lastUpdated,
+  onRefresh,
 }) => {
+  const accentColor = dataSource === 'simulated' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+  const accentBg =
+    dataSource === 'simulated'
+      ? 'rgba(0, 229, 200, 0.15)'
+      : 'rgba(245, 166, 35, 0.15)';
+
   return (
     <header
       style={{
@@ -21,39 +76,27 @@ export const TopBar: React.FC<TopBarProps> = ({
         borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
         padding: '0 20px',
+        gap: '12px',
         flexShrink: 0,
         position: 'relative',
         zIndex: 50,
+        fontFamily: "'JetBrains Mono', monospace",
       }}
     >
-      {/* Left: App Title */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-        <span
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '15px',
-            fontWeight: 700,
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: 'var(--text-primary)',
-            lineHeight: 1,
-          }}
-        >
-          TOPOLOGY
-        </span>
-        <div
-          style={{
-            height: '2px',
-            width: '100%',
-            background: 'var(--accent-cyan)',
-            borderRadius: '1px',
-          }}
-        />
-      </div>
+      {/* Left: Source selector */}
+      <SourceSelector value={dataSource} onChange={onDataSourceChange} />
 
-      {/* Center: L2 / L3 Toggle */}
+      {/* Network filter — Meraki only */}
+      {dataSource === 'meraki' && (
+        <NetworkFilter
+          networks={merakiNetworks}
+          value={selectedNetwork}
+          onChange={onNetworkChange}
+        />
+      )}
+
+      {/* Center: View mode pills */}
       <div
         style={{
           display: 'flex',
@@ -63,14 +106,15 @@ export const TopBar: React.FC<TopBarProps> = ({
           borderRadius: '999px',
           padding: '3px',
           gap: '2px',
+          marginLeft: dataSource === 'meraki' ? '0' : '4px',
         }}
       >
-        {([['l2', 'L2'], ['hybrid', 'L2+L3'], ['l3', 'L3']] as const).map(([mode, label]) => {
-          const isActive = viewMode === mode;
+        {VIEW_MODES.map(({ id, label }) => {
+          const isActive = viewMode === id;
           return (
             <button
-              key={mode}
-              onClick={() => onViewModeChange(mode)}
+              key={id}
+              onClick={() => onViewModeChange(id)}
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '12px',
@@ -82,7 +126,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background 0.15s ease, color 0.15s ease',
-                background: isActive ? 'var(--accent-cyan)' : 'transparent',
+                background: isActive ? accentColor : 'transparent',
                 color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
                 lineHeight: 1,
               }}
@@ -93,43 +137,171 @@ export const TopBar: React.FC<TopBarProps> = ({
         })}
       </div>
 
-      {/* Right: Live Indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Live Polling Indicator */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '7px',
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '11px',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <span
-            className={isConnected ? 'animate-pulse-dot' : undefined}
-            style={{
-              display: 'inline-block',
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: isConnected ? 'var(--accent-green)' : 'var(--accent-red)',
-              boxShadow: isConnected
-                ? '0 0 6px rgba(0, 214, 143, 0.6)'
-                : '0 0 6px rgba(255, 71, 87, 0.5)',
-              flexShrink: 0,
-            }}
-          />
-          {isConnected ? (
-            <span style={{ color: 'var(--text-secondary)' }}>
-              <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>LIVE</span>
-              {' '}
-              <span style={{ color: 'var(--text-muted)' }}>#{pollCount}</span>
-            </span>
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Right controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {dataSource === 'simulated' ? (
+          simulationRunning ? (
+            <>
+              {/* Live indicator */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '7px',
+                  fontSize: '11px',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                <span
+                  className="animate-pulse-dot"
+                  style={{
+                    display: 'inline-block',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-green)',
+                    boxShadow: '0 0 6px rgba(0, 214, 143, 0.6)',
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>LIVE</span>
+                <span style={{ color: 'var(--text-muted)' }}>#{pollCount}</span>
+              </div>
+
+              {/* Countdown */}
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--accent-amber)',
+                  fontWeight: 500,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {formatTime(simulationRemaining)} remaining
+              </div>
+
+              {/* Stop button */}
+              <button
+                onClick={onSimulationStop}
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '5px 14px',
+                  height: '30px',
+                  borderRadius: '5px',
+                  border: '1px solid var(--accent-red)',
+                  cursor: 'pointer',
+                  background: 'rgba(255, 71, 87, 0.12)',
+                  color: 'var(--accent-red)',
+                  transition: 'background 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 71, 87, 0.22)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 71, 87, 0.12)';
+                }}
+              >
+                Stop
+              </button>
+            </>
           ) : (
-            <span style={{ color: 'var(--accent-red)', fontWeight: 600 }}>OFFLINE</span>
-          )}
-        </div>
+            /* Start simulation button */
+            <button
+              onClick={onSimulationStart}
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                padding: '5px 16px',
+                height: '30px',
+                borderRadius: '5px',
+                border: '1px solid var(--accent-cyan)',
+                cursor: 'pointer',
+                background: 'rgba(0, 229, 200, 0.12)',
+                color: 'var(--accent-cyan)',
+                transition: 'background 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 229, 200, 0.22)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 229, 200, 0.12)';
+              }}
+            >
+              Start Simulation
+            </button>
+          )
+        ) : (
+          /* Meraki right controls */
+          <>
+            {/* Last updated timestamp */}
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.06em',
+              }}
+            >
+              Updated{' '}
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {lastUpdated ? formatAgo(lastUpdated) : '—'}
+              </span>
+            </span>
+
+            {/* Refresh button */}
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              title="Refresh topology"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '30px',
+                height: '30px',
+                borderRadius: '5px',
+                border: '1px solid var(--border-subtle)',
+                cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                background: 'var(--bg-tertiary)',
+                color: isRefreshing ? 'var(--text-muted)' : 'var(--accent-amber)',
+                opacity: isRefreshing ? 0.6 : 1,
+                transition: 'opacity 0.15s ease, color 0.15s ease',
+              }}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                className={isRefreshing ? 'spin' : undefined}
+                style={{ color: 'inherit' }}
+              >
+                <path
+                  d="M12.5 2.5A6 6 0 1 1 7 1"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M7 1l2.5 2.5L7 6"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
     </header>
   );
