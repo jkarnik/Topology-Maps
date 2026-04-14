@@ -77,7 +77,7 @@ export interface TopologyUpdate {
 }
 
 // View modes
-export type ViewMode = 'l2' | 'l3';
+export type ViewMode = 'l2' | 'l3' | 'hybrid';
 
 // Drill-down state
 export interface DrillDownState {

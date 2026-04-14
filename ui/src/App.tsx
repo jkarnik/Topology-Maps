@@ -6,6 +6,7 @@ import TopologyCanvas from './components/TopologyCanvas';
 import EditMode from './components/EditMode';
 import DetailPanel from './components/DetailPanel';
 import L3View from './components/L3View';
+import HybridView from './components/HybridView';
 
 function App() {
   const {
@@ -78,6 +79,15 @@ function App() {
               pinnedDeviceIds={pinnedDeviceIds}
             />
           </ReactFlowProvider>
+        ) : viewMode === 'hybrid' ? (
+          <ReactFlowProvider>
+            <HybridView
+              l2Topology={l2Topology}
+              l3Topology={l3Topology}
+              onSelectDevice={setSelectedDevice}
+              onSelectVlan={() => {}}
+            />
+          </ReactFlowProvider>
         ) : (
           <ReactFlowProvider>
             <L3View topology={l3Topology} onSelectVlan={() => {}} />
@@ -85,7 +95,7 @@ function App() {
         )}
 
         {/* Detail panel — slides in from right when a device is selected */}
-        {viewMode === 'l2' && (
+        {(viewMode === 'l2' || viewMode === 'hybrid') && (
           <DetailPanel
             device={selectedDevice}
             topology={l2Topology}

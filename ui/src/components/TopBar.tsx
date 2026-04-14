@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface TopBarProps {
-  viewMode: 'l2' | 'l3';
-  onViewModeChange: (mode: 'l2' | 'l3') => void;
+  viewMode: 'l2' | 'l3' | 'hybrid';
+  onViewModeChange: (mode: 'l2' | 'l3' | 'hybrid') => void;
   isConnected: boolean;
   pollCount: number;
   editMode: boolean;
@@ -69,7 +69,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           gap: '2px',
         }}
       >
-        {(['l2', 'l3'] as const).map((mode) => {
+        {([['l2', 'L2'], ['hybrid', 'L2+L3'], ['l3', 'L3']] as const).map(([mode, label]) => {
           const isActive = viewMode === mode;
           return (
             <button
@@ -91,7 +91,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 lineHeight: 1,
               }}
             >
-              {mode.toUpperCase()}
+              {label}
             </button>
           );
         })}
