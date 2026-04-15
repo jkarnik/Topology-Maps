@@ -141,17 +141,22 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    // Clear old data and reset state for clean transition
+    setL2Topology(null);
+    setL3Topology(null);
+    setSelectedDevice(null);
+    setDrillDown({ path: [], currentDeviceId: null, currentVlanId: null });
     setIsRefreshing(true);
     setRefreshPhase('discovery');
     setRefreshProgress(0);
-    setRefreshTotal(2);
+    setRefreshTotal(3);
     setRemainingSeconds(null);
     setError(null);
 
     try {
       const networkParam = targetNetwork ? `?network=${encodeURIComponent(targetNetwork)}` : '';
 
-      // Fetch L2 topology
+      // Step 1: Fetch L2 topology (devices + infrastructure edges)
       setRefreshPhase('topology');
       setRefreshProgress(1);
       const l2Resp = await fetch(`/api/meraki/topology/l2${networkParam}`, {
@@ -163,7 +168,8 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       const l2Data = await l2Resp.json() as L2Topology;
       setL2Topology(l2Data);
 
-      // Fetch L3 topology
+      // Step 2: Fetch L3 topology (VLANs + subnets)
+      setRefreshPhase('clients');
       setRefreshProgress(2);
       const l3Resp = await fetch(`/api/meraki/topology/l3${networkParam}`, {
         signal: controller.signal,
@@ -174,6 +180,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       const l3Data = await l3Resp.json() as L3Topology;
       setL3Topology(l3Data);
 
+      setRefreshProgress(3);
       setRefreshPhase('complete');
       setLastUpdated(new Date());
       setRemainingSeconds(0);

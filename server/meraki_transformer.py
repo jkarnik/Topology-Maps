@@ -45,6 +45,7 @@ class MerakiTransformer:
         devices: list[dict],
         device_statuses: list[dict],
         link_layer_data: list[dict],
+        clients_by_ap: Optional[dict[str, list[dict]]] = None,
     ) -> L2Topology:
         """Build an L2 topology from Meraki device and link-layer data.
 
@@ -54,6 +55,9 @@ class MerakiTransformer:
                 GET /organizations/{id}/devices/statuses.
             link_layer_data: List of link-layer topology objects from
                 GET /networks/{id}/topology/linkLayer, one per network.
+            clients_by_ap: Optional dict of AP serial → client list.
+                When provided, clients are added as endpoint nodes with
+                wireless edges to their AP.
 
         Returns:
             L2Topology with nodes and edges populated.
@@ -89,6 +93,32 @@ class MerakiTransformer:
             )
 
         edges = self._build_edges(link_layer_data)
+
+        # Add wireless clients as endpoint nodes connected to APs
+        if clients_by_ap:
+            for ap_serial, clients in clients_by_ap.items():
+                for c in clients:
+                    client_id = c.get("id") or c.get("mac", "")
+                    if not client_id:
+                        continue
+                    client_name = c.get("description") or c.get("dhcpHostname") or c.get("mac", "Unknown")
+                    nodes.append(Device(
+                        id=client_id,
+                        type=DeviceType.ENDPOINT,
+                        model=c.get("os", "Client"),
+                        ip=c.get("ip", ""),
+                        status=DeviceStatus.UP,
+                        mac=c.get("mac"),
+                        vlan=c.get("vlan"),
+                        connected_ap=ap_serial,
+                        ssid=c.get("ssid"),
+                    ))
+                    edges.append(Edge(
+                        id=f"{ap_serial}-{client_id}",
+                        source=ap_serial,
+                        target=client_id,
+                        protocol=LinkProtocol.WIRELESS,
+                    ))
 
         return L2Topology(nodes=nodes, edges=edges)
 

@@ -157,7 +157,18 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
         except Exception:
             logger.warning("Failed to get link-layer for network %s", nid)
 
-    l2 = _transformer.build_l2(devices, statuses, all_link_layer)
+    # Fetch clients for APs to show wireless connections
+    ap_serials = [d["serial"] for d in devices if d.get("productType") == "wireless" and d.get("serial")]
+    clients_by_ap: dict[str, list[dict]] = {}
+    for serial in ap_serials:
+        try:
+            clients = await client.get_device_clients(serial)
+            if clients:
+                clients_by_ap[serial] = clients
+        except Exception:
+            pass
+
+    l2 = _transformer.build_l2(devices, statuses, all_link_layer, clients_by_ap)
     return l2.model_dump()
 
 

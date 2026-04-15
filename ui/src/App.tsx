@@ -110,7 +110,6 @@ function App() {
             phase={meraki.refreshPhase}
             progress={meraki.refreshProgress}
             total={meraki.refreshTotal}
-            remainingSeconds={meraki.remainingSeconds ?? 0}
           />
         )}
 

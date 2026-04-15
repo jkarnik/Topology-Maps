@@ -7,16 +7,15 @@ interface RefreshOverlayProps {
   phase: RefreshPhase | null;
   progress: number;
   total: number;
-  remainingSeconds: number;
 }
 
 /* ---------- Helpers ---------- */
 
 const phaseLabel: Record<RefreshPhase, string> = {
-  discovery: 'Discovering organization...',
+  discovery: 'Discovering devices...',
   devices: 'Placing devices...',
-  topology: 'Building topology',
-  clients: 'Loading clients',
+  topology: 'Fetching topology & clients...',
+  clients: 'Loading VLANs & subnets...',
   complete: 'Complete',
 };
 
@@ -26,7 +25,6 @@ const RefreshOverlay: React.FC<RefreshOverlayProps> = ({
   phase,
   progress,
   total,
-  remainingSeconds,
 }) => {
   // Hide when no phase or complete
   if (phase === null || phase === 'complete') return null;
@@ -43,10 +41,8 @@ const RefreshOverlay: React.FC<RefreshOverlayProps> = ({
 
   // Detail text
   let detailText = '';
-  if (phase === 'topology' && total > 0) {
-    detailText = `${progress}/${total} networks`;
-  } else if (remainingSeconds > 0) {
-    detailText = `~${remainingSeconds}s remaining`;
+  if (total > 0) {
+    detailText = `Step ${progress}/${total}`;
   }
 
   return (
