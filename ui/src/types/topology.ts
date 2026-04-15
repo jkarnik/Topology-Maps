@@ -16,6 +16,7 @@ export interface DeviceInterface {
 
 export interface Device {
   id: string;
+  name?: string | null;
   type: DeviceType;
   model: string;
   ip: string;
@@ -28,6 +29,21 @@ export interface Device {
   connected_ap: string | null;
   ssid: string | null;
   rssi: number | null;
+  // Extended Meraki fields
+  firmware?: string | null;
+  public_ip?: string | null;
+  gateway?: string | null;
+  primary_dns?: string | null;
+  secondary_dns?: string | null;
+  address?: string | null;
+  tags?: string[];
+  notes?: string | null;
+  last_reported_at?: string | null;
+  config_updated_at?: string | null;
+  ip_type?: string | null;
+  dashboard_url?: string | null;
+  network_id?: string | null;
+  software_version?: string | null;
 }
 
 export interface Edge {

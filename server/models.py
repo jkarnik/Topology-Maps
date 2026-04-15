@@ -56,6 +56,7 @@ class Interface(BaseModel):
 
 class Device(BaseModel):
     id: str
+    name: Optional[str] = None
     type: DeviceType
     model: str
     ip: str
@@ -68,6 +69,21 @@ class Device(BaseModel):
     connected_ap: Optional[str] = None  # For wireless clients
     ssid: Optional[str] = None
     rssi: Optional[int] = None  # Signal strength in dBm
+    # Extended Meraki fields
+    firmware: Optional[str] = None
+    public_ip: Optional[str] = None
+    gateway: Optional[str] = None
+    primary_dns: Optional[str] = None
+    secondary_dns: Optional[str] = None
+    address: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    notes: Optional[str] = None
+    last_reported_at: Optional[str] = None
+    config_updated_at: Optional[str] = None
+    ip_type: Optional[str] = None
+    dashboard_url: Optional[str] = None
+    network_id: Optional[str] = None
+    software_version: Optional[str] = None
 
 
 # --- Edge / Connection Models ---

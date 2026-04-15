@@ -278,6 +278,7 @@ const shapeConfigs: Record<DeviceType, ShapeConfig> = {
 const DeviceNode = memo(({ data }: NodeProps) => {
   const { device, animationState } = data as DeviceNodeData;
   const { type, status, id } = device;
+  const label = device.name || id;
   // Endpoints use their category color; infrastructure uses device type color
   const color = type === 'endpoint' && device.category
     ? endpointCategoryColor[device.category]
@@ -397,7 +398,7 @@ const DeviceNode = memo(({ data }: NodeProps) => {
                 lineHeight: 1.3,
               }}
             >
-              {id}
+              {label}
             </div>
             <div
               style={{
@@ -438,7 +439,7 @@ const DeviceNode = memo(({ data }: NodeProps) => {
                 lineHeight: 1.3,
               }}
             >
-              {id}
+              {label}
             </div>
             <div
               style={{
@@ -483,7 +484,7 @@ const DeviceNode = memo(({ data }: NodeProps) => {
                   lineHeight: 1.3,
                 }}
               >
-                {id}
+                {label}
               </div>
               <div
                 style={{
@@ -530,7 +531,7 @@ const DeviceNode = memo(({ data }: NodeProps) => {
                   paddingRight: 14,
                 }}
               >
-                {id}
+                {label}
               </div>
               <div
                 style={{

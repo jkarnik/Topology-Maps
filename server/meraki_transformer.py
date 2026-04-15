@@ -63,8 +63,8 @@ class MerakiTransformer:
             L2Topology with nodes and edges populated.
         """
         # Index statuses by serial for O(1) lookup
-        status_by_serial: dict[str, str] = {
-            s["serial"]: s.get("status", "offline")
+        status_by_serial: dict[str, dict] = {
+            s["serial"]: s
             for s in device_statuses
             if "serial" in s
         }
@@ -78,17 +78,48 @@ class MerakiTransformer:
             product_type = dev.get("productType", "")
             device_type = DEVICE_TYPE_MAP.get(product_type, DeviceType.ENDPOINT)
 
-            raw_status = status_by_serial.get(serial, "offline")
+            status_obj = status_by_serial.get(serial, {})
+            raw_status = status_obj.get("status", "offline")
             status = STATUS_MAP.get(raw_status, DeviceStatus.DOWN)
+
+            # Extract software version from the details array if present
+            software_version: Optional[str] = None
+            for detail_item in dev.get("details", []):
+                if detail_item.get("name") == "software":
+                    software_version = detail_item.get("value")
+                    break
+
+            # Normalize tags (Meraki returns a space-separated string or a list)
+            raw_tags = dev.get("tags", [])
+            if isinstance(raw_tags, str):
+                tags = [t for t in raw_tags.split() if t]
+            else:
+                tags = list(raw_tags) if raw_tags else []
 
             nodes.append(
                 Device(
                     id=serial,
+                    name=dev.get("name") or serial,
                     type=device_type,
                     model=dev.get("model", "Unknown"),
                     ip=dev.get("lanIp") or dev.get("wan1Ip") or "",
                     status=status,
                     mac=dev.get("mac"),
+                    network_id=dev.get("networkId"),
+                    firmware=dev.get("firmware"),
+                    address=dev.get("address"),
+                    tags=tags,
+                    notes=dev.get("notes"),
+                    config_updated_at=dev.get("configurationUpdatedAt"),
+                    dashboard_url=dev.get("url"),
+                    software_version=software_version,
+                    # From status object
+                    public_ip=status_obj.get("publicIp"),
+                    last_reported_at=status_obj.get("lastReportedAt"),
+                    gateway=status_obj.get("gateway"),
+                    primary_dns=status_obj.get("primaryDns"),
+                    secondary_dns=status_obj.get("secondaryDns"),
+                    ip_type=status_obj.get("ipType"),
                 )
             )
 
@@ -104,6 +135,7 @@ class MerakiTransformer:
                     client_name = c.get("description") or c.get("dhcpHostname") or c.get("mac", "Unknown")
                     nodes.append(Device(
                         id=client_id,
+                        name=client_name,
                         type=DeviceType.ENDPOINT,
                         model=c.get("os") or "Client",
                         ip=c.get("ip") or "",

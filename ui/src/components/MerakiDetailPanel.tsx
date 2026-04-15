@@ -354,7 +354,7 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {device.id}
+                    {device.name || device.id}
                   </span>
                 </div>
 
@@ -485,10 +485,62 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
             {!loading && (
               <>
                 <SectionHeader>Identity</SectionHeader>
-                <InfoRow label="IP" value={device.ip} />
+                {device.name && device.name !== device.id && <InfoRow label="Name" value={device.name} />}
+                <InfoRow label="Serial" value={device.id} />
+                <InfoRow label="Model" value={device.model} />
+                {device.software_version && <InfoRow label="Software" value={device.software_version} />}
+                {device.firmware && <InfoRow label="Firmware" value={device.firmware} />}
+                {device.network_id && <InfoRow label="Network ID" value={device.network_id} />}
+
+                <SectionHeader>Network</SectionHeader>
+                <InfoRow label="IP" value={device.ip || '—'} />
+                {device.public_ip && <InfoRow label="Public IP" value={device.public_ip} />}
                 {device.mac && <InfoRow label="MAC" value={device.mac} />}
+                {device.gateway && <InfoRow label="Gateway" value={device.gateway} />}
+                {device.primary_dns && <InfoRow label="Primary DNS" value={device.primary_dns} />}
+                {device.secondary_dns && <InfoRow label="Secondary DNS" value={device.secondary_dns} />}
+                {device.ip_type && <InfoRow label="IP Type" value={device.ip_type} />}
                 {device.vlan != null && <InfoRow label="VLAN" value={device.vlan} />}
+                {device.ssid && <InfoRow label="SSID" value={device.ssid} />}
                 {device.floor != null && <InfoRow label="Floor" value={`F${device.floor}`} />}
+
+                {device.address && (
+                  <>
+                    <SectionHeader>Location</SectionHeader>
+                    <InfoRow label="Address" value={device.address} />
+                  </>
+                )}
+
+                {(device.tags?.length || device.notes || device.last_reported_at || device.config_updated_at || device.dashboard_url) && (
+                  <>
+                    <SectionHeader>Meta</SectionHeader>
+                    {device.tags && device.tags.length > 0 && (
+                      <InfoRow label="Tags" value={device.tags.join(', ')} />
+                    )}
+                    {device.notes && <InfoRow label="Notes" value={device.notes} />}
+                    {device.last_reported_at && (
+                      <InfoRow label="Last Reported" value={new Date(device.last_reported_at).toLocaleString()} />
+                    )}
+                    {device.config_updated_at && (
+                      <InfoRow label="Config Updated" value={new Date(device.config_updated_at).toLocaleString()} />
+                    )}
+                    {device.dashboard_url && (
+                      <InfoRow
+                        label="Dashboard"
+                        value={
+                          <a
+                            href={device.dashboard_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: 'var(--accent-amber)', textDecoration: 'none' }}
+                          >
+                            Open ↗
+                          </a>
+                        }
+                      />
+                    )}
+                  </>
+                )}
               </>
             )}
 
