@@ -126,7 +126,10 @@ async def get_networks():
 
 @router.get("/topology/l2")
 async def get_l2_topology(network: Optional[str] = Query(None, description="Network ID")):
-    """Return L2 topology for a specific network."""
+    """Return L2 infrastructure topology (devices + links + stacks, no clients).
+
+    This is the fast first call. Use /topology/l2/clients for wireless clients.
+    """
     org_id = await _get_org_id()
     client = _get_client()
 
@@ -148,16 +151,49 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
     else:
         network_ids = list({d.get("networkId") for d in devices if d.get("networkId")})
 
-    # Fetch link-layer topology per network
+    # Fetch link-layer topology + stacks in parallel per network
     all_link_layer = []
+    stacks_by_network: dict[str, list[dict]] = {}
     for nid in network_ids:
         try:
-            ll = await client.get_network_topology(nid)
+            ll, stacks = await asyncio.gather(
+                client.get_network_topology(nid),
+                client.get_network_switch_stacks(nid),
+            )
             all_link_layer.append(ll)
+            if stacks:
+                stacks_by_network[nid] = stacks
         except Exception:
-            logger.warning("Failed to get link-layer for network %s", nid)
+            logger.warning("Failed to get topology/stacks for network %s", nid)
 
-    # Fetch clients for APs to show wireless connections
+    l2 = _transformer.build_l2(devices, statuses, all_link_layer, None, stacks_by_network)
+    return l2.model_dump()
+
+
+@router.get("/topology/l2/clients")
+async def get_l2_clients(network: Optional[str] = Query(None, description="Network ID")):
+    """Return wireless clients for APs in the given network(s).
+
+    Called after /topology/l2 to progressively add clients.
+    Returns {clients_by_ap: {serial: [{client}, ...]}, nodes: [...], edges: [...]}
+    """
+    org_id = await _get_org_id()
+    client = _get_client()
+
+    try:
+        devices, statuses = await asyncio.gather(
+            client.get_org_devices(org_id),
+            client.get_org_device_statuses(org_id),
+        )
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=exc.response.status_code,
+            detail=f"Meraki API error: {exc.response.text}",
+        ) from exc
+
+    if network:
+        devices = [d for d in devices if d.get("networkId") == network]
+
     ap_serials = [d["serial"] for d in devices if d.get("productType") == "wireless" and d.get("serial")]
     clients_by_ap: dict[str, list[dict]] = {}
     for serial in ap_serials:
@@ -168,18 +204,14 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
         except Exception:
             pass
 
-    # Fetch switch stacks per network to visualise stacking links
-    stacks_by_network: dict[str, list[dict]] = {}
-    for nid in network_ids:
-        try:
-            stacks = await client.get_network_switch_stacks(nid)
-            if stacks:
-                stacks_by_network[nid] = stacks
-        except Exception:
-            pass
-
-    l2 = _transformer.build_l2(devices, statuses, all_link_layer, clients_by_ap, stacks_by_network)
-    return l2.model_dump()
+    # Build just the client nodes + wireless edges
+    l2 = _transformer.build_l2([], [], [], clients_by_ap, None)
+    return {
+        "ap_count": len(ap_serials),
+        "client_count": sum(len(v) for v in clients_by_ap.values()),
+        "nodes": [n.model_dump() for n in l2.nodes],
+        "edges": [e.model_dump() for e in l2.edges],
+    }
 
 
 # ---------------------------------------------------------------------------

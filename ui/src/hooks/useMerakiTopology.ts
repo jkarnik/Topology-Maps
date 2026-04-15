@@ -166,40 +166,69 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     setLoadingMessage('Discovering networks...');
 
     try {
-      // Single network — one fast call
+      // Single network — 4 granular stages
       if (targetNetwork) {
         const param = `?network=${encodeURIComponent(targetNetwork)}`;
         const networkName = networks.find(n => n.id === targetNetwork)?.name ?? targetNetwork;
-        setRefreshTotal(2);
+        setRefreshTotal(4);
 
+        // Stage 1: Infrastructure topology (devices + links + stacks)
         setRefreshPhase('topology');
         setRefreshProgress(1);
-        setLoadingMessage(`Fetching topology for ${networkName}...`);
+        setLoadingMessage(`Fetching infrastructure for ${networkName}...`);
         const l2Resp = await fetch(`/api/meraki/topology/l2${param}`, { signal: controller.signal });
-        if (!l2Resp.ok) throw new Error(`L2 failed: ${l2Resp.status}`);
+        if (!l2Resp.ok) throw new Error(`Infrastructure fetch failed: ${l2Resp.status}`);
         const l2Data = await l2Resp.json() as L2Topology;
         setL2Topology(l2Data);
-        setLoadingMessage(`${networkName}: ${l2Data.nodes.length} devices, ${l2Data.edges.length} connections`);
+        setLoadingMessage(`${networkName}: ${l2Data.nodes.length} devices, ${l2Data.edges.length} links`);
 
-        setRefreshPhase('clients');
+        // Stage 2: VLANs & subnets
         setRefreshProgress(2);
         setLoadingMessage(`Fetching VLANs for ${networkName}...`);
         const l3Resp = await fetch(`/api/meraki/topology/l3${param}`, { signal: controller.signal });
-        if (!l3Resp.ok) throw new Error(`L3 failed: ${l3Resp.status}`);
+        if (!l3Resp.ok) throw new Error(`VLAN fetch failed: ${l3Resp.status}`);
         const l3Data = await l3Resp.json() as L3Topology;
         setL3Topology(l3Data);
+        setLoadingMessage(`${l3Data.subnets.length} VLANs loaded`);
 
+        // Stage 3: Wireless clients (separate call, can be slow)
+        setRefreshPhase('clients');
+        setRefreshProgress(3);
+        setLoadingMessage(`Fetching wireless clients for ${networkName}...`);
+        try {
+          const clientsResp = await fetch(`/api/meraki/topology/l2/clients${param}`, { signal: controller.signal });
+          if (clientsResp.ok) {
+            const clientsData = await clientsResp.json();
+            const clientNodes = clientsData.nodes as Device[];
+            const clientEdges = clientsData.edges as Edge[];
+            if (clientNodes.length > 0) {
+              setL2Topology(prev => prev ? {
+                nodes: [...prev.nodes, ...clientNodes],
+                edges: [...prev.edges, ...clientEdges],
+              } : prev);
+              setLoadingMessage(`Added ${clientsData.client_count} wireless clients from ${clientsData.ap_count} APs`);
+            } else {
+              setLoadingMessage('No wireless clients found');
+            }
+          }
+        } catch (err) {
+          if ((err as Error).name === 'AbortError') throw err;
+          setLoadingMessage('Clients fetch skipped');
+        }
+
+        // Stage 4: Done
+        setRefreshProgress(4);
         setRefreshPhase('complete');
         setLastUpdated(new Date());
-        setLoadingMessage(`Done — ${l2Data.nodes.length} devices, ${l3Data.subnets.length} VLANs`);
+        setLoadingMessage(`Done — ${networkName}`);
       } else {
-        // All Networks — fetch each network one at a time, merge progressively
+        // All Networks — fetch each network with granular stages
         const networkList = networks.length > 0 ? networks : [];
         if (networkList.length === 0) {
           throw new Error('No networks available');
         }
 
-        const totalSteps = networkList.length;
+        const totalSteps = networkList.length * 3; // 3 stages per network
         setRefreshTotal(totalSteps);
         setRefreshPhase('topology');
 
@@ -211,10 +240,11 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
         for (let i = 0; i < networkList.length; i++) {
           const net = networkList[i];
           const param = `?network=${encodeURIComponent(net.id)}`;
-          setRefreshProgress(i + 1);
-          setLoadingMessage(`Fetching ${net.name} (${i + 1}/${totalSteps})...`);
+          const stepBase = i * 3;
 
-          // Fetch L2 for this network
+          // Stage A: Infrastructure
+          setRefreshProgress(stepBase + 1);
+          setLoadingMessage(`${net.name}: fetching infrastructure (${i + 1}/${networkList.length})...`);
           try {
             const l2Resp = await fetch(`/api/meraki/topology/l2${param}`, { signal: controller.signal });
             if (l2Resp.ok) {
@@ -224,10 +254,12 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
             }
           } catch (err) {
             if ((err as Error).name === 'AbortError') throw err;
-            // Skip failed network, continue
           }
+          setL2Topology({ nodes: [...allNodes], edges: [...allEdges] });
 
-          // Fetch L3 for this network
+          // Stage B: VLANs
+          setRefreshProgress(stepBase + 2);
+          setLoadingMessage(`${net.name}: fetching VLANs...`);
           try {
             const l3Resp = await fetch(`/api/meraki/topology/l3${param}`, { signal: controller.signal });
             if (l3Resp.ok) {
@@ -238,16 +270,31 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
           } catch (err) {
             if ((err as Error).name === 'AbortError') throw err;
           }
-
-          // Update topology progressively — user sees devices appear per network
-          setL2Topology({ nodes: [...allNodes], edges: [...allEdges] });
           setL3Topology({ subnets: [...allSubnets], routes: [...allRoutes] });
-          setLoadingMessage(`Loaded ${allNodes.length} devices from ${i + 1}/${totalSteps} networks`);
+
+          // Stage C: Wireless clients
+          setRefreshPhase('clients');
+          setRefreshProgress(stepBase + 3);
+          setLoadingMessage(`${net.name}: fetching wireless clients...`);
+          try {
+            const clientsResp = await fetch(`/api/meraki/topology/l2/clients${param}`, { signal: controller.signal });
+            if (clientsResp.ok) {
+              const clientsData = await clientsResp.json();
+              allNodes.push(...(clientsData.nodes as Device[]));
+              allEdges.push(...(clientsData.edges as Edge[]));
+              setL2Topology({ nodes: [...allNodes], edges: [...allEdges] });
+            }
+          } catch (err) {
+            if ((err as Error).name === 'AbortError') throw err;
+          }
+
+          setRefreshPhase('topology');
+          setLoadingMessage(`Loaded ${allNodes.length} devices from ${i + 1}/${networkList.length} networks`);
         }
 
         setRefreshPhase('complete');
         setLastUpdated(new Date());
-        setLoadingMessage(`Done — ${allNodes.length} devices, ${allSubnets.length} VLANs from ${totalSteps} networks`);
+        setLoadingMessage(`Done — ${allNodes.length} devices, ${allSubnets.length} VLANs from ${networkList.length} networks`);
       }
     } catch (err) {
       if ((err as Error).name === 'AbortError') {
