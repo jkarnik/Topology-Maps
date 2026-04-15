@@ -105,8 +105,8 @@ class MerakiTransformer:
                     nodes.append(Device(
                         id=client_id,
                         type=DeviceType.ENDPOINT,
-                        model=c.get("os", "Client"),
-                        ip=c.get("ip", ""),
+                        model=c.get("os") or "Client",
+                        ip=c.get("ip") or "",
                         status=DeviceStatus.UP,
                         mac=c.get("mac"),
                         vlan=c.get("vlan"),

@@ -7,6 +7,7 @@ interface RefreshOverlayProps {
   phase: RefreshPhase | null;
   progress: number;
   total: number;
+  message?: string;
 }
 
 /* ---------- Helpers ---------- */
@@ -25,6 +26,7 @@ const RefreshOverlay: React.FC<RefreshOverlayProps> = ({
   phase,
   progress,
   total,
+  message,
 }) => {
   // Hide when no phase or complete
   if (phase === null || phase === 'complete') return null;
@@ -93,7 +95,7 @@ const RefreshOverlay: React.FC<RefreshOverlayProps> = ({
               color: 'var(--text-primary)',
             }}
           >
-            {phaseLabel[phase]}
+            {message || phaseLabel[phase]}
           </span>
         </div>
 

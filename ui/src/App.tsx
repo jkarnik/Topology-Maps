@@ -110,6 +110,7 @@ function App() {
             phase={meraki.refreshPhase}
             progress={meraki.refreshProgress}
             total={meraki.refreshTotal}
+            message={meraki.loadingMessage}
           />
         )}
 
