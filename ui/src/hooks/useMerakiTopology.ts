@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { L2Topology, L3Topology, ViewMode, Device, DrillDownState } from '../types/topology';
+import { L2Topology, L3Topology, ViewMode, Device, Edge, DrillDownState } from '../types/topology';
 import { MerakiNetwork, MerakiStatus, RefreshPhase } from '../types/meraki';
 
 // ---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   const [refreshPhase, setRefreshPhase] = useState<RefreshPhase | null>(null);
   const [refreshProgress, setRefreshProgress] = useState(0);
   const [refreshTotal, setRefreshTotal] = useState(0);
-  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const [remainingSeconds] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [clientCounts] = useState<Record<string, number>>({});
 
@@ -162,55 +162,93 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     setRefreshPhase('discovery');
     setRefreshProgress(0);
     setRefreshTotal(0);
-    setRemainingSeconds(null);
     setError(null);
     setLoadingMessage('Discovering networks...');
 
     try {
-      const networkParam = targetNetwork ? `?network=${encodeURIComponent(targetNetwork)}` : '';
+      // Single network — one fast call
+      if (targetNetwork) {
+        const param = `?network=${encodeURIComponent(targetNetwork)}`;
+        const networkName = networks.find(n => n.id === targetNetwork)?.name ?? targetNetwork;
+        setRefreshTotal(2);
 
-      // Step 1: Fetch networks to know the count
-      setLoadingMessage('Fetching device list...');
-      const statusResp = await fetch('/api/meraki/status', { signal: controller.signal });
-      if (!statusResp.ok) throw new Error('Failed to check Meraki status');
+        setRefreshPhase('topology');
+        setRefreshProgress(1);
+        setLoadingMessage(`Fetching topology for ${networkName}...`);
+        const l2Resp = await fetch(`/api/meraki/topology/l2${param}`, { signal: controller.signal });
+        if (!l2Resp.ok) throw new Error(`L2 failed: ${l2Resp.status}`);
+        const l2Data = await l2Resp.json() as L2Topology;
+        setL2Topology(l2Data);
+        setLoadingMessage(`${networkName}: ${l2Data.nodes.length} devices, ${l2Data.edges.length} connections`);
 
-      // Step 2: Fetch L2 topology (this is the slow one — devices + link-layer + clients per AP)
-      setRefreshPhase('topology');
-      setLoadingMessage(targetNetwork
-        ? 'Fetching topology for selected network...'
-        : 'Fetching topology for all networks (this may take a moment)...');
-      setRefreshProgress(1);
-      setRefreshTotal(3);
+        setRefreshPhase('clients');
+        setRefreshProgress(2);
+        setLoadingMessage(`Fetching VLANs for ${networkName}...`);
+        const l3Resp = await fetch(`/api/meraki/topology/l3${param}`, { signal: controller.signal });
+        if (!l3Resp.ok) throw new Error(`L3 failed: ${l3Resp.status}`);
+        const l3Data = await l3Resp.json() as L3Topology;
+        setL3Topology(l3Data);
 
-      const l2Resp = await fetch(`/api/meraki/topology/l2${networkParam}`, {
-        signal: controller.signal,
-      });
-      if (!l2Resp.ok) {
-        const errText = await l2Resp.text().catch(() => l2Resp.statusText);
-        throw new Error(`L2 fetch failed: ${l2Resp.status} — ${errText}`);
+        setRefreshPhase('complete');
+        setLastUpdated(new Date());
+        setLoadingMessage(`Done — ${l2Data.nodes.length} devices, ${l3Data.subnets.length} VLANs`);
+      } else {
+        // All Networks — fetch each network one at a time, merge progressively
+        const networkList = networks.length > 0 ? networks : [];
+        if (networkList.length === 0) {
+          throw new Error('No networks available');
+        }
+
+        const totalSteps = networkList.length;
+        setRefreshTotal(totalSteps);
+        setRefreshPhase('topology');
+
+        const allNodes: Device[] = [];
+        const allEdges: Edge[] = [];
+        const allSubnets: L3Topology['subnets'] = [];
+        const allRoutes: L3Topology['routes'] = [];
+
+        for (let i = 0; i < networkList.length; i++) {
+          const net = networkList[i];
+          const param = `?network=${encodeURIComponent(net.id)}`;
+          setRefreshProgress(i + 1);
+          setLoadingMessage(`Fetching ${net.name} (${i + 1}/${totalSteps})...`);
+
+          // Fetch L2 for this network
+          try {
+            const l2Resp = await fetch(`/api/meraki/topology/l2${param}`, { signal: controller.signal });
+            if (l2Resp.ok) {
+              const l2Data = await l2Resp.json() as L2Topology;
+              allNodes.push(...l2Data.nodes);
+              allEdges.push(...l2Data.edges);
+            }
+          } catch (err) {
+            if ((err as Error).name === 'AbortError') throw err;
+            // Skip failed network, continue
+          }
+
+          // Fetch L3 for this network
+          try {
+            const l3Resp = await fetch(`/api/meraki/topology/l3${param}`, { signal: controller.signal });
+            if (l3Resp.ok) {
+              const l3Data = await l3Resp.json() as L3Topology;
+              allSubnets.push(...l3Data.subnets);
+              allRoutes.push(...l3Data.routes);
+            }
+          } catch (err) {
+            if ((err as Error).name === 'AbortError') throw err;
+          }
+
+          // Update topology progressively — user sees devices appear per network
+          setL2Topology({ nodes: [...allNodes], edges: [...allEdges] });
+          setL3Topology({ subnets: [...allSubnets], routes: [...allRoutes] });
+          setLoadingMessage(`Loaded ${allNodes.length} devices from ${i + 1}/${totalSteps} networks`);
+        }
+
+        setRefreshPhase('complete');
+        setLastUpdated(new Date());
+        setLoadingMessage(`Done — ${allNodes.length} devices, ${allSubnets.length} VLANs from ${totalSteps} networks`);
       }
-      const l2Data = await l2Resp.json() as L2Topology;
-      setL2Topology(l2Data);
-      setLoadingMessage(`Loaded ${l2Data.nodes.length} devices, ${l2Data.edges.length} connections`);
-
-      // Step 3: Fetch L3 topology (VLANs + subnets)
-      setRefreshPhase('clients');
-      setRefreshProgress(2);
-      setLoadingMessage('Fetching VLANs & subnets...');
-      const l3Resp = await fetch(`/api/meraki/topology/l3${networkParam}`, {
-        signal: controller.signal,
-      });
-      if (!l3Resp.ok) {
-        const errText = await l3Resp.text().catch(() => l3Resp.statusText);
-        throw new Error(`L3 fetch failed: ${l3Resp.status} — ${errText}`);
-      }
-      const l3Data = await l3Resp.json() as L3Topology;
-      setL3Topology(l3Data);
-
-      setRefreshProgress(3);
-      setRefreshPhase('complete');
-      setLastUpdated(new Date());
-      setLoadingMessage(`Done — ${l2Data.nodes.length} devices, ${l3Data.subnets.length} VLANs`);
     } catch (err) {
       if ((err as Error).name === 'AbortError') {
         return;
@@ -223,7 +261,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       setRefreshPhase(null);
       abortControllerRef.current = null;
     }
-  }, [selectedNetwork]);
+  }, [selectedNetwork, networks]);
 
   // -------------------------------------------------------------------------
   // Drill-down navigation (mirrors useTopology)
