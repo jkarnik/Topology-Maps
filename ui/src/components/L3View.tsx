@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -6,6 +6,8 @@ import {
   Controls,
   Handle,
   Position,
+  useNodesState,
+  useEdgesState,
   type NodeProps,
   type Edge as RFEdge,
   type Node as RFNode,
@@ -362,6 +364,14 @@ const L3View: React.FC<L3ViewProps> = ({ topology, onSelectVlan, gatewayLabel = 
     return buildL3Graph(topology, onSelectVlan, gatewayLabel);
   }, [topology, onSelectVlan, gatewayLabel]);
 
+  const [nodes, setNodes, onNodesChange] = useNodesState(graph.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(graph.edges);
+
+  useEffect(() => {
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+  }, [graph, setNodes, setEdges]);
+
   const handlePaneClick = useCallback(() => {
     // no-op, could deselect in future
   }, []);
@@ -380,8 +390,10 @@ const L3View: React.FC<L3ViewProps> = ({ topology, onSelectVlan, gatewayLabel = 
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ReactFlow
-        nodes={graph.nodes}
-        edges={graph.edges}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         onPaneClick={handlePaneClick}
         fitView

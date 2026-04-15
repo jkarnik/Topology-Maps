@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -7,6 +7,8 @@ import {
   MiniMap,
   Handle,
   Position,
+  useNodesState,
+  useEdgesState,
   type NodeProps,
   type Edge as RFEdge,
   type Node as RFNode,
@@ -773,6 +775,14 @@ const HybridView: React.FC<HybridViewProps> = ({
     return buildHybridGraph(l2Topology, l3Topology, onSelectDevice, onSelectVlan);
   }, [l2Topology, l3Topology, onSelectDevice, onSelectVlan]);
 
+  const [nodes, setNodes, onNodesChange] = useNodesState(graph.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(graph.edges);
+
+  useEffect(() => {
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+  }, [graph, setNodes, setEdges]);
+
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: RFNode) => {
       if (node.type === 'deviceNode' && onSelectDevice) {
@@ -805,8 +815,10 @@ const HybridView: React.FC<HybridViewProps> = ({
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <ReactFlow
-        nodes={graph.nodes}
-        edges={graph.edges}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
