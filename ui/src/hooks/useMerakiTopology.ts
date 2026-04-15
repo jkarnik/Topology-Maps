@@ -23,7 +23,7 @@ export interface UseMerakiTopologyReturn {
   networks: MerakiNetwork[];
   selectedNetwork: string | null;
   setSelectedNetwork: (networkId: string | null) => void;
-  fetchNetworks: () => Promise<void>;
+  fetchNetworks: () => Promise<string | null>;
 
   // Meraki-specific: refresh
   refresh: (networkId?: string) => Promise<void>;
@@ -89,7 +89,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   // fetchNetworks — calls /api/meraki/status then /api/meraki/networks
   // -------------------------------------------------------------------------
 
-  const fetchNetworks = useCallback(async () => {
+  const fetchNetworks = useCallback(async (): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -99,7 +99,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
         if (statusRes.status === 401) {
           setIsConfigured(false);
           setError('Meraki API key is not configured');
-          return;
+          return null;
         }
         throw new Error(`Status check failed: ${statusRes.statusText}`);
       }
@@ -120,9 +120,17 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
         throw new Error(`Failed to fetch networks: ${networksRes.statusText}`);
       }
       const networksData = (await networksRes.json()) as { networks: MerakiNetwork[] };
-      setNetworks(networksData.networks ?? []);
+      const networkList = networksData.networks ?? [];
+      setNetworks(networkList);
+      // Auto-select first network if none selected (all-networks is too slow)
+      if (!selectedNetwork && networkList.length > 0) {
+        setSelectedNetwork(networkList[0].id);
+        return networkList[0].id;
+      }
+      return selectedNetwork;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch Meraki networks');
+      return null;
     } finally {
       setIsLoading(false);
     }

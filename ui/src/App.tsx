@@ -23,7 +23,9 @@ function App() {
   useEffect(() => {
     if (dataSource === 'meraki' && !merakiInitialized) {
       setMerakiInitialized(true);
-      meraki.fetchNetworks().then(() => meraki.refresh());
+      meraki.fetchNetworks().then((networkId) => {
+        if (networkId) meraki.refresh(networkId);
+      });
     }
   }, [dataSource, merakiInitialized]);
 
