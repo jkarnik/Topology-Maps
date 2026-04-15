@@ -205,10 +205,11 @@ const nodeTypes = {
    Layout constants
    ================================================================ */
 
-const TIER_0_Y = 0;       // FortiGate pair
-const TIER_1_Y = 180;     // Core switch
-const TIER_2_Y = 360;     // Floor switches
-const TIER_3_Y = 580;     // VLAN group boxes
+const TIER_0_Y = 0;       // Firewalls/FortiGate pair
+const TIER_1_Y = 180;     // Core switches (or floor switches if no core)
+const TIER_2_Y = 360;     // Floor switches (skipped when no core switches)
+const TIER_AP_Y = 530;    // Access points (between switches and VLANs)
+const TIER_VLAN_Y_BASE = 700; // VLAN group boxes (shifts up when no core)
 
 const VLAN_BOX_W = 240;
 const VLAN_BOX_H = 130;
@@ -235,6 +236,7 @@ function buildHybridGraph(
   const firewalls: Device[] = [];
   const coreSwitches: Device[] = [];
   const floorSwitches: Device[] = [];
+  const accessPoints: Device[] = [];
   const endpoints: Device[] = [];
 
   for (const d of l2.nodes) {
@@ -249,14 +251,24 @@ function buildHybridGraph(
       case 'floor_switch':
         floorSwitches.push(d);
         break;
+      case 'access_point':
+        accessPoints.push(d);
+        break;
       case 'endpoint':
         endpoints.push(d);
         break;
-      // access_point and others are not placed in infrastructure tiers
     }
   }
 
-  /* ------ 2. Tier 0 — FortiGate pair ------ */
+  /* ------ Determine effective tier layout ------ */
+  // Meraki case: no core switches → collapse tiers upward
+  const hasCoreSwitches = coreSwitches.length > 0;
+  // Y positions for floor switches and VLAN boxes depend on whether core switches exist
+  const effectiveFloorSwitchY = hasCoreSwitches ? TIER_2_Y : TIER_1_Y;
+  const effectiveApY = hasCoreSwitches ? TIER_AP_Y : TIER_AP_Y - (TIER_2_Y - TIER_1_Y);
+  const effectiveVlanY = hasCoreSwitches ? TIER_VLAN_Y_BASE : TIER_VLAN_Y_BASE - (TIER_2_Y - TIER_1_Y);
+
+  /* ------ 2. Tier 0 — Firewall pair ------ */
 
   // Sort so primary comes first (convention: "fg-primary" before "fg-standby")
   firewalls.sort((a, b) => a.id.localeCompare(b.id));
@@ -303,56 +315,59 @@ function buildHybridGraph(
     });
   }
 
-  /* ------ 3. Tier 1 — Core Switch ------ */
-
   const gridTotalWidth = VLAN_COLS * (VLAN_BOX_W + VLAN_H_GAP) - VLAN_H_GAP;
-  const coreCenterX = gridTotalWidth / 2 - 110; // 220/2 = 110
 
-  coreSwitches.forEach((cs, i) => {
-    nodes.push({
-      id: cs.id,
-      type: 'deviceNode',
-      position: { x: coreCenterX + i * 260, y: TIER_1_Y },
-      data: { device: cs },
-      draggable: true,
-    });
-  });
+  /* ------ 3. Tier 1 — Core Switches (only when they exist) ------ */
 
-  // Edges: FortiGates -> Core Switch(es)
-  for (const fw of firewalls) {
-    for (const cs of coreSwitches) {
-      // Check if an L2 edge exists between them
-      const l2Edge = l2.edges.find(
-        (e) =>
-          (e.source === fw.id && e.target === cs.id) ||
-          (e.source === cs.id && e.target === fw.id),
-      );
-      edges.push({
-        id: `infra-${fw.id}-${cs.id}`,
-        source: fw.id,
-        target: cs.id,
-        style: {
-          stroke: 'var(--accent-cyan)',
-          strokeWidth: 2,
-          opacity: 0.7,
-        },
-        label: l2Edge?.speed ?? '10G',
-        labelStyle: {
-          fill: 'var(--text-muted)',
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 9,
-        },
-        labelBgStyle: {
-          fill: 'var(--bg-primary)',
-          fillOpacity: 0.85,
-        },
-        labelBgPadding: [3, 3] as [number, number],
-        labelBgBorderRadius: 3,
+  if (hasCoreSwitches) {
+    const coreCenterX = gridTotalWidth / 2 - 110; // 220/2 = 110
+
+    coreSwitches.forEach((cs, i) => {
+      nodes.push({
+        id: cs.id,
+        type: 'deviceNode',
+        position: { x: coreCenterX + i * 260, y: TIER_1_Y },
+        data: { device: cs },
+        draggable: true,
       });
+    });
+
+    // Edges: FortiGates -> Core Switch(es) — only where L2 edges exist
+    for (const fw of firewalls) {
+      for (const cs of coreSwitches) {
+        const l2Edge = l2.edges.find(
+          (e) =>
+            (e.source === fw.id && e.target === cs.id) ||
+            (e.source === cs.id && e.target === fw.id),
+        );
+        if (!l2Edge) continue;
+        edges.push({
+          id: `infra-${fw.id}-${cs.id}`,
+          source: fw.id,
+          target: cs.id,
+          style: {
+            stroke: 'var(--accent-cyan)',
+            strokeWidth: 2,
+            opacity: 0.7,
+          },
+          label: l2Edge.speed ?? '10G',
+          labelStyle: {
+            fill: 'var(--text-muted)',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+          },
+          labelBgStyle: {
+            fill: 'var(--bg-primary)',
+            fillOpacity: 0.85,
+          },
+          labelBgPadding: [3, 3] as [number, number],
+          labelBgBorderRadius: 3,
+        });
+      }
     }
   }
 
-  /* ------ 4. Tier 2 — Floor Switches ------ */
+  /* ------ 4. Floor Switches (Tier 1 when no core, Tier 2 otherwise) ------ */
 
   // Sort floor switches by id for consistent ordering
   floorSwitches.sort((a, b) => a.id.localeCompare(b.id));
@@ -366,34 +381,102 @@ function buildHybridGraph(
     nodes.push({
       id: fs.id,
       type: 'deviceNode',
-      position: { x: fsStartX + i * fsSpacing, y: TIER_2_Y },
+      position: { x: fsStartX + i * fsSpacing, y: effectiveFloorSwitchY },
       data: { device: fs },
       draggable: true,
     });
   });
 
-  // Edges: Core Switch -> Floor Switches
-  for (const cs of coreSwitches) {
-    for (const fs of floorSwitches) {
-      const l2Edge = l2.edges.find(
-        (e) =>
-          (e.source === cs.id && e.target === fs.id) ||
-          (e.source === fs.id && e.target === cs.id),
-      );
+  if (hasCoreSwitches) {
+    // Edges: Core Switches -> Floor Switches (only where L2 edges exist)
+    for (const cs of coreSwitches) {
+      for (const fs of floorSwitches) {
+        const l2Edge = l2.edges.find(
+          (e) =>
+            (e.source === cs.id && e.target === fs.id) ||
+            (e.source === fs.id && e.target === cs.id),
+        );
+        if (!l2Edge) continue;
+        edges.push({
+          id: `infra-${cs.id}-${fs.id}`,
+          source: cs.id,
+          target: fs.id,
+          style: {
+            stroke: 'var(--accent-cyan)',
+            strokeWidth: 1.5,
+            opacity: 0.6,
+          },
+          label: l2Edge.speed ?? '1G',
+          labelStyle: {
+            fill: 'var(--text-muted)',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+          },
+          labelBgStyle: {
+            fill: 'var(--bg-primary)',
+            fillOpacity: 0.85,
+          },
+          labelBgPadding: [3, 3] as [number, number],
+          labelBgBorderRadius: 3,
+        });
+      }
+    }
+  } else {
+    // Meraki: Firewalls connect directly to floor switches using actual L2 edges
+    for (const fw of firewalls) {
+      for (const fs of floorSwitches) {
+        const l2Edge = l2.edges.find(
+          (e) =>
+            (e.source === fw.id && e.target === fs.id) ||
+            (e.source === fs.id && e.target === fw.id),
+        );
+        if (!l2Edge) continue;
+        edges.push({
+          id: `infra-${fw.id}-${fs.id}`,
+          source: fw.id,
+          target: fs.id,
+          style: {
+            stroke: 'var(--accent-cyan)',
+            strokeWidth: 2,
+            opacity: 0.7,
+          },
+          label: l2Edge.speed ?? '1G',
+          labelStyle: {
+            fill: 'var(--text-muted)',
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+          },
+          labelBgStyle: {
+            fill: 'var(--bg-primary)',
+            fillOpacity: 0.85,
+          },
+          labelBgPadding: [3, 3] as [number, number],
+          labelBgBorderRadius: 3,
+        });
+      }
+    }
+  }
+
+  /* ------ 4b. Stack edges ------ */
+
+  for (const l2Edge of l2.edges) {
+    if (l2Edge.protocol === 'stack') {
       edges.push({
-        id: `infra-${cs.id}-${fs.id}`,
-        source: cs.id,
-        target: fs.id,
+        id: `stack-${l2Edge.source}-${l2Edge.target}`,
+        source: l2Edge.source,
+        target: l2Edge.target,
         style: {
-          stroke: 'var(--accent-cyan)',
-          strokeWidth: 1.5,
-          opacity: 0.6,
+          stroke: 'var(--accent-green)',
+          strokeWidth: 2,
+          strokeDasharray: '6 3',
+          opacity: 0.8,
         },
-        label: l2Edge?.speed ?? '1G',
+        label: 'stack',
         labelStyle: {
-          fill: 'var(--text-muted)',
+          fill: 'var(--accent-green)',
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 9,
+          fontWeight: 600,
         },
         labelBgStyle: {
           fill: 'var(--bg-primary)',
@@ -405,13 +488,76 @@ function buildHybridGraph(
     }
   }
 
-  /* ------ 5. Tier 3 — VLAN Group Boxes ------ */
+  /* ------ 5. Access Points tier (between switches and VLANs) ------ */
 
-  // Build a mapping: vlanId -> set of floor switch IDs that serve that VLAN
-  // An endpoint is served by a floor switch if there is an L2 edge between them
   const floorSwitchIds = new Set(floorSwitches.map((fs) => fs.id));
 
+  // Build AP -> parent floor switch mapping from L2 edges
+  const apToFloorSwitch = new Map<string, string>();
+  for (const edge of l2.edges) {
+    if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'access_point') {
+      apToFloorSwitch.set(edge.target, edge.source);
+    } else if (
+      floorSwitchIds.has(edge.target) &&
+      deviceMap.get(edge.source)?.type === 'access_point'
+    ) {
+      apToFloorSwitch.set(edge.source, edge.target);
+    }
+  }
+
+  accessPoints.sort((a, b) => a.id.localeCompare(b.id));
+
+  const apSpacing = 200;
+  const apTotalWidth = accessPoints.length * 180 + (accessPoints.length - 1) * (apSpacing - 180);
+  const apStartX = accessPoints.length > 0 ? gridTotalWidth / 2 - apTotalWidth / 2 : 0;
+
+  accessPoints.forEach((ap, i) => {
+    nodes.push({
+      id: ap.id,
+      type: 'deviceNode',
+      position: { x: apStartX + i * apSpacing, y: effectiveApY },
+      data: { device: ap },
+      draggable: true,
+    });
+  });
+
+  // Edges: Floor Switches -> APs (only where L2 edges exist)
+  for (const ap of accessPoints) {
+    const fsId = apToFloorSwitch.get(ap.id);
+    if (!fsId) continue;
+    const l2Edge = l2.edges.find(
+      (e) =>
+        (e.source === fsId && e.target === ap.id) ||
+        (e.source === ap.id && e.target === fsId),
+    );
+    edges.push({
+      id: `infra-${fsId}-${ap.id}`,
+      source: fsId,
+      target: ap.id,
+      style: {
+        stroke: 'var(--accent-cyan)',
+        strokeWidth: 1.5,
+        opacity: 0.6,
+      },
+      label: l2Edge?.speed ?? undefined,
+      labelStyle: {
+        fill: 'var(--text-muted)',
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: 9,
+      },
+      labelBgStyle: {
+        fill: 'var(--bg-primary)',
+        fillOpacity: 0.85,
+      },
+      labelBgPadding: [3, 3] as [number, number],
+      labelBgBorderRadius: 3,
+    });
+  }
+
+  /* ------ 6. VLAN Group Boxes ------ */
+
   // Build endpoint -> floor-switch mapping from L2 edges
+  // Includes direct connections and AP-mediated connections
   const endpointToFloorSwitch = new Map<string, string>();
   for (const edge of l2.edges) {
     if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'endpoint') {
@@ -422,9 +568,8 @@ function buildHybridGraph(
     ) {
       endpointToFloorSwitch.set(edge.source, edge.target);
     }
-    // Also handle access_point -> floor_switch -> endpoint chains
+    // AP -> floor switch -> endpoint chains (wireless clients)
     if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'access_point') {
-      // APs connect to floor switches; endpoints on those APs inherit the floor switch
       const apId = edge.target;
       for (const ep of endpoints) {
         if (ep.connected_ap === apId) {
@@ -444,8 +589,8 @@ function buildHybridGraph(
     }
   }
 
-  // vlanId -> set of floor switch IDs
-  const vlanToFloorSwitches = new Map<number, Set<string>>();
+  // vlanId -> set of floor switch IDs (or AP IDs for wireless VLANs)
+  const vlanToSwitchOrAp = new Map<number, Set<string>>();
   // vlanId -> actual endpoint count from L2 data
   const vlanDeviceCounts = new Map<number, number>();
 
@@ -453,35 +598,44 @@ function buildHybridGraph(
     if (ep.vlan == null) continue;
     const fsId = endpointToFloorSwitch.get(ep.id);
     if (fsId) {
-      if (!vlanToFloorSwitches.has(ep.vlan)) {
-        vlanToFloorSwitches.set(ep.vlan, new Set());
+      if (!vlanToSwitchOrAp.has(ep.vlan)) {
+        vlanToSwitchOrAp.set(ep.vlan, new Set());
       }
-      vlanToFloorSwitches.get(ep.vlan)!.add(fsId);
+      vlanToSwitchOrAp.get(ep.vlan)!.add(fsId);
     }
     // Count endpoints per VLAN
     vlanDeviceCounts.set(ep.vlan, (vlanDeviceCounts.get(ep.vlan) ?? 0) + 1);
   }
 
-  // Also count endpoints by floor assignment (fallback if no direct L2 edge)
+  // Also connect AP nodes to VLAN boxes for wireless client VLANs
+  for (const ep of endpoints) {
+    if (ep.vlan == null || ep.connected_ap == null) continue;
+    if (!vlanToSwitchOrAp.has(ep.vlan)) {
+      vlanToSwitchOrAp.set(ep.vlan, new Set());
+    }
+    // Use AP id as the edge source so the visual goes AP -> VLAN
+    vlanToSwitchOrAp.get(ep.vlan)!.add(ep.connected_ap);
+  }
+
+  // Fallback: match by floor number when no L2 edge found
   for (const ep of endpoints) {
     if (ep.vlan == null || ep.floor == null) continue;
-    // Match floor to floor switch by floor number
     const matchingFs = floorSwitches.find((fs) => fs.floor === ep.floor);
     if (matchingFs) {
-      if (!vlanToFloorSwitches.has(ep.vlan)) {
-        vlanToFloorSwitches.set(ep.vlan, new Set());
+      if (!vlanToSwitchOrAp.has(ep.vlan)) {
+        vlanToSwitchOrAp.set(ep.vlan, new Set());
       }
-      vlanToFloorSwitches.get(ep.vlan)!.add(matchingFs.id);
+      vlanToSwitchOrAp.get(ep.vlan)!.add(matchingFs.id);
     }
   }
 
-  // Create VLAN group nodes in a 3x2 grid
+  // Create VLAN group nodes in a 3xN grid
   const subnets = l3.subnets;
   subnets.forEach((subnet, i) => {
     const col = i % VLAN_COLS;
     const row = Math.floor(i / VLAN_COLS);
     const x = col * (VLAN_BOX_W + VLAN_H_GAP);
-    const y = TIER_3_Y + row * (VLAN_BOX_H + VLAN_V_GAP);
+    const y = effectiveVlanY + row * (VLAN_BOX_H + VLAN_V_GAP);
     const color = getVlanColor(subnet.vlan);
     const glow = getVlanGlow(subnet.vlan);
     const deviceCount = vlanDeviceCounts.get(subnet.vlan) ?? subnet.device_count;
@@ -501,20 +655,26 @@ function buildHybridGraph(
     });
   });
 
-  // Edges: Floor Switches -> VLAN groups
-  const addedFsVlanEdges = new Set<string>();
+  // Edges: Switches/APs -> VLAN groups
+  const addedSwitchVlanEdges = new Set<string>();
+  const apIds = new Set(accessPoints.map((ap) => ap.id));
   for (const subnet of subnets) {
-    const fsSet = vlanToFloorSwitches.get(subnet.vlan);
-    if (!fsSet) continue;
+    const srcSet = vlanToSwitchOrAp.get(subnet.vlan);
+    if (!srcSet) continue;
     const color = getVlanColor(subnet.vlan);
-    for (const fsId of fsSet) {
-      const edgeKey = `${fsId}-vlan-${subnet.vlan}`;
-      if (addedFsVlanEdges.has(edgeKey)) continue;
-      addedFsVlanEdges.add(edgeKey);
+    for (const srcId of srcSet) {
+      const edgeKey = `${srcId}-vlan-${subnet.vlan}`;
+      if (addedSwitchVlanEdges.has(edgeKey)) continue;
+      addedSwitchVlanEdges.add(edgeKey);
+
+      // Only emit this edge if the source node actually exists in the graph
+      const srcIsFloorSwitch = floorSwitchIds.has(srcId);
+      const srcIsAp = apIds.has(srcId);
+      if (!srcIsFloorSwitch && !srcIsAp) continue;
 
       edges.push({
-        id: `fs-vlan-${fsId}-${subnet.vlan}`,
-        source: fsId,
+        id: `fs-vlan-${srcId}-${subnet.vlan}`,
+        source: srcId,
         target: `vlan-${subnet.vlan}`,
         style: {
           stroke: color,
@@ -525,7 +685,7 @@ function buildHybridGraph(
     }
   }
 
-  /* ------ 6. Inter-VLAN Routing Policy Edges ------ */
+  /* ------ 7. Inter-VLAN Routing Policy Edges ------ */
 
   // Build a subnet id -> vlan id mapping for route resolution
   const subnetIdToVlan = new Map<string, number>();
