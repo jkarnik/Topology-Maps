@@ -70,5 +70,13 @@ class MerakiClient:
                 return []
             raise
 
+    async def get_network_switch_stacks(self, network_id: str) -> list[dict]:
+        try:
+            return await self._get(f"/networks/{network_id}/switch/stacks")
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code in (400, 404):
+                return []
+            raise
+
     async def close(self) -> None:
         await self._client.aclose()

@@ -2,7 +2,7 @@
 export type DeviceType = 'firewall' | 'core_switch' | 'floor_switch' | 'access_point' | 'endpoint';
 export type DeviceStatus = 'up' | 'down' | 'degraded' | 'alerting';
 export type EndpointCategory = 'payment' | 'operations' | 'employee' | 'security' | 'iot' | 'guest';
-export type LinkProtocol = 'LLDP' | 'ARP' | 'wireless';
+export type LinkProtocol = 'LLDP' | 'ARP' | 'wireless' | 'stack';
 export type RoutingPolicy = 'allow' | 'deny';
 
 export interface DeviceInterface {
@@ -29,6 +29,8 @@ export interface Device {
   connected_ap: string | null;
   ssid: string | null;
   rssi: number | null;
+  stack_role?: string | null;
+  stack_name?: string | null;
   // Extended Meraki fields
   firmware?: string | null;
   public_ip?: string | null;

@@ -46,6 +46,7 @@ class MerakiTransformer:
         device_statuses: list[dict],
         link_layer_data: list[dict],
         clients_by_ap: Optional[dict[str, list[dict]]] = None,
+        stacks_by_network: Optional[dict[str, list[dict]]] = None,
     ) -> L2Topology:
         """Build an L2 topology from Meraki device and link-layer data.
 
@@ -58,6 +59,11 @@ class MerakiTransformer:
             clients_by_ap: Optional dict of AP serial → client list.
                 When provided, clients are added as endpoint nodes with
                 wireless edges to their AP.
+            stacks_by_network: Optional dict of network_id → list of stack dicts
+                from GET /networks/{id}/switch/stacks.  When provided, stack
+                members are annotated with stack_role/stack_name and virtual
+                "stack" edges are created between the active member and each
+                other member (star topology).
 
         Returns:
             L2Topology with nodes and edges populated.
@@ -124,6 +130,58 @@ class MerakiTransformer:
             )
 
         edges = self._build_edges(link_layer_data)
+
+        # Process switch stacks — annotate nodes and add virtual stack edges
+        if stacks_by_network:
+            # Build serial → (role, stack_name) lookup from all networks
+            serial_to_stack: dict[str, dict] = {}
+            for stack_list in stacks_by_network.values():
+                for stack in stack_list:
+                    stack_name = stack.get("name", "")
+                    serials = stack.get("serials", [])
+                    if not serials:
+                        continue
+                    # Meraki stacks list an "id" but don't explicitly label the
+                    # active member in the stacks endpoint — treat the first
+                    # serial as active (matching Meraki convention).
+                    active_serial = serials[0]
+                    for i, serial in enumerate(serials):
+                        role = "active" if i == 0 else "member"
+                        serial_to_stack[serial] = {
+                            "role": role,
+                            "stack_name": stack_name,
+                            "active_serial": active_serial,
+                        }
+
+            # Update existing device nodes with stack metadata
+            node_by_id = {n.id: n for n in nodes}
+            for node in nodes:
+                info = serial_to_stack.get(node.id)
+                if info:
+                    node.stack_role = info["role"]
+                    node.stack_name = info["stack_name"]
+
+            # Create star-topology stack edges: active → each member
+            seen_stack_pairs: set[frozenset[str]] = set()
+            for serial, info in serial_to_stack.items():
+                active = info["active_serial"]
+                if serial == active:
+                    continue
+                # Only create edge if both nodes exist in this topology
+                if active not in node_by_id or serial not in node_by_id:
+                    continue
+                pair = frozenset({active, serial})
+                if pair in seen_stack_pairs:
+                    continue
+                seen_stack_pairs.add(pair)
+                edges.append(
+                    Edge(
+                        id=f"stack-{active}-{serial}",
+                        source=active,
+                        target=serial,
+                        protocol=LinkProtocol.STACK,
+                    )
+                )
 
         # Add wireless clients as endpoint nodes connected to APs
         if clients_by_ap:

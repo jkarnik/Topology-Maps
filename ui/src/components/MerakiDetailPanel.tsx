@@ -491,6 +491,12 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
                 {device.software_version && <InfoRow label="Software" value={device.software_version} />}
                 {device.firmware && <InfoRow label="Firmware" value={device.firmware} />}
                 {device.network_id && <InfoRow label="Network ID" value={device.network_id} />}
+                {device.stack_name && (
+                  <InfoRow
+                    label="Stack"
+                    value={`${device.stack_name}${device.stack_role ? ` (${device.stack_role})` : ''}`}
+                  />
+                )}
 
                 <SectionHeader>Network</SectionHeader>
                 <InfoRow label="IP" value={device.ip || '—'} />

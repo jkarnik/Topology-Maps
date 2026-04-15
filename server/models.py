@@ -36,6 +36,7 @@ class LinkProtocol(str, Enum):
     LLDP = "LLDP"
     ARP = "ARP"
     WIRELESS = "wireless"
+    STACK = "stack"
 
 
 class RoutingPolicy(str, Enum):
@@ -69,6 +70,8 @@ class Device(BaseModel):
     connected_ap: Optional[str] = None  # For wireless clients
     ssid: Optional[str] = None
     rssi: Optional[int] = None  # Signal strength in dBm
+    stack_role: Optional[str] = None   # "active" or "member"
+    stack_name: Optional[str] = None   # name of the stack
     # Extended Meraki fields
     firmware: Optional[str] = None
     public_ip: Optional[str] = None

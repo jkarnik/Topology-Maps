@@ -168,7 +168,17 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
         except Exception:
             pass
 
-    l2 = _transformer.build_l2(devices, statuses, all_link_layer, clients_by_ap)
+    # Fetch switch stacks per network to visualise stacking links
+    stacks_by_network: dict[str, list[dict]] = {}
+    for nid in network_ids:
+        try:
+            stacks = await client.get_network_switch_stacks(nid)
+            if stacks:
+                stacks_by_network[nid] = stacks
+        except Exception:
+            pass
+
+    l2 = _transformer.build_l2(devices, statuses, all_link_layer, clients_by_ap, stacks_by_network)
     return l2.model_dump()
 
 
