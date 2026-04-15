@@ -631,6 +631,18 @@ function buildHybridGraph(
     }
   }
 
+  // Meraki fallback: when no endpoints map switches to VLANs,
+  // connect all floor switches to all VLANs (switches serve all VLANs)
+  if (vlanToSwitchOrAp.size === 0 && floorSwitches.length > 0 && l3.subnets.length > 0) {
+    for (const subnet of l3.subnets) {
+      const switchSet = new Set<string>();
+      for (const fs of floorSwitches) {
+        switchSet.add(fs.id);
+      }
+      vlanToSwitchOrAp.set(subnet.vlan, switchSet);
+    }
+  }
+
   // Create VLAN group nodes in a 3xN grid
   const subnets = l3.subnets;
   subnets.forEach((subnet, i) => {
