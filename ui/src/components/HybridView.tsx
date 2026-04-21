@@ -699,50 +699,6 @@ function buildHybridGraph(
     }
   }
 
-  /* ------ 7. Inter-VLAN Routing Policy Edges ------ */
-
-  // Build a subnet id -> vlan id mapping for route resolution
-  const subnetIdToVlan = new Map<string, number>();
-  for (const s of subnets) {
-    subnetIdToVlan.set(s.id, s.vlan);
-  }
-
-  l3.routes.forEach((route, i) => {
-    // Skip gateway routes
-    if (route.from_subnet === 'gateway' || route.to_subnet === 'gateway') return;
-
-    const fromVlan = subnetIdToVlan.get(route.from_subnet);
-    const toVlan = subnetIdToVlan.get(route.to_subnet);
-    if (fromVlan == null || toVlan == null) return;
-
-    const isAllow = route.policy === 'allow';
-
-    edges.push({
-      id: `route-${i}`,
-      source: `vlan-${fromVlan}`,
-      target: `vlan-${toVlan}`,
-      style: {
-        stroke: isAllow ? 'var(--accent-green)' : 'var(--accent-red)',
-        strokeWidth: 1.5,
-        strokeDasharray: '6 4',
-        opacity: 0.6,
-      },
-      label: isAllow ? 'allow' : 'deny',
-      labelStyle: {
-        fill: isAllow ? 'var(--accent-green)' : 'var(--accent-red)',
-        fontFamily: "'JetBrains Mono', monospace",
-        fontSize: 9,
-        fontWeight: 600,
-      },
-      labelBgStyle: {
-        fill: 'var(--bg-primary)',
-        fillOpacity: 0.85,
-      },
-      labelBgPadding: [3, 4] as [number, number],
-      labelBgBorderRadius: 3,
-    });
-  });
-
   return { nodes, edges };
 }
 

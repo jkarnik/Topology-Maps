@@ -13,10 +13,11 @@ import asyncio
 import json
 import logging
 import time
-from typing import Optional
+from pathlib import Path
+from typing import Any, Optional
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Body, HTTPException, Query
 from sse_starlette.sse import EventSourceResponse
 
 from server.meraki_client import MerakiClient
@@ -134,9 +135,10 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
     client = _get_client()
 
     try:
-        devices, statuses = await asyncio.gather(
+        devices, availabilities, uplinks_addresses = await asyncio.gather(
             client.get_org_devices(org_id),
-            client.get_org_device_statuses(org_id),
+            client.get_org_device_availabilities(org_id),
+            client.get_org_device_uplinks_addresses(org_id),
         )
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
@@ -166,7 +168,14 @@ async def get_l2_topology(network: Optional[str] = Query(None, description="Netw
         except Exception:
             logger.warning("Failed to get topology/stacks for network %s", nid)
 
-    l2 = _transformer.build_l2(devices, statuses, all_link_layer, None, stacks_by_network)
+    l2 = _transformer.build_l2(
+        devices,
+        availabilities,
+        uplinks_addresses,
+        all_link_layer,
+        None,
+        stacks_by_network,
+    )
     return l2.model_dump()
 
 
@@ -181,10 +190,7 @@ async def get_l2_clients(network: Optional[str] = Query(None, description="Netwo
     client = _get_client()
 
     try:
-        devices, statuses = await asyncio.gather(
-            client.get_org_devices(org_id),
-            client.get_org_device_statuses(org_id),
-        )
+        devices = await client.get_org_devices(org_id)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=exc.response.status_code,
@@ -194,7 +200,17 @@ async def get_l2_clients(network: Optional[str] = Query(None, description="Netwo
     if network:
         devices = [d for d in devices if d.get("networkId") == network]
 
-    ap_serials = [d["serial"] for d in devices if d.get("productType") == "wireless" and d.get("serial")]
+    # Keep an AP serial → network_id map so we can annotate the client nodes.
+    # Clients don't carry a network on their own, but they inherit it from
+    # the AP they're associated with.  This lets the frontend filter a
+    # cached All-Networks topology down to a single site without refetching.
+    ap_to_network: dict[str, str] = {
+        d["serial"]: d.get("networkId", "")
+        for d in devices
+        if d.get("productType") == "wireless" and d.get("serial")
+    }
+    ap_serials = list(ap_to_network.keys())
+
     clients_by_ap: dict[str, list[dict]] = {}
     for serial in ap_serials:
         try:
@@ -205,13 +221,89 @@ async def get_l2_clients(network: Optional[str] = Query(None, description="Netwo
             pass
 
     # Build just the client nodes + wireless edges
-    l2 = _transformer.build_l2([], [], [], clients_by_ap, None)
+    l2 = _transformer.build_l2([], [], [], [], clients_by_ap, None)
+
+    # Annotate each client node with its AP's network.  The transformer
+    # assigns the client's node id from either id or mac, and the edge id
+    # starts with the AP serial, so we can recover the AP from each edge.
+    client_to_ap: dict[str, str] = {}
+    for edge in l2.edges:
+        # Edge format from transformer: Edge(id=f"{ap_serial}-{client_id}",
+        # source=ap_serial, target=client_id, protocol=WIRELESS)
+        client_to_ap[edge.target] = edge.source
+    for node in l2.nodes:
+        ap_serial = client_to_ap.get(node.id)
+        if ap_serial:
+            node.network_id = ap_to_network.get(ap_serial)
+
     return {
         "ap_count": len(ap_serials),
         "client_count": sum(len(v) for v in clients_by_ap.values()),
         "nodes": [n.model_dump() for n in l2.nodes],
         "edges": [e.model_dump() for e in l2.edges],
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /api/meraki/topology/device-details
+# ---------------------------------------------------------------------------
+
+
+@router.get("/topology/device-details")
+async def get_topology_device_details(
+    network: Optional[str] = Query(None, description="Network ID"),
+):
+    """Bulk-fetch per-device detail (clients + switch ports) for every
+    device in the given network(s).
+
+    This lets the frontend pre-populate the right-hand detail panel for
+    every device in one refresh pass, so clicking a device fires no
+    additional Meraki calls.
+
+    Returns a serial-keyed map:
+        {
+            "Q2XX-XXXX-XXXX": {
+                "serial": "Q2XX-XXXX-XXXX",
+                "clients": [...],
+                "switch_ports": [...]
+            },
+            ...
+        }
+    """
+    org_id = await _get_org_id()
+    client = _get_client()
+
+    try:
+        devices = await client.get_org_devices(org_id)
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=exc.response.status_code,
+            detail=f"Meraki API error: {exc.response.text}",
+        ) from exc
+
+    if network:
+        devices = [d for d in devices if d.get("networkId") == network]
+
+    serials = [d["serial"] for d in devices if d.get("serial")]
+
+    async def _fetch_one(serial: str) -> tuple[str, dict]:
+        try:
+            clients, ports = await asyncio.gather(
+                client.get_device_clients(serial),
+                client.get_device_switch_ports(serial),
+            )
+        except Exception:
+            clients, ports = [], []
+        return serial, {
+            "serial": serial,
+            "clients": clients,
+            "switch_ports": ports,
+        }
+
+    # The shared rate limiter inside MerakiClient serializes these despite
+    # asyncio.gather — we still benefit from overlapping event-loop work.
+    results = await asyncio.gather(*[_fetch_one(s) for s in serials])
+    return dict(results)
 
 
 # ---------------------------------------------------------------------------
@@ -307,10 +399,11 @@ async def refresh_topology(network: Optional[str] = Query(None, description="Net
         # Phase 1: discovery
         # ------------------------------------------------------------------ #
         try:
-            devices, networks_list, statuses = await asyncio.gather(
+            devices, networks_list, availabilities, uplinks_addresses = await asyncio.gather(
                 client.get_org_devices(org_id),
                 client.get_org_networks(org_id),
-                client.get_org_device_statuses(org_id),
+                client.get_org_device_availabilities(org_id),
+                client.get_org_device_uplinks_addresses(org_id),
             )
         except httpx.HTTPStatusError as exc:
             yield {
@@ -368,7 +461,9 @@ async def refresh_topology(network: Optional[str] = Query(None, description="Net
 
             # Build partial L2 for this network to stream nodes/edges
             net_devices = [d for d in devices if d.get("networkId") == net_id]
-            partial_l2 = _transformer.build_l2(net_devices, statuses, [link_layer])
+            partial_l2 = _transformer.build_l2(
+                net_devices, availabilities, uplinks_addresses, [link_layer]
+            )
 
             yield {
                 "event": "message",
@@ -416,7 +511,9 @@ async def refresh_topology(network: Optional[str] = Query(None, description="Net
         # Phase 4: complete — full L2 + L3
         # ------------------------------------------------------------------ #
         final_devices = [d for d in devices if d.get("networkId") in target_network_ids]
-        final_l2 = _transformer.build_l2(final_devices, statuses, all_link_layer)
+        final_l2 = _transformer.build_l2(
+            final_devices, availabilities, uplinks_addresses, all_link_layer
+        )
         final_l3 = _transformer.build_l3(vlans_by_network, final_devices)
 
         yield {
@@ -429,3 +526,36 @@ async def refresh_topology(network: Optional[str] = Query(None, description="Net
         }
 
     return EventSourceResponse(event_generator())
+
+
+# ---------------------------------------------------------------------------
+# POST /api/meraki/save-seed
+# ---------------------------------------------------------------------------
+# Developer utility — writes the current frontend topology cache into
+# ui/public/meraki-topology-seed.json so a fresh clone can render without
+# hitting the Meraki API on first load.  Intended for local dev use;
+# simply commit the produced file after calling this endpoint.
+
+
+_SEED_PATH = Path("ui/public/meraki-topology-seed.json")
+
+
+@router.post("/save-seed")
+async def save_seed(payload: dict[str, Any] = Body(...)):
+    """Persist a topology-cache snapshot to ui/public/meraki-topology-seed.json.
+
+    The body should be the same shape the UI stores in localStorage.  The
+    endpoint does not inspect the schema — it trusts the caller — so
+    bumping the UI cache version requires no backend change.
+    """
+    try:
+        _SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _SEED_PATH.write_text(json.dumps(payload, indent=2))
+    except OSError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to write seed file at {_SEED_PATH}: {exc}",
+        ) from exc
+
+    size = _SEED_PATH.stat().st_size
+    return {"saved": True, "path": str(_SEED_PATH), "bytes": size}

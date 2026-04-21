@@ -34,8 +34,23 @@ class MerakiClient:
     async def get_org_devices(self, org_id: str) -> list[dict]:
         return await self._get(f"/organizations/{org_id}/devices")
 
-    async def get_org_device_statuses(self, org_id: str) -> list[dict]:
-        return await self._get(f"/organizations/{org_id}/devices/statuses")
+    async def get_org_device_availabilities(self, org_id: str) -> list[dict]:
+        """Replaces the deprecated /devices/statuses `status` field.
+
+        Returns a list of {serial, status, productType, network, ...} with
+        status in {online, alerting, offline, dormant}.
+        """
+        return await self._get(f"/organizations/{org_id}/devices/availabilities")
+
+    async def get_org_device_uplinks_addresses(self, org_id: str) -> list[dict]:
+        """Replaces the deprecated /devices/statuses network fields.
+
+        Returns a list of {serial, network, uplinks: [{interface, addresses: [...]}]}
+        with public IP, gateway, DNS, and assignment mode per uplink.
+        """
+        return await self._get(
+            f"/organizations/{org_id}/devices/uplinks/addresses/byDevice"
+        )
 
     async def get_org_networks(self, org_id: str) -> list[dict]:
         return await self._get(f"/organizations/{org_id}/networks")

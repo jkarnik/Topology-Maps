@@ -81,7 +81,6 @@ class Device(BaseModel):
     address: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
     notes: Optional[str] = None
-    last_reported_at: Optional[str] = None
     config_updated_at: Optional[str] = None
     ip_type: Optional[str] = None
     dashboard_url: Optional[str] = None
@@ -117,6 +116,9 @@ class Subnet(BaseModel):
     cidr: str
     gateway: str
     device_count: int = 0
+    # Meraki: network the VLAN belongs to.  Used for client-side filtering
+    # of a cached "All Networks" topology when the user picks a specific site.
+    network_id: Optional[str] = None
 
 
 class Route(BaseModel):

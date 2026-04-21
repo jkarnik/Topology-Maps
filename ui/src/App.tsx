@@ -18,23 +18,24 @@ function App() {
   const topo = useTopology();
   const meraki = useMerakiTopology();
 
-  // First-switch trigger for Meraki: fetch networks then refresh
+  // First-switch trigger for Meraki.  Resolution order:
+  //   1. localStorage cache — hydrated synchronously by the hook
+  //   2. /meraki-topology-seed.json — fetched once, committed to the repo
+  //   3. Live Meraki API — last resort
+  // Only (3) sends requests to Meraki, so a fresh clone with a seed file
+  // renders without touching the Meraki API until the user hits Refresh.
   const [merakiInitialized, setMerakiInitialized] = useState(false);
   useEffect(() => {
-    if (dataSource === 'meraki' && !merakiInitialized) {
-      setMerakiInitialized(true);
+    if (dataSource !== 'meraki' || merakiInitialized) return;
+    setMerakiInitialized(true);
+    if (meraki.networks.length > 0 && meraki.l2Topology !== null) return;
+    meraki.loadSeedFile().then((seedOk) => {
+      if (seedOk) return;
       meraki.fetchNetworks().then((networkId) => {
         if (networkId) meraki.refresh(networkId);
       });
-    }
+    });
   }, [dataSource, merakiInitialized]);
-
-  // Re-fetch when network filter changes
-  useEffect(() => {
-    if (dataSource === 'meraki' && merakiInitialized) {
-      meraki.refresh();
-    }
-  }, [meraki.selectedNetwork]);
 
   const isSimulated = dataSource === 'simulated';
   const l2 = isSimulated ? topo.l2Topology : meraki.l2Topology;
@@ -70,6 +71,7 @@ function App() {
         isRefreshing={meraki.isRefreshing}
         lastUpdated={meraki.lastUpdated}
         onRefresh={meraki.refresh}
+        onSaveSnapshot={meraki.saveSnapshot}
       />
       <div className="flex-1 relative overflow-hidden">
         {showSimStopped ? (
@@ -120,7 +122,13 @@ function App() {
           <DetailPanel device={selectedDevice} topology={l2} onClose={() => setSelectedDevice(null)} />
         )}
         {(viewMode === 'l2' || viewMode === 'hybrid') && !isSimulated && (
-          <MerakiDetailPanel device={selectedDevice} topology={l2} clientCounts={meraki.clientCounts} onClose={() => setSelectedDevice(null)} />
+          <MerakiDetailPanel
+            device={selectedDevice}
+            topology={l2}
+            clientCounts={meraki.clientCounts}
+            onClose={() => setSelectedDevice(null)}
+            onGetDeviceDetail={meraki.getDeviceDetail}
+          />
         )}
       </div>
     </div>

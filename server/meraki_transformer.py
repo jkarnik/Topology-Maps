@@ -43,7 +43,8 @@ class MerakiTransformer:
     def build_l2(
         self,
         devices: list[dict],
-        device_statuses: list[dict],
+        availabilities: list[dict],
+        uplinks_addresses: list[dict],
         link_layer_data: list[dict],
         clients_by_ap: Optional[dict[str, list[dict]]] = None,
         stacks_by_network: Optional[dict[str, list[dict]]] = None,
@@ -52,8 +53,13 @@ class MerakiTransformer:
 
         Args:
             devices: List of device objects from GET /organizations/{id}/devices.
-            device_statuses: List of status objects from
-                GET /organizations/{id}/devices/statuses.
+            availabilities: List of availability objects from
+                GET /organizations/{id}/devices/availabilities.  Replaces the
+                deprecated `status` field from /devices/statuses.
+            uplinks_addresses: List of uplink-address objects from
+                GET /organizations/{id}/devices/uplinks/addresses/byDevice.
+                Replaces the public_ip/gateway/dns/ipType fields from
+                /devices/statuses.
             link_layer_data: List of link-layer topology objects from
                 GET /networks/{id}/topology/linkLayer, one per network.
             clients_by_ap: Optional dict of AP serial → client list.
@@ -68,12 +74,26 @@ class MerakiTransformer:
         Returns:
             L2Topology with nodes and edges populated.
         """
-        # Index statuses by serial for O(1) lookup
-        status_by_serial: dict[str, dict] = {
-            s["serial"]: s
-            for s in device_statuses
-            if "serial" in s
+        # Index availabilities by serial for O(1) status lookup
+        avail_by_serial: dict[str, dict] = {
+            a["serial"]: a
+            for a in availabilities
+            if "serial" in a
         }
+        # Index uplink-address info by serial; pick the first ipv4 address
+        # across wan1/wan2/man1/man2 uplinks.
+        uplink_by_serial: dict[str, dict] = {}
+        for entry in uplinks_addresses:
+            serial = entry.get("serial")
+            if not serial:
+                continue
+            for uplink in entry.get("uplinks", []):
+                for addr in uplink.get("addresses", []):
+                    if addr.get("protocol") == "ipv4":
+                        uplink_by_serial[serial] = addr
+                        break
+                if serial in uplink_by_serial:
+                    break
 
         nodes: list[Device] = []
         for dev in devices:
@@ -84,9 +104,16 @@ class MerakiTransformer:
             product_type = dev.get("productType", "")
             device_type = DEVICE_TYPE_MAP.get(product_type, DeviceType.ENDPOINT)
 
-            status_obj = status_by_serial.get(serial, {})
-            raw_status = status_obj.get("status", "offline")
+            avail_obj = avail_by_serial.get(serial, {})
+            raw_status = avail_obj.get("status", "offline")
             status = STATUS_MAP.get(raw_status, DeviceStatus.DOWN)
+            uplink_addr = uplink_by_serial.get(serial, {})
+            public_obj = uplink_addr.get("public") or {}
+            nameservers = (uplink_addr.get("nameservers") or {}).get("addresses") or []
+            # assignmentMode: "static" | "dynamic" — normalize "dynamic" → "dhcp"
+            # for backward compatibility with existing UI labels.
+            assignment_mode = uplink_addr.get("assignmentMode")
+            ip_type_value = "dhcp" if assignment_mode == "dynamic" else assignment_mode
 
             # Extract software version from the details array if present
             software_version: Optional[str] = None
@@ -119,13 +146,13 @@ class MerakiTransformer:
                     config_updated_at=dev.get("configurationUpdatedAt"),
                     dashboard_url=dev.get("url"),
                     software_version=software_version,
-                    # From status object
-                    public_ip=status_obj.get("publicIp"),
-                    last_reported_at=status_obj.get("lastReportedAt"),
-                    gateway=status_obj.get("gateway"),
-                    primary_dns=status_obj.get("primaryDns"),
-                    secondary_dns=status_obj.get("secondaryDns"),
-                    ip_type=status_obj.get("ipType"),
+                    # From availability + uplink-address objects (replacements
+                    # for the deprecated /devices/statuses endpoint).
+                    public_ip=public_obj.get("address"),
+                    gateway=uplink_addr.get("gateway"),
+                    primary_dns=nameservers[0] if len(nameservers) > 0 else None,
+                    secondary_dns=nameservers[1] if len(nameservers) > 1 else None,
+                    ip_type=ip_type_value,
                 )
             )
 
@@ -290,7 +317,7 @@ class MerakiTransformer:
 
         subnets: list[Subnet] = []
 
-        for _network_id, vlans in vlans_by_network.items():
+        for network_id, vlans in vlans_by_network.items():
             for vlan in vlans:
                 vlan_id = vlan.get("id")
                 if vlan_id is None:
@@ -310,6 +337,7 @@ class MerakiTransformer:
                         cidr=cidr,
                         gateway=gateway,
                         device_count=device_count,
+                        network_id=network_id,
                     )
                 )
 

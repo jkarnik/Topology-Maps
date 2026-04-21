@@ -28,3 +28,14 @@ export interface RefreshProgress {
   l2?: Record<string, unknown>;
   l3?: Record<string, unknown>;
 }
+
+/**
+ * Per-device detail pre-fetched during refresh and shown in the right-hand
+ * MerakiDetailPanel.  Mirrors the response shape of
+ * `GET /api/meraki/devices/{serial}`.
+ */
+export interface MerakiDeviceDetail {
+  serial: string;
+  clients: Record<string, unknown>[];
+  switch_ports: Record<string, unknown>[];
+}

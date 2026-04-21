@@ -36,11 +36,14 @@ AP_DEVICE = {
 
 ALL_DEVICES = [APPLIANCE_DEVICE, SWITCH_DEVICE, AP_DEVICE]
 
-ALL_STATUSES = [
+ALL_AVAILABILITIES = [
     {"serial": "Q2AB-1111-AAAA", "status": "online"},
     {"serial": "Q2SW-2222-BBBB", "status": "offline"},
     {"serial": "Q2AP-3333-CCCC", "status": "alerting"},
 ]
+
+# Empty uplinks-addresses payload for tests that don't exercise IP/DNS/gateway.
+NO_UPLINKS: list[dict] = []
 
 LINK_LAYER_DATA = [
     {
@@ -108,19 +111,19 @@ VLANS_BY_NETWORK = {
 class TestDeviceTypeMapping:
     def test_appliance_maps_to_firewall(self):
         t = MerakiTransformer()
-        topo = t.build_l2([APPLIANCE_DEVICE], ALL_STATUSES, [])
+        topo = t.build_l2([APPLIANCE_DEVICE], ALL_AVAILABILITIES, NO_UPLINKS, [])
         node = next(n for n in topo.nodes if n.id == "Q2AB-1111-AAAA")
         assert node.type == DeviceType.FIREWALL
 
     def test_switch_maps_to_floor_switch(self):
         t = MerakiTransformer()
-        topo = t.build_l2([SWITCH_DEVICE], ALL_STATUSES, [])
+        topo = t.build_l2([SWITCH_DEVICE], ALL_AVAILABILITIES, NO_UPLINKS, [])
         node = next(n for n in topo.nodes if n.id == "Q2SW-2222-BBBB")
         assert node.type == DeviceType.FLOOR_SWITCH
 
     def test_wireless_maps_to_access_point(self):
         t = MerakiTransformer()
-        topo = t.build_l2([AP_DEVICE], ALL_STATUSES, [])
+        topo = t.build_l2([AP_DEVICE], ALL_AVAILABILITIES, NO_UPLINKS, [])
         node = next(n for n in topo.nodes if n.id == "Q2AP-3333-CCCC")
         assert node.type == DeviceType.ACCESS_POINT
 
@@ -133,32 +136,32 @@ class TestDeviceTypeMapping:
 class TestStatusMapping:
     def test_online_maps_to_up(self):
         t = MerakiTransformer()
-        topo = t.build_l2([APPLIANCE_DEVICE], [{"serial": "Q2AB-1111-AAAA", "status": "online"}], [])
+        topo = t.build_l2([APPLIANCE_DEVICE], [{"serial": "Q2AB-1111-AAAA", "status": "online"}], NO_UPLINKS, [])
         node = topo.nodes[0]
         assert node.status == DeviceStatus.UP
 
     def test_offline_maps_to_down(self):
         t = MerakiTransformer()
-        topo = t.build_l2([SWITCH_DEVICE], [{"serial": "Q2SW-2222-BBBB", "status": "offline"}], [])
+        topo = t.build_l2([SWITCH_DEVICE], [{"serial": "Q2SW-2222-BBBB", "status": "offline"}], NO_UPLINKS, [])
         node = topo.nodes[0]
         assert node.status == DeviceStatus.DOWN
 
     def test_alerting_maps_to_alerting(self):
         t = MerakiTransformer()
-        topo = t.build_l2([AP_DEVICE], [{"serial": "Q2AP-3333-CCCC", "status": "alerting"}], [])
+        topo = t.build_l2([AP_DEVICE], [{"serial": "Q2AP-3333-CCCC", "status": "alerting"}], NO_UPLINKS, [])
         node = topo.nodes[0]
         assert node.status == DeviceStatus.ALERTING
 
     def test_dormant_maps_to_down(self):
         t = MerakiTransformer()
-        topo = t.build_l2([AP_DEVICE], [{"serial": "Q2AP-3333-CCCC", "status": "dormant"}], [])
+        topo = t.build_l2([AP_DEVICE], [{"serial": "Q2AP-3333-CCCC", "status": "dormant"}], NO_UPLINKS, [])
         node = topo.nodes[0]
         assert node.status == DeviceStatus.DOWN
 
     def test_missing_status_defaults_to_down(self):
         """A device with no status entry should default to DOWN."""
         t = MerakiTransformer()
-        topo = t.build_l2([APPLIANCE_DEVICE], [], [])
+        topo = t.build_l2([APPLIANCE_DEVICE], [], [], [])
         node = topo.nodes[0]
         assert node.status == DeviceStatus.DOWN
 
@@ -171,19 +174,19 @@ class TestStatusMapping:
 class TestEdgeCreation:
     def test_edges_created_from_link_layer(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, LINK_LAYER_DATA)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, LINK_LAYER_DATA)
         assert len(topo.edges) == 2
 
     def test_edge_source_and_target(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, LINK_LAYER_DATA)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, LINK_LAYER_DATA)
         serials = {frozenset({e.source, e.target}) for e in topo.edges}
         assert frozenset({"Q2AB-1111-AAAA", "Q2SW-2222-BBBB"}) in serials
         assert frozenset({"Q2SW-2222-BBBB", "Q2AP-3333-CCCC"}) in serials
 
     def test_lldp_port_ids_captured(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, LINK_LAYER_DATA)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, LINK_LAYER_DATA)
         edge = next(
             e for e in topo.edges
             if frozenset({e.source, e.target}) == frozenset({"Q2AB-1111-AAAA", "Q2SW-2222-BBBB"})
@@ -194,7 +197,7 @@ class TestEdgeCreation:
 
     def test_cdp_port_id_captured_when_no_lldp(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, LINK_LAYER_DATA)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, LINK_LAYER_DATA)
         edge = next(
             e for e in topo.edges
             if frozenset({e.source, e.target}) == frozenset({"Q2SW-2222-BBBB", "Q2AP-3333-CCCC"})
@@ -204,13 +207,13 @@ class TestEdgeCreation:
 
     def test_protocol_is_lldp(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, LINK_LAYER_DATA)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, LINK_LAYER_DATA)
         for edge in topo.edges:
             assert edge.protocol == LinkProtocol.LLDP
 
     def test_no_edges_when_no_link_layer_data(self):
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, [])
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, [])
         assert topo.edges == []
 
     def test_duplicate_links_deduplicated(self):
@@ -234,7 +237,7 @@ class TestEdgeCreation:
             }
         ]
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, duplicate_link_data)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, duplicate_link_data)
         assert len(topo.edges) == 1
 
     def test_link_missing_serial_skipped(self):
@@ -251,7 +254,7 @@ class TestEdgeCreation:
             }
         ]
         t = MerakiTransformer()
-        topo = t.build_l2(ALL_DEVICES, ALL_STATUSES, bad_link_data)
+        topo = t.build_l2(ALL_DEVICES, ALL_AVAILABILITIES, NO_UPLINKS, bad_link_data)
         assert topo.edges == []
 
 

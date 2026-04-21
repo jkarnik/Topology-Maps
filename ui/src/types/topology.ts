@@ -40,7 +40,6 @@ export interface Device {
   address?: string | null;
   tags?: string[];
   notes?: string | null;
-  last_reported_at?: string | null;
   config_updated_at?: string | null;
   ip_type?: string | null;
   dashboard_url?: string | null;
@@ -70,6 +69,7 @@ export interface Subnet {
   cidr: string;
   gateway: string;
   device_count: number;
+  network_id?: string | null;
 }
 
 export interface Route {

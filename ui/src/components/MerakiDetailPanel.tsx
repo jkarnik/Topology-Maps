@@ -8,6 +8,18 @@ interface MerakiDetailPanelProps {
   topology: L2Topology | null;
   clientCounts: Record<string, number>;
   onClose: () => void;
+  /**
+   * Resolve per-device detail (clients + switch ports).  The parent hook
+   * pre-populates this during refresh, so selection typically completes
+   * without any additional Meraki API calls.  When the cache lacks an
+   * entry — e.g. a new device since the last refresh — the resolver
+   * falls back to a live fetch.
+   */
+  onGetDeviceDetail: (serial: string) => Promise<{
+    serial: string;
+    clients: Record<string, unknown>[];
+    switch_ports: Record<string, unknown>[];
+  } | null>;
 }
 
 /* ---------- API types ---------- */
@@ -204,13 +216,16 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
   topology,
   clientCounts,
   onClose,
+  onGetDeviceDetail,
 }) => {
   const isOpen = device !== null;
   const [detail, setDetail] = useState<DeviceDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch device detail whenever the selected device changes
+  // Resolve device detail whenever the selected device changes.  The
+  // resolver checks the in-memory cache populated during refresh before
+  // falling back to a network call, so clicks are typically instant.
   useEffect(() => {
     if (!device) {
       setDetail(null);
@@ -223,16 +238,15 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
     setError(null);
     setDetail(null);
 
-    fetch(`/api/meraki/devices/${encodeURIComponent(device.id)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<DeviceDetail>;
-      })
+    onGetDeviceDetail(device.id)
       .then((data) => {
-        if (!cancelled) {
-          setDetail(data);
-          setLoading(false);
+        if (cancelled) return;
+        if (data) {
+          setDetail(data as DeviceDetail);
+        } else {
+          setError('Device detail unavailable');
         }
+        setLoading(false);
       })
       .catch((err: unknown) => {
         if (!cancelled) {
@@ -244,7 +258,7 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [device?.id]);
+  }, [device?.id, onGetDeviceDetail]);
 
   // Neighbors from topology
   const neighbors = React.useMemo(() => {
@@ -517,16 +531,13 @@ const MerakiDetailPanel: React.FC<MerakiDetailPanelProps> = ({
                   </>
                 )}
 
-                {(device.tags?.length || device.notes || device.last_reported_at || device.config_updated_at || device.dashboard_url) && (
+                {(device.tags?.length || device.notes || device.config_updated_at || device.dashboard_url) && (
                   <>
                     <SectionHeader>Meta</SectionHeader>
                     {device.tags && device.tags.length > 0 && (
                       <InfoRow label="Tags" value={device.tags.join(', ')} />
                     )}
                     {device.notes && <InfoRow label="Notes" value={device.notes} />}
-                    {device.last_reported_at && (
-                      <InfoRow label="Last Reported" value={new Date(device.last_reported_at).toLocaleString()} />
-                    )}
                     {device.config_updated_at && (
                       <InfoRow label="Config Updated" value={new Date(device.config_updated_at).toLocaleString()} />
                     )}

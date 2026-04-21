@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DataSource, ViewMode } from '../types/topology';
 import { MerakiNetwork } from '../types/meraki';
 import { SourceSelector } from './SourceSelector';
@@ -21,6 +21,7 @@ interface TopBarProps {
   isRefreshing: boolean;
   lastUpdated: Date | null;
   onRefresh: () => void;
+  onSaveSnapshot: () => Promise<boolean>;
 }
 
 /** Convert seconds to "M:SS" format */
@@ -64,8 +65,18 @@ export const TopBar: React.FC<TopBarProps> = ({
   isRefreshing,
   lastUpdated,
   onRefresh,
+  onSaveSnapshot,
 }) => {
   const accentColor = dataSource === 'simulated' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const handleSaveSnapshot = async () => {
+    if (saveStatus === 'saving') return;
+    setSaveStatus('saving');
+    const ok = await onSaveSnapshot();
+    setSaveStatus(ok ? 'saved' : 'error');
+    setTimeout(() => setSaveStatus('idle'), 2000);
+  };
 
   return (
     <header
@@ -258,7 +269,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
             {/* Refresh button */}
             <button
-              onClick={onRefresh}
+              onClick={() => onRefresh()}
               disabled={isRefreshing}
               title="Refresh topology"
               style={{
@@ -298,6 +309,64 @@ export const TopBar: React.FC<TopBarProps> = ({
                   strokeLinejoin="round"
                 />
               </svg>
+            </button>
+
+            {/* Save snapshot button — writes the current cache into
+                ui/public/meraki-topology-seed.json so the next fresh
+                clone can render without any Meraki API calls. */}
+            <button
+              onClick={handleSaveSnapshot}
+              disabled={saveStatus === 'saving'}
+              title={
+                saveStatus === 'saved'
+                  ? 'Saved to ui/public/meraki-topology-seed.json'
+                  : saveStatus === 'error'
+                  ? 'Save failed — check backend logs'
+                  : 'Save current cache to seed file'
+              }
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                height: '30px',
+                padding: saveStatus === 'saved' || saveStatus === 'error' ? '0 10px' : '0',
+                width: saveStatus === 'saved' || saveStatus === 'error' ? 'auto' : '30px',
+                borderRadius: '5px',
+                border: '1px solid var(--border-subtle)',
+                cursor: saveStatus === 'saving' ? 'not-allowed' : 'pointer',
+                background: 'var(--bg-tertiary)',
+                color:
+                  saveStatus === 'saved'
+                    ? 'var(--accent-green)'
+                    : saveStatus === 'error'
+                    ? 'var(--accent-red)'
+                    : 'var(--accent-amber)',
+                opacity: saveStatus === 'saving' ? 0.6 : 1,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                transition: 'color 0.15s ease',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                {/* Floppy-disk shape */}
+                <path
+                  d="M2 2h7.5L12 4.5V12H2V2z"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4 2v3h5V2M4 12v-4h5v4"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {saveStatus === 'saved' && <span>SAVED</span>}
+              {saveStatus === 'error' && <span>ERR</span>}
             </button>
           </>
         )}
