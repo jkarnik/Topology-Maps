@@ -97,3 +97,52 @@ async def test_get_org_adaptive_policy_policies(client):
     async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
         mock.get("/organizations/123/adaptivePolicy/policies").mock(return_value=httpx.Response(200, json=[]))
         assert await client.get_org_adaptive_policy_policies("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_appliance_vpn_third_party_peers(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/appliance/vpn/thirdPartyVPNPeers").mock(return_value=httpx.Response(200, json={"peers": []}))
+        assert await client.get_org_appliance_vpn_third_party_peers("123") == {"peers": []}
+
+
+@pytest.mark.asyncio
+async def test_get_org_appliance_vpn_firewall(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/appliance/vpn/vpnFirewallRules").mock(return_value=httpx.Response(200, json={"rules": []}))
+        assert await client.get_org_appliance_vpn_firewall("123") == {"rules": []}
+
+
+@pytest.mark.asyncio
+async def test_get_org_snmp(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/snmp").mock(return_value=httpx.Response(200, json={"v2cEnabled": False}))
+        assert "v2cEnabled" in await client.get_org_snmp("123")
+
+
+@pytest.mark.asyncio
+async def test_get_org_alerts_profiles(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/alerts/profiles").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_alerts_profiles("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_inventory_devices(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/inventory/devices").mock(return_value=httpx.Response(200, json=[{"serial": "Q2AB"}]))
+        assert await client.get_org_inventory_devices("123") == [{"serial": "Q2AB"}]
+
+
+@pytest.mark.asyncio
+async def test_get_org_licenses_per_device(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/licenses").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_licenses_per_device("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_licenses_coterm(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/licensing/coterm/licenses").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_licenses_coterm("123") == []

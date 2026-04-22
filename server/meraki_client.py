@@ -177,5 +177,26 @@ class MerakiClient:
     async def get_org_adaptive_policy_policies(self, org_id: str) -> list[dict]:
         return await self._get(f"/organizations/{org_id}/adaptivePolicy/policies")
 
+    async def get_org_appliance_vpn_third_party_peers(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/appliance/vpn/thirdPartyVPNPeers")
+
+    async def get_org_appliance_vpn_firewall(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/appliance/vpn/vpnFirewallRules")
+
+    async def get_org_snmp(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/snmp")
+
+    async def get_org_alerts_profiles(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/alerts/profiles")
+
+    async def get_org_inventory_devices(self, org_id: str) -> list[dict]:
+        return await self._get_paginated(f"/organizations/{org_id}/inventory/devices")
+
+    async def get_org_licenses_per_device(self, org_id: str) -> list[dict]:
+        return await self._get_paginated(f"/organizations/{org_id}/licenses")
+
+    async def get_org_licenses_coterm(self, org_id: str) -> list[dict]:
+        return await self._get_paginated(f"/organizations/{org_id}/licensing/coterm/licenses")
+
     async def close(self) -> None:
         await self._client.aclose()
