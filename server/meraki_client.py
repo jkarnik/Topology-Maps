@@ -277,5 +277,46 @@ class MerakiClient:
     async def get_appliance_firewall_cellular(self, network_id: str) -> dict:
         return await self._get(f"/networks/{network_id}/appliance/firewall/cellularFirewallRules")
 
+    # --- Plan 1.07: MX security / shaping / VPN / routing ------------------
+
+    async def get_appliance_content_filtering(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/contentFiltering")
+
+    async def get_appliance_security_intrusion(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/security/intrusion")
+
+    async def get_appliance_security_malware(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/security/malware")
+
+    async def get_appliance_traffic_shaping_rules(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/trafficShaping/rules")
+
+    async def get_appliance_uplink_bandwidth(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/trafficShaping/uplinkBandwidth")
+
+    async def get_appliance_uplink_selection(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/trafficShaping/uplinkSelection")
+
+    async def get_appliance_custom_performance_classes(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/appliance/trafficShaping/customPerformanceClasses")
+
+    async def get_appliance_site_to_site_vpn(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/vpn/siteToSiteVpn")
+
+    async def get_appliance_vpn_bgp(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/vpn/bgp")
+
+    async def get_appliance_static_routes(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/appliance/staticRoutes")
+
+    async def get_appliance_warm_spare(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/warmSpare")
+
+    async def get_appliance_connectivity_monitoring(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/connectivityMonitoringDestinations")
+
+    async def get_appliance_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/settings")
+
     async def close(self) -> None:
         await self._client.aclose()

@@ -56,3 +56,26 @@ async def test_mx_vlan_port_firewall(client, method, path, body):
         mock.get(path).mock(return_value=httpx.Response(200, json=body))
         result = await getattr(client, method)("N_1")
     assert result == body
+
+
+@pytest.mark.parametrize("method,path,body", [
+    ("get_appliance_content_filtering",       "/networks/N_1/appliance/contentFiltering",                  {"blockedUrlCategories": []}),
+    ("get_appliance_security_intrusion",      "/networks/N_1/appliance/security/intrusion",                {"mode": "disabled"}),
+    ("get_appliance_security_malware",        "/networks/N_1/appliance/security/malware",                  {"mode": "disabled"}),
+    ("get_appliance_traffic_shaping_rules",   "/networks/N_1/appliance/trafficShaping/rules",              {"rules": []}),
+    ("get_appliance_uplink_bandwidth",        "/networks/N_1/appliance/trafficShaping/uplinkBandwidth",    {"bandwidthLimits": {}}),
+    ("get_appliance_uplink_selection",        "/networks/N_1/appliance/trafficShaping/uplinkSelection",    {"activeActiveAutoVpnEnabled": False}),
+    ("get_appliance_custom_performance_classes","/networks/N_1/appliance/trafficShaping/customPerformanceClasses", []),
+    ("get_appliance_site_to_site_vpn",        "/networks/N_1/appliance/vpn/siteToSiteVpn",                 {"mode": "none"}),
+    ("get_appliance_vpn_bgp",                 "/networks/N_1/appliance/vpn/bgp",                           {"enabled": False}),
+    ("get_appliance_static_routes",           "/networks/N_1/appliance/staticRoutes",                      []),
+    ("get_appliance_warm_spare",              "/networks/N_1/appliance/warmSpare",                         {"enabled": False}),
+    ("get_appliance_connectivity_monitoring", "/networks/N_1/appliance/connectivityMonitoringDestinations", {"destinations": []}),
+    ("get_appliance_settings",                "/networks/N_1/appliance/settings",                           {"clientTrackingMethod": "MAC address"}),
+])
+@pytest.mark.asyncio
+async def test_mx_security_shaping_vpn(client, method, path, body):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get(path).mock(return_value=httpx.Response(200, json=body))
+        result = await getattr(client, method)("N_1")
+    assert result == body
