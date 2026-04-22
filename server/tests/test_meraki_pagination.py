@@ -74,3 +74,19 @@ async def test_get_paginated_follows_link_next(client):
 
         result = await client._get_paginated("/organizations/123/inventory/devices")
     assert result == [{"id": "1"}, {"id": "2"}, {"id": "3"}, {"id": "4"}, {"id": "5"}]
+
+
+@pytest.mark.asyncio
+async def test_get_paginated_raises_on_max_pages(client):
+    """If more pages than max_pages exist, raise MaxPagesExceeded."""
+    async with respx.mock as mock:
+        always_has_next = httpx.Response(
+            200,
+            json=[{"id": "x"}],
+            headers={"Link": '<https://api.meraki.com/api/v1/foo?startingAfter=x>; rel="next"'},
+        )
+        mock.get("https://api.meraki.com/api/v1/foo", params={"perPage": 1000}).mock(return_value=always_has_next)
+        mock.get(url__startswith="https://api.meraki.com/api/v1/foo?startingAfter=").mock(return_value=always_has_next)
+
+        with pytest.raises(MaxPagesExceeded):
+            await client._get_paginated("/foo", max_pages=3)
