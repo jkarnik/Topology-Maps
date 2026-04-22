@@ -115,3 +115,36 @@ def test_config_change_events_dedup_unique_constraint(fresh_db):
     with pytest.raises(sqlite3.IntegrityError):
         fresh_db.execute(insert_sql, args)
         fresh_db.commit()
+
+
+def test_config_sweep_runs_table_exists(fresh_db):
+    """config_sweep_runs table has expected columns and defaults."""
+    assert _table_exists(fresh_db, "config_sweep_runs")
+
+    cols = {row["name"]: row for row in fresh_db.execute("PRAGMA table_info(config_sweep_runs)")}
+    expected = {
+        "id", "org_id", "kind", "status",
+        "started_at", "completed_at",
+        "total_calls", "completed_calls", "failed_calls", "skipped_calls",
+        "error_summary",
+    }
+    assert set(cols.keys()) == expected
+    assert cols["id"]["pk"] == 1
+    assert cols["org_id"]["notnull"] == 1
+    assert cols["kind"]["notnull"] == 1
+    assert cols["status"]["notnull"] == 1
+
+
+def test_config_sweep_runs_counter_defaults(fresh_db):
+    """Inserting with only required fields leaves counters at 0."""
+    fresh_db.execute(
+        "INSERT INTO config_sweep_runs (org_id, kind, status) VALUES (?, ?, ?)",
+        ("org1", "baseline", "queued"),
+    )
+    fresh_db.commit()
+    row = fresh_db.execute(
+        "SELECT completed_calls, failed_calls, skipped_calls FROM config_sweep_runs"
+    ).fetchone()
+    assert row["completed_calls"] == 0
+    assert row["failed_calls"] == 0
+    assert row["skipped_calls"] == 0

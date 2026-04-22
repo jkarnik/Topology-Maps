@@ -121,6 +121,20 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             fetched_at TEXT NOT NULL,
             UNIQUE(org_id, ts, network_id, label, old_value, new_value)
         );
+
+        CREATE TABLE IF NOT EXISTS config_sweep_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            status TEXT NOT NULL,
+            started_at TEXT,
+            completed_at TEXT,
+            total_calls INTEGER,
+            completed_calls INTEGER DEFAULT 0,
+            failed_calls INTEGER DEFAULT 0,
+            skipped_calls INTEGER DEFAULT 0,
+            error_summary TEXT
+        );
     """)
     conn.commit()
 
