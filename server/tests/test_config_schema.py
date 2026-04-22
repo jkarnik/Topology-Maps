@@ -41,3 +41,17 @@ def test_scaffolding_loads():
     """Sanity check: test file imports and helpers resolve."""
     assert _table_exists is not None
     assert _index_exists is not None
+
+
+def test_config_blobs_table_exists(fresh_db):
+    """config_blobs table is created with the expected columns."""
+    assert _table_exists(fresh_db, "config_blobs")
+
+    cols = {row["name"]: row for row in fresh_db.execute("PRAGMA table_info(config_blobs)")}
+    assert set(cols.keys()) == {"hash", "payload", "byte_size", "first_seen_at"}
+    assert cols["hash"]["pk"] == 1                  # hash is PRIMARY KEY
+    assert cols["hash"]["notnull"] == 0             # PK implies NOT NULL; PRAGMA reports 0 for text PK
+    assert cols["payload"]["notnull"] == 1
+    assert cols["byte_size"]["notnull"] == 1
+    assert cols["first_seen_at"]["notnull"] == 1
+    assert cols["byte_size"]["type"].upper() == "INTEGER"

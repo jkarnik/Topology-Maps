@@ -76,6 +76,13 @@ def _create_tables(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target);
         CREATE INDEX IF NOT EXISTS idx_devices_type ON devices(type);
         CREATE INDEX IF NOT EXISTS idx_connection_history_device ON connection_history(device);
+
+        CREATE TABLE IF NOT EXISTS config_blobs (
+            hash TEXT PRIMARY KEY,
+            payload TEXT NOT NULL,
+            byte_size INTEGER NOT NULL,
+            first_seen_at TEXT NOT NULL
+        );
     """)
     conn.commit()
 
