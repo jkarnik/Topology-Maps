@@ -51,3 +51,26 @@ async def test_get_paginated_single_page_no_link(client):
         )
         result = await client._get_paginated("/organizations/123/admins")
     assert result == [{"id": "1"}, {"id": "2"}]
+
+
+@pytest.mark.asyncio
+async def test_get_paginated_follows_link_next(client):
+    """Multiple pages are concatenated in order."""
+    async with respx.mock as mock:
+        page1 = httpx.Response(
+            200,
+            json=[{"id": "1"}, {"id": "2"}],
+            headers={"Link": '<https://api.meraki.com/api/v1/organizations/123/inventory/devices?startingAfter=2>; rel="next"'},
+        )
+        page2 = httpx.Response(
+            200,
+            json=[{"id": "3"}, {"id": "4"}],
+            headers={"Link": '<https://api.meraki.com/api/v1/organizations/123/inventory/devices?startingAfter=4>; rel="next"'},
+        )
+        page3 = httpx.Response(200, json=[{"id": "5"}])  # no Link header → terminal
+        mock.get("https://api.meraki.com/api/v1/organizations/123/inventory/devices", params={"perPage": 1000}).mock(return_value=page1)
+        mock.get("https://api.meraki.com/api/v1/organizations/123/inventory/devices?startingAfter=2").mock(return_value=page2)
+        mock.get("https://api.meraki.com/api/v1/organizations/123/inventory/devices?startingAfter=4").mock(return_value=page3)
+
+        result = await client._get_paginated("/organizations/123/inventory/devices")
+    assert result == [{"id": "1"}, {"id": "2"}, {"id": "3"}, {"id": "4"}, {"id": "5"}]
