@@ -62,3 +62,38 @@ async def test_get_org_policy_object_groups_paginated(client):
             return_value=httpx.Response(200, json=[])
         )
         assert await client.get_org_policy_object_groups("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_config_templates(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/configTemplates").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_config_templates("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_adaptive_policy_settings(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/adaptivePolicy/settings").mock(return_value=httpx.Response(200, json={"enabledNetworks": []}))
+        assert "enabledNetworks" in await client.get_org_adaptive_policy_settings("123")
+
+
+@pytest.mark.asyncio
+async def test_get_org_adaptive_policy_acls(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/adaptivePolicy/acls").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_adaptive_policy_acls("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_adaptive_policy_groups(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/adaptivePolicy/groups").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_adaptive_policy_groups("123") == []
+
+
+@pytest.mark.asyncio
+async def test_get_org_adaptive_policy_policies(client):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/adaptivePolicy/policies").mock(return_value=httpx.Response(200, json=[]))
+        assert await client.get_org_adaptive_policy_policies("123") == []

@@ -162,5 +162,20 @@ class MerakiClient:
     async def get_org_policy_object_groups(self, org_id: str) -> list[dict]:
         return await self._get_paginated(f"/organizations/{org_id}/policyObjects/groups")
 
+    async def get_org_config_templates(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/configTemplates")
+
+    async def get_org_adaptive_policy_settings(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/adaptivePolicy/settings")
+
+    async def get_org_adaptive_policy_acls(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/adaptivePolicy/acls")
+
+    async def get_org_adaptive_policy_groups(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/adaptivePolicy/groups")
+
+    async def get_org_adaptive_policy_policies(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/adaptivePolicy/policies")
+
     async def close(self) -> None:
         await self._client.aclose()
