@@ -24,6 +24,7 @@ FIXTURE_AREA_MAP = {
     "wireless_ssids_sample.json": "wireless_ssids",
     "appliance_site_to_site_vpn_sample.json": "appliance_site_to_site_vpn",
     "network_snmp_sample.json": "network_snmp",
+    "webhook_http_servers_sample.json": "network_webhooks_http_servers",
 }
 
 SECRET_KEY_PATTERN = re.compile(

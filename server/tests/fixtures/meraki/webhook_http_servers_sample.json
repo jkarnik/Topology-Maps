@@ -1,0 +1,8 @@
+[
+  {
+    "id": "abc123",
+    "name": "Splunk",
+    "url": "https://splunk.internal/webhook",
+    "sharedSecret": "splunk-webhook-secret"
+  }
+]
