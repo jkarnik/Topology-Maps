@@ -37,7 +37,8 @@ class EndpointSpec:
 
 from server.config_collector._endpoints_org import ORG_ENDPOINTS
 from server.config_collector._endpoints_network import NETWORK_ENDPOINTS
+from server.config_collector._endpoints_device import DEVICE_ENDPOINTS
 
 # Aggregate list of every endpoint the collector knows about.
 # More tuples will be added in subsequent tasks (_endpoints_device).
-ENDPOINTS: tuple[EndpointSpec, ...] = ORG_ENDPOINTS + NETWORK_ENDPOINTS
+ENDPOINTS: tuple[EndpointSpec, ...] = ORG_ENDPOINTS + NETWORK_ENDPOINTS + DEVICE_ENDPOINTS

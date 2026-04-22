@@ -109,3 +109,32 @@ def test_ssid_scope_has_number_placeholder():
     for s in ssid_specs:
         assert "{ssid_number}" in s.url_template
         assert "wireless" in s.product_filter or s.product_filter == ("wireless",)
+
+
+def test_device_endpoints_cover_spec():
+    """All device-level areas from the spec are in the catalog."""
+    dev_specs = [e for e in ENDPOINTS if e.scope == "device"]
+    areas = {e.config_area for e in dev_specs}
+    expected = {
+        "device_metadata",
+        "device_management_interface",
+        "switch_device_ports",
+        "switch_device_routing_interfaces",
+        "switch_device_routing_static_routes",
+        "switch_device_warm_spare",
+        "wireless_device_radio_settings",
+        "wireless_device_bluetooth",
+        "appliance_device_uplinks",
+        "camera_device_quality_retention",
+        "camera_device_video_settings",
+        "camera_device_sense",
+    }
+    missing = expected - areas
+    assert not missing, f"Missing device areas: {missing}"
+
+
+def test_device_specs_include_serial_placeholder():
+    """Device-scope URL templates all reference {serial}."""
+    for e in ENDPOINTS:
+        if e.scope == "device":
+            assert "{serial}" in e.url_template, f"{e.config_area}: missing {{serial}}"
