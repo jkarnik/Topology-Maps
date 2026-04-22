@@ -132,3 +132,79 @@ def expand_for_org(
                         "sub_key": None,
                         "paginated": spec.paginated,
                     }
+
+
+# Dashboard page-prefix → set of config_areas to re-pull.
+# More entries will be added as real Meraki pages are observed; the
+# poller logs WARN on unmapped pages so the gap is visible.
+_PAGE_PREFIX_MAP: dict[str, set[str]] = {
+    "Security & SD-WAN > Addressing & VLANs": {
+        "appliance_vlans", "appliance_vlans_settings", "appliance_single_lan",
+    },
+    "Security & SD-WAN > Firewall": {
+        "appliance_firewall_l3", "appliance_firewall_l7",
+        "appliance_firewall_inbound", "appliance_firewall_port_forwarding",
+        "appliance_firewall_one_to_one_nat", "appliance_firewall_one_to_many_nat",
+    },
+    "Security & SD-WAN > Content filtering": {"appliance_content_filtering"},
+    "Security & SD-WAN > Threat protection": {"appliance_security_intrusion", "appliance_security_malware"},
+    "Security & SD-WAN > SD-WAN & traffic shaping": {
+        "appliance_traffic_shaping_rules", "appliance_uplink_bandwidth", "appliance_uplink_selection",
+    },
+    "Security & SD-WAN > Site-to-site VPN": {"appliance_site_to_site_vpn", "appliance_vpn_bgp"},
+    "Security & SD-WAN > Static routes": {"appliance_static_routes"},
+    "Switch > Switch settings": {"switch_settings", "switch_stp", "switch_mtu"},
+    "Switch > ACL": {"switch_acls"},
+    "Switch > Access policies": {"switch_access_policies"},
+    "Switch > QoS": {"switch_qos_rules", "switch_qos_order", "switch_dscp_to_cos"},
+    "Switch > Stacks": {"switch_stacks"},
+    "Switch > Link aggregation": {"switch_link_aggregations"},
+    "Switch > DHCP servers & ARP": {"switch_dhcp_server_policy"},
+    "Wireless > SSIDs": {"wireless_ssids"},
+    "Wireless > Access Control": {"wireless_ssids", "wireless_ssid_traffic_shaping"},
+    "Wireless > Firewall & traffic shaping": {
+        "wireless_ssid_l3_firewall", "wireless_ssid_l7_firewall", "wireless_ssid_traffic_shaping",
+    },
+    "Wireless > RF profiles": {"wireless_rf_profiles"},
+    "Network-wide > General": {"network_metadata", "network_settings"},
+    "Network-wide > Alerts": {"network_alerts_settings"},
+    "Network-wide > Group policies": {"network_group_policies"},
+    "Organization > Administrators": {"org_admins", "org_saml_roles"},
+    "Organization > Configuration templates": {"org_config_templates"},
+    "Organization > Policy objects": {"org_policy_objects", "org_policy_object_groups"},
+}
+
+_PER_SSID_SUBAREAS: set[str] = {
+    "wireless_ssid_l3_firewall",
+    "wireless_ssid_l7_firewall",
+    "wireless_ssid_traffic_shaping",
+    "wireless_ssid_splash",
+    "wireless_ssid_schedules",
+    "wireless_ssid_vpn",
+    "wireless_ssid_device_type_policies",
+    "wireless_ssid_identity_psks",
+}
+
+
+def event_to_endpoints(event: dict) -> set[str]:
+    """Map a Meraki change-log event to the set of config_areas to re-pull.
+
+    Uses the event's `page` string as the primary key. If the event references
+    a specific SSID (ssidNumber set), expands to include per-SSID sub-endpoints
+    even if the change was only to an SSID-level setting — the reactive catch
+    required by the spec.
+
+    Returns an empty set for events with no known mapping; callers log these.
+    """
+    page = event.get("page") or ""
+    areas: set[str] = set()
+    for prefix, mapped in _PAGE_PREFIX_MAP.items():
+        if page.startswith(prefix):
+            areas |= mapped
+            break
+
+    # Reactive catch: any event with ssidNumber triggers per-SSID pulls
+    if event.get("ssidNumber") is not None:
+        areas |= {"wireless_ssids"} | _PER_SSID_SUBAREAS
+
+    return areas
