@@ -55,3 +55,28 @@ def test_config_blobs_table_exists(fresh_db):
     assert cols["byte_size"]["notnull"] == 1
     assert cols["first_seen_at"]["notnull"] == 1
     assert cols["byte_size"]["type"].upper() == "INTEGER"
+
+
+def test_config_observations_table_exists(fresh_db):
+    """config_observations table has expected columns, types, and FKs."""
+    assert _table_exists(fresh_db, "config_observations")
+
+    cols = {row["name"]: row for row in fresh_db.execute("PRAGMA table_info(config_observations)")}
+    expected = {
+        "id", "org_id", "entity_type", "entity_id", "config_area", "sub_key",
+        "hash", "observed_at", "source_event", "change_event_id", "sweep_run_id",
+        "name_hint", "enabled_hint",
+    }
+    assert set(cols.keys()) == expected
+
+    # Primary key is auto-incrementing id
+    assert cols["id"]["pk"] == 1
+    assert cols["id"]["type"].upper() == "INTEGER"
+
+    # Required fields
+    for required in ("org_id", "entity_type", "entity_id", "config_area", "hash", "observed_at", "source_event"):
+        assert cols[required]["notnull"] == 1, f"{required} must be NOT NULL"
+
+    # Optional fields
+    for optional in ("sub_key", "change_event_id", "sweep_run_id", "name_hint", "enabled_hint"):
+        assert cols[optional]["notnull"] == 0, f"{optional} must be nullable"

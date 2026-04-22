@@ -83,6 +83,22 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             byte_size INTEGER NOT NULL,
             first_seen_at TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS config_observations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            config_area TEXT NOT NULL,
+            sub_key TEXT,
+            hash TEXT NOT NULL REFERENCES config_blobs(hash),
+            observed_at TEXT NOT NULL,
+            source_event TEXT NOT NULL,
+            change_event_id INTEGER,
+            sweep_run_id INTEGER,
+            name_hint TEXT,
+            enabled_hint INTEGER
+        );
     """)
     conn.commit()
 
