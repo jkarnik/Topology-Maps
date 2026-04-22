@@ -72,3 +72,40 @@ def test_paginated_endpoints_include_configuration_changes_peers():
     by_area = {e.config_area: e for e in ENDPOINTS}
     assert by_area["org_inventory_devices"].paginated is True
     assert by_area["org_admins"].paginated is False
+
+
+def test_network_endpoints_cover_spec_tiers():
+    """Network scope contains the canonical Tier-1 areas from the spec."""
+    net_specs = [e for e in ENDPOINTS if e.scope == "network"]
+    areas = {e.config_area for e in net_specs}
+    tier1_expected = {
+        # Generic
+        "network_metadata", "network_settings", "network_group_policies",
+        "network_syslog_servers",
+        # MX
+        "appliance_vlans", "appliance_vlans_settings", "appliance_single_lan",
+        "appliance_ports", "appliance_firewall_l3", "appliance_firewall_l7",
+        "appliance_firewall_inbound", "appliance_firewall_port_forwarding",
+        "appliance_firewall_one_to_one_nat", "appliance_content_filtering",
+        "appliance_security_intrusion", "appliance_security_malware",
+        "appliance_traffic_shaping_rules", "appliance_uplink_bandwidth",
+        "appliance_uplink_selection", "appliance_site_to_site_vpn",
+        "appliance_static_routes", "appliance_warm_spare",
+        # MS
+        "switch_access_policies", "switch_acls", "switch_qos_rules",
+        "switch_qos_order", "switch_stp", "switch_stacks",
+        "switch_link_aggregations", "switch_dhcp_server_policy",
+        # MR
+        "wireless_ssids", "wireless_rf_profiles", "wireless_settings",
+    }
+    missing = tier1_expected - areas
+    assert not missing, f"Tier-1 network areas missing: {missing}"
+
+
+def test_ssid_scope_has_number_placeholder():
+    """Per-SSID specs use ssid scope and reference {ssid_number}."""
+    ssid_specs = [e for e in ENDPOINTS if e.scope == "ssid"]
+    assert len(ssid_specs) >= 5, "expected at least 5 per-SSID sub-endpoints"
+    for s in ssid_specs:
+        assert "{ssid_number}" in s.url_template
+        assert "wireless" in s.product_filter or s.product_filter == ("wireless",)
