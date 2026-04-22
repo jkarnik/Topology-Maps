@@ -236,5 +236,46 @@ class MerakiClient:
     async def get_network_floor_plans(self, network_id: str) -> list[dict]:
         return await self._get(f"/networks/{network_id}/floorPlans")
 
+    # --- Plan 1.07: MX appliance (VLAN / ports / firewall) -----------------
+
+    async def get_appliance_vlans(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/appliance/vlans")
+
+    async def get_appliance_vlans_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/vlans/settings")
+
+    async def get_appliance_single_lan(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/singleLan")
+
+    async def get_appliance_ports(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/appliance/ports")
+
+    async def get_appliance_firewall_l3(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/l3FirewallRules")
+
+    async def get_appliance_firewall_l7(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/l7FirewallRules")
+
+    async def get_appliance_firewall_inbound(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/inboundFirewallRules")
+
+    async def get_appliance_firewall_port_forwarding(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/portForwardingRules")
+
+    async def get_appliance_firewall_one_to_one_nat(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/oneToOneNatRules")
+
+    async def get_appliance_firewall_one_to_many_nat(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/oneToManyNatRules")
+
+    async def get_appliance_firewall_firewalled_services(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/firewalledServices")
+
+    async def get_appliance_firewall_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/settings")
+
+    async def get_appliance_firewall_cellular(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/appliance/firewall/cellularFirewallRules")
+
     async def close(self) -> None:
         await self._client.aclose()
