@@ -45,6 +45,38 @@ class MerakiClient:
         resp.raise_for_status()
         return resp.json()
 
+    async def _get_paginated(
+        self,
+        path: str,
+        params: Optional[dict] = None,
+        per_page: int = 1000,
+        max_pages: int = 100,
+    ) -> list:
+        """Fetch `path` with RFC 5988 Link-header pagination, concatenating items.
+
+        Each page fetch passes through the rate limiter. Raises
+        `MaxPagesExceeded` if more than `max_pages` pages would be fetched.
+        """
+        merged_params = {"perPage": per_page, **(params or {})}
+        await self._limiter.acquire()
+        resp = await self._client.get(path, params=merged_params)
+        resp.raise_for_status()
+        results = list(resp.json())
+
+        page_count = 1
+        next_url = _parse_link_header(resp.headers.get("Link"))
+        while next_url:
+            if page_count >= max_pages:
+                raise MaxPagesExceeded(f"exceeded max_pages={max_pages} for {path}")
+            await self._limiter.acquire()
+            resp = await self._client.get(next_url)
+            resp.raise_for_status()
+            results.extend(resp.json())
+            page_count += 1
+            next_url = _parse_link_header(resp.headers.get("Link"))
+
+        return results
+
     async def get_organizations(self) -> list[dict]:
         return await self._get("/organizations")
 

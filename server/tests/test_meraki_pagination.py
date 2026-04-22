@@ -30,3 +30,24 @@ def test_parse_link_header_no_next_returns_none():
 def test_parse_link_header_empty_or_none():
     assert _parse_link_header(None) is None
     assert _parse_link_header("") is None
+
+
+import os
+
+
+@pytest.fixture
+def client(monkeypatch):
+    monkeypatch.setenv("MERAKI_API_KEY", "test-key")
+    c = MerakiClient(api_key="test-key")
+    yield c
+
+
+@pytest.mark.asyncio
+async def test_get_paginated_single_page_no_link(client):
+    """A response without a Link header returns just the body."""
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/admins").mock(
+            return_value=httpx.Response(200, json=[{"id": "1"}, {"id": "2"}])
+        )
+        result = await client._get_paginated("/organizations/123/admins")
+    assert result == [{"id": "1"}, {"id": "2"}]
