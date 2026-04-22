@@ -198,5 +198,43 @@ class MerakiClient:
     async def get_org_licenses_coterm(self, org_id: str) -> list[dict]:
         return await self._get_paginated(f"/organizations/{org_id}/licensing/coterm/licenses")
 
+    # --- Plan 1.07: Network-generic endpoints ----------------------------
+
+    async def get_network_metadata(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}")
+
+    async def get_network_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/settings")
+
+    async def get_network_group_policies(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/groupPolicies")
+
+    async def get_network_syslog_servers(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/syslogServers")
+
+    async def get_network_snmp(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/snmp")
+
+    async def get_network_traffic_analysis(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/trafficAnalysis")
+
+    async def get_network_netflow(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/netflow")
+
+    async def get_network_alerts_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/alerts/settings")
+
+    async def get_network_webhooks_http_servers(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/webhooks/httpServers")
+
+    async def get_network_webhooks_payload_templates(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/webhooks/payloadTemplates")
+
+    async def get_network_firmware_upgrades(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/firmwareUpgrades")
+
+    async def get_network_floor_plans(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/floorPlans")
+
     async def close(self) -> None:
         await self._client.aclose()
