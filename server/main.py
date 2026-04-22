@@ -15,6 +15,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from server.db import close_db, init_db
 from server.websocket import WebSocketManager
 from server.routes import topology, devices, system, simulation, meraki
 from collector.main import create_poller
@@ -29,6 +30,9 @@ poller = None
 async def lifespan(app: FastAPI):
     """Manage startup and shutdown of the collector poller."""
     global poller
+
+    # Startup: open the SQLite connection and ensure the schema exists
+    init_db()
 
     # Startup: create and start the collector poller
     poller = create_poller()
@@ -48,6 +52,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
     if poller.is_running:
         await poller.stop()
+    close_db()
     logger.info("Server shutdown complete")
 
 

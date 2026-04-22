@@ -28,6 +28,10 @@ services:
       - SIMULATOR_HOST=simulator
       - SIMULATOR_REST_PORT=8001
       - MERAKI_API_KEY=${MERAKI_API_KEY:-}
+    volumes:
+      # Persist the SQLite topology/config cache across container
+      # restarts and redeploys.  Matches the DB_PATH in server/db.py.
+      - topology-data:/app/data
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/status')"]
       interval: 10s
@@ -58,3 +62,6 @@ services:
 networks:
   topology-net:
     driver: bridge
+
+volumes:
+  topology-data:

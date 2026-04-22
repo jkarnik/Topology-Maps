@@ -13,13 +13,13 @@ import asyncio
 import json
 import logging
 import time
-from pathlib import Path
 from typing import Any, Optional
 
 import httpx
 from fastapi import APIRouter, Body, HTTPException, Query
 from sse_starlette.sse import EventSourceResponse
 
+from server import db
 from server.meraki_client import MerakiClient
 from server.meraki_transformer import MerakiTransformer
 
@@ -529,33 +529,34 @@ async def refresh_topology(network: Optional[str] = Query(None, description="Net
 
 
 # ---------------------------------------------------------------------------
-# POST /api/meraki/save-seed
+# GET  /api/meraki/cache/load
+# POST /api/meraki/cache/save
 # ---------------------------------------------------------------------------
-# Developer utility — writes the current frontend topology cache into
-# ui/public/meraki-topology-seed.json so a fresh clone can render without
-# hitting the Meraki API on first load.  Intended for local dev use;
-# simply commit the produced file after calling this endpoint.
+# Server-side persistence for the topology cache, backed by SQLite at
+# data/app.db.  Replaces the old ui/public/meraki-topology-seed.json flow:
+# the frontend loads from /cache/load on first render, and writes to
+# /cache/save when the user clicks the Save Snapshot button.  Future
+# config tables live in the same DB and can be added alongside.
 
 
-_SEED_PATH = Path("ui/public/meraki-topology-seed.json")
+@router.get("/cache/load")
+def load_cache():
+    """Return the full persisted topology cache, or 404 if empty."""
+    snapshot = db.load_snapshot()
+    if snapshot is None:
+        raise HTTPException(status_code=404, detail="No cached snapshot")
+    return snapshot
 
 
-@router.post("/save-seed")
-async def save_seed(payload: dict[str, Any] = Body(...)):
-    """Persist a topology-cache snapshot to ui/public/meraki-topology-seed.json.
-
-    The body should be the same shape the UI stores in localStorage.  The
-    endpoint does not inspect the schema — it trusts the caller — so
-    bumping the UI cache version requires no backend change.
-    """
+@router.post("/cache/save")
+def save_cache(payload: dict[str, Any] = Body(...)):
+    """Replace the persisted topology cache with the given snapshot."""
     try:
-        _SEED_PATH.parent.mkdir(parents=True, exist_ok=True)
-        _SEED_PATH.write_text(json.dumps(payload, indent=2))
-    except OSError as exc:
+        rows = db.save_snapshot(payload)
+    except Exception as exc:
+        logger.exception("Failed to save topology snapshot")
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to write seed file at {_SEED_PATH}: {exc}",
+            detail=f"Failed to persist snapshot: {exc}",
         ) from exc
-
-    size = _SEED_PATH.stat().st_size
-    return {"saved": True, "path": str(_SEED_PATH), "bytes": size}
+    return {"saved": True, "rows": rows}

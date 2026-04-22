@@ -560,7 +560,9 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
 
   const loadSeedFile = useCallback(async (): Promise<boolean> => {
     try {
-      const resp = await fetch('/meraki-topology-seed.json', { cache: 'no-store' });
+      // Server-side cache (SQLite-backed).  404 means nothing stored yet —
+      // caller will fall through to the live Meraki fetch.
+      const resp = await fetch('/api/meraki/cache/load', { cache: 'no-store' });
       if (!resp.ok) return false;
       const data = await resp.json();
       if (!data || typeof data !== 'object' || data.version !== SCHEMA_VERSION) return false;
@@ -602,7 +604,14 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   }, []);
 
   const saveSnapshot = useCallback(async (): Promise<boolean> => {
-    if (networks.length === 0 || cacheRef.current.size === 0) return false;
+    if (networks.length === 0) {
+      console.warn('[saveSnapshot] aborting: no networks loaded');
+      return false;
+    }
+    if (cacheRef.current.size === 0) {
+      console.warn('[saveSnapshot] aborting: cacheRef is empty');
+      return false;
+    }
     const payload = {
       version: SCHEMA_VERSION,
       orgName,
@@ -611,14 +620,30 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       topology: Object.fromEntries(cacheRef.current),
       lastUpdated: lastUpdated ? lastUpdated.toISOString() : null,
     };
+    let body: string;
     try {
-      const resp = await fetch('/api/meraki/save-seed', {
+      body = JSON.stringify(payload);
+    } catch (err) {
+      console.error('[saveSnapshot] JSON.stringify failed:', err);
+      return false;
+    }
+    console.log(
+      `[saveSnapshot] POSTing ${(body.length / 1024 / 1024).toFixed(2)} MB `
+      + `(${cacheRef.current.size} cache keys, ${networks.length} networks)`,
+    );
+    try {
+      const resp = await fetch('/api/meraki/cache/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body,
       });
+      if (!resp.ok) {
+        const text = await resp.text().catch(() => '<no body>');
+        console.error(`[saveSnapshot] HTTP ${resp.status} ${resp.statusText}: ${text}`);
+      }
       return resp.ok;
-    } catch {
+    } catch (err) {
+      console.error('[saveSnapshot] fetch failed:', err);
       return false;
     }
   }, [networks, orgName, selectedNetwork, lastUpdated]);

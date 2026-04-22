@@ -37,10 +37,6 @@ Thumbs.db
 .env
 .env.local
 
-# Meraki topology seed — contains real device serials, public IPs, and VLAN
-# info. Kept local-only; regenerate via the "save snapshot" button.
-ui/public/meraki-topology-seed.json
-
 # Build logs
 output.txt
 .superpowers/
