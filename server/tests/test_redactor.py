@@ -132,3 +132,20 @@ def test_redact_hot_columns_none_when_absent():
     payload = {"other": 123}
     _, _, _, hot = redact(payload, "unknown_area")
     assert hot == {"name_hint": None, "enabled_hint": None}
+
+
+# Fixture sanity tests --------------------------------------------------------
+
+import json
+from pathlib import Path
+
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures" / "meraki"
+
+
+def test_all_fixtures_parse_as_valid_json():
+    files = list(FIXTURES_DIR.glob("*.json"))
+    assert len(files) >= 3, "expected at least 3 seed fixtures"
+    for f in files:
+        data = json.loads(f.read_text())
+        assert data is not None
