@@ -188,3 +188,28 @@ def test_migration_is_idempotent(monkeypatch):
         assert row is not None
         assert row["payload"] == "{}"
         conn2.close()
+
+
+def test_existing_tables_still_work(fresh_db):
+    """devices, edges, topology_snapshots, connection_history are unaffected by the migration."""
+    for existing in ("devices", "edges", "topology_snapshots", "connection_history"):
+        assert _table_exists(fresh_db, existing), f"Missing existing table: {existing}"
+
+    # Existing indexes still present
+    for idx in (
+        "idx_edges_source",
+        "idx_edges_target",
+        "idx_devices_type",
+        "idx_connection_history_device",
+    ):
+        assert _index_exists(fresh_db, idx), f"Missing existing index: {idx}"
+
+    # Sanity insert into an existing table still works
+    fresh_db.execute(
+        """INSERT INTO devices (id, type, model, ip, updated_at)
+           VALUES (?, ?, ?, ?, ?)""",
+        ("dev1", "switch", "MS225-48LP", "192.0.2.1", "2026-04-22T10:00:00Z"),
+    )
+    fresh_db.commit()
+    row = fresh_db.execute("SELECT id FROM devices WHERE id='dev1'").fetchone()
+    assert row["id"] == "dev1"
