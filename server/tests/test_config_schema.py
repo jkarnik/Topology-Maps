@@ -162,3 +162,29 @@ def test_config_indexes_exist(fresh_db):
     }
     for idx_name in expected_indexes:
         assert _index_exists(fresh_db, idx_name), f"Missing index: {idx_name}"
+
+
+def test_migration_is_idempotent(monkeypatch):
+    """Running get_connection() twice on the same DB file does not error or duplicate state."""
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "topology.db"
+        from server import database
+        monkeypatch.setattr(database, "DB_PATH", db_path)
+
+        conn1 = database.get_connection()
+        # Seed a row in config_blobs
+        conn1.execute(
+            "INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?, ?, ?, ?)",
+            ("abc123", "{}", 2, "2026-04-22T10:00:00Z"),
+        )
+        conn1.commit()
+        conn1.close()
+
+        # Second open should re-run _create_tables without error and preserve data
+        conn2 = database.get_connection()
+        row = conn2.execute(
+            "SELECT hash, payload FROM config_blobs WHERE hash='abc123'"
+        ).fetchone()
+        assert row is not None
+        assert row["payload"] == "{}"
+        conn2.close()
