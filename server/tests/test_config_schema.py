@@ -148,3 +148,17 @@ def test_config_sweep_runs_counter_defaults(fresh_db):
     assert row["completed_calls"] == 0
     assert row["failed_calls"] == 0
     assert row["skipped_calls"] == 0
+
+
+def test_config_indexes_exist(fresh_db):
+    """All Plan 1.01 indexes are created."""
+    expected_indexes = {
+        "idx_obs_entity_latest",
+        "idx_obs_area_time",
+        "idx_obs_hash",
+        "idx_events_org_ts",
+        "idx_events_network",
+        "idx_runs_org_kind",
+    }
+    for idx_name in expected_indexes:
+        assert _index_exists(fresh_db, idx_name), f"Missing index: {idx_name}"

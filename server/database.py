@@ -135,6 +135,19 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             skipped_calls INTEGER DEFAULT 0,
             error_summary TEXT
         );
+
+        CREATE INDEX IF NOT EXISTS idx_obs_entity_latest
+            ON config_observations(org_id, entity_type, entity_id, config_area, sub_key, observed_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_obs_area_time
+            ON config_observations(config_area, observed_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_obs_hash
+            ON config_observations(hash);
+        CREATE INDEX IF NOT EXISTS idx_events_org_ts
+            ON config_change_events(org_id, ts DESC);
+        CREATE INDEX IF NOT EXISTS idx_events_network
+            ON config_change_events(network_id, ts DESC);
+        CREATE INDEX IF NOT EXISTS idx_runs_org_kind
+            ON config_sweep_runs(org_id, kind, started_at DESC);
     """)
     conn.commit()
 
