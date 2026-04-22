@@ -3,9 +3,26 @@ import os
 from typing import Optional, Union
 import httpx
 from server.rate_limiter import RateLimiter
+import re as _re
 
 logger = logging.getLogger(__name__)
 MERAKI_BASE_URL = "https://api.meraki.com/api/v1"
+
+
+class MaxPagesExceeded(Exception):
+    """Raised when paginated fetch exceeds the configured page ceiling."""
+
+
+_LINK_NEXT_RE = _re.compile(r'<([^>]+)>;\s*rel="next"')
+
+
+def _parse_link_header(header):
+    """Return the URL of the rel=next link, or None if absent."""
+    if not header:
+        return None
+    m = _LINK_NEXT_RE.search(header)
+    return m.group(1) if m else None
+
 
 class MerakiClient:
     def __init__(self, api_key: Optional[str] = None, rate_limit: float = 5.0):
