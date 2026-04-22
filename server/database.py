@@ -99,6 +99,28 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             name_hint TEXT,
             enabled_hint INTEGER
         );
+
+        CREATE TABLE IF NOT EXISTS config_change_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            ts TEXT NOT NULL,
+            admin_id TEXT,
+            admin_name TEXT,
+            admin_email TEXT,
+            network_id TEXT,
+            network_name TEXT,
+            ssid_number INTEGER,
+            ssid_name TEXT,
+            page TEXT,
+            label TEXT,
+            old_value TEXT,
+            new_value TEXT,
+            client_id TEXT,
+            client_description TEXT,
+            raw_json TEXT NOT NULL,
+            fetched_at TEXT NOT NULL,
+            UNIQUE(org_id, ts, network_id, label, old_value, new_value)
+        );
     """)
     conn.commit()
 

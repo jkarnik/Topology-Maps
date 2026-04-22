@@ -80,3 +80,38 @@ def test_config_observations_table_exists(fresh_db):
     # Optional fields
     for optional in ("sub_key", "change_event_id", "sweep_run_id", "name_hint", "enabled_hint"):
         assert cols[optional]["notnull"] == 0, f"{optional} must be nullable"
+
+
+def test_config_change_events_table_exists(fresh_db):
+    """config_change_events table has expected columns and unique dedup index."""
+    assert _table_exists(fresh_db, "config_change_events")
+
+    cols = {row["name"]: row for row in fresh_db.execute("PRAGMA table_info(config_change_events)")}
+    expected = {
+        "id", "org_id", "ts", "admin_id", "admin_name", "admin_email",
+        "network_id", "network_name", "ssid_number", "ssid_name",
+        "page", "label", "old_value", "new_value",
+        "client_id", "client_description",
+        "raw_json", "fetched_at",
+    }
+    assert set(cols.keys()) == expected
+    assert cols["id"]["pk"] == 1
+    assert cols["org_id"]["notnull"] == 1
+    assert cols["ts"]["notnull"] == 1
+    assert cols["raw_json"]["notnull"] == 1
+    assert cols["fetched_at"]["notnull"] == 1
+
+
+def test_config_change_events_dedup_unique_constraint(fresh_db):
+    """Inserting the same (org_id, ts, network_id, label, old_value, new_value) twice fails."""
+    insert_sql = """
+        INSERT INTO config_change_events
+          (org_id, ts, network_id, label, old_value, new_value, raw_json, fetched_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    args = ("org1", "2026-04-22T10:00:00Z", "N_1", "VLAN", "10", "20", "{}", "2026-04-22T10:01:00Z")
+    fresh_db.execute(insert_sql, args)
+    fresh_db.commit()
+    with pytest.raises(sqlite3.IntegrityError):
+        fresh_db.execute(insert_sql, args)
+        fresh_db.commit()
