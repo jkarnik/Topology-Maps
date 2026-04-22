@@ -8,6 +8,7 @@ plaintext.
 """
 from __future__ import annotations
 
+import copy
 import re
 from typing import Any
 
@@ -103,3 +104,45 @@ def mask_path(payload: Any, steps: list[tuple]) -> None:
         else:
             for item in payload:
                 mask_path(item, rest)
+
+
+# Top-level entry point -------------------------------------------------------
+
+from server.config_collector.redaction_catalog import REDACTION_PATHS
+
+
+def _extract_hot_columns(payload: Any) -> dict:
+    """Pull denormalized hot columns used by config_observations."""
+    name_hint = None
+    enabled_hint = None
+    if isinstance(payload, dict):
+        name = payload.get("name")
+        if isinstance(name, str):
+            name_hint = name
+        enabled = payload.get("enabled")
+        if isinstance(enabled, bool):
+            enabled_hint = 1 if enabled else 0
+    return {"name_hint": name_hint, "enabled_hint": enabled_hint}
+
+
+def redact(payload: Any, config_area: str) -> tuple[str, str, int, dict]:
+    """Mask secrets in `payload` and return canonical form + hash + size + hot columns.
+
+    Returns
+    -------
+    (redacted_canonical_str, sha256_hex, byte_size, hot_columns)
+      - redacted_canonical_str : JSON string with secrets replaced by
+        {"_redacted": true, "_hash": "..."} sentinels
+      - sha256_hex : SHA-256 of the canonical string (UTF-8 encoded)
+      - byte_size  : UTF-8 byte count of the canonical string
+      - hot_columns : {"name_hint": str|None, "enabled_hint": 0|1|None}
+    """
+    # Deep-copy so the caller's input is never mutated
+    working = copy.deepcopy(payload)
+
+    for path in REDACTION_PATHS.get(config_area, ()):
+        mask_path(working, parse_path(path))
+
+    canonical = _canonical_dumps(working)
+    encoded = canonical.encode("utf-8")
+    return canonical, _hashlib.sha256(encoded).hexdigest(), len(encoded), _extract_hot_columns(payload)

@@ -75,3 +75,60 @@ def _sha256(value):
     import json
     canonical = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+# Top-level redact() entry point tests ----------------------------------------
+
+from server.config_collector.redactor import redact
+
+
+def test_redact_wireless_ssids_masks_psks():
+    payload = [
+        {"number": 0, "name": "Corp", "enabled": True, "psk": "corppass123", "authMode": "psk"},
+        {"number": 1, "name": "Guest", "enabled": True, "psk": "guestpass", "authMode": "psk"},
+    ]
+    redacted_str, hash_hex, byte_size, hot = redact(payload, "wireless_ssids")
+
+    # Canonical string is valid JSON
+    import json
+    parsed = json.loads(redacted_str)
+    assert parsed[0]["psk"] == {"_redacted": True, "_hash": _sha256("corppass123")}
+    assert parsed[1]["psk"] == {"_redacted": True, "_hash": _sha256("guestpass")}
+    assert parsed[0]["name"] == "Corp"  # name retained
+
+    assert len(hash_hex) == 64
+    assert byte_size == len(redacted_str.encode("utf-8"))
+
+
+def test_redact_unknown_config_area_passes_through():
+    """An area not in the catalog → no redaction, but still canonicalized + hashed."""
+    payload = {"foo": 1}
+    redacted_str, hash_hex, byte_size, hot = redact(payload, "unknown_area")
+    assert redacted_str == '{"foo":1}'
+
+
+def test_redact_same_payload_different_key_order_same_hash():
+    a = {"b": 1, "a": 2, "c": [3, 2, 1]}
+    b = {"c": [3, 2, 1], "a": 2, "b": 1}
+    _, h1, _, _ = redact(a, "unknown_area")
+    _, h2, _, _ = redact(b, "unknown_area")
+    assert h1 == h2
+
+
+def test_redact_different_secret_different_hash():
+    """Hashing on the sentinel distinguishes changed secrets."""
+    _, h1, _, _ = redact([{"psk": "v1"}], "wireless_ssids")
+    _, h2, _, _ = redact([{"psk": "v2"}], "wireless_ssids")
+    assert h1 != h2
+
+
+def test_redact_extracts_name_and_enabled_hot_columns():
+    payload = {"name": "Store 42", "enabled": True, "other": 123}
+    _, _, _, hot = redact(payload, "unknown_area")
+    assert hot == {"name_hint": "Store 42", "enabled_hint": 1}
+
+
+def test_redact_hot_columns_none_when_absent():
+    payload = {"other": 123}
+    _, _, _, hot = redact(payload, "unknown_area")
+    assert hot == {"name_hint": None, "enabled_hint": None}
