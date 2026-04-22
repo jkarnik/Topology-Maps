@@ -68,11 +68,11 @@ class MerakiClient:
         while next_url:
             if page_count >= max_pages:
                 raise MaxPagesExceeded(f"exceeded max_pages={max_pages} for {path}")
+            page_count += 1
             await self._limiter.acquire()
             resp = await self._client.get(next_url)
             resp.raise_for_status()
             results.extend(resp.json())
-            page_count += 1
             next_url = _parse_link_header(resp.headers.get("Link"))
 
         return results
@@ -141,6 +141,26 @@ class MerakiClient:
             if e.response.status_code in (400, 404):
                 return []
             raise
+
+    # --- Plan 1.06: Organization-level endpoints (access/policy) -----------
+
+    async def get_org_admins(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/admins")
+
+    async def get_org_saml_roles(self, org_id: str) -> list[dict]:
+        return await self._get(f"/organizations/{org_id}/samlRoles")
+
+    async def get_org_saml(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/saml")
+
+    async def get_org_login_security(self, org_id: str) -> dict:
+        return await self._get(f"/organizations/{org_id}/loginSecurity")
+
+    async def get_org_policy_objects(self, org_id: str) -> list[dict]:
+        return await self._get_paginated(f"/organizations/{org_id}/policyObjects")
+
+    async def get_org_policy_object_groups(self, org_id: str) -> list[dict]:
+        return await self._get_paginated(f"/organizations/{org_id}/policyObjects/groups")
 
     async def close(self) -> None:
         await self._client.aclose()
