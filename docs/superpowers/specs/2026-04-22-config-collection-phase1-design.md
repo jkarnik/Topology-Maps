@@ -12,7 +12,7 @@ Build a continuous, change-log-driven pipeline that captures Meraki configuratio
 
 This phase establishes the foundation that later phases build on: diff (Phase 2), topology overlay (Phase 3), drift monitoring (Phase 4), compliance (Phase 5), multi-site comparison (Phase 6), and export/revert bundle generation (Phase 7).
 
-Scale target: up to 30,000 devices per organization, backed by Meraki's configuration change log so steady-state cost is 1 API call + a handful of targeted pulls per 5-minute cycle, rather than exhaustive re-polling.
+Scale target: up to 30,000 devices per organization, backed by Meraki's configuration change log so steady-state cost is 1 API call + a handful of targeted pulls per 30-minute cycle, rather than exhaustive re-polling. Config changes do not require sub-minute detection latency — 30 minutes is well inside the expected operator reaction window.
 
 ---
 
@@ -200,7 +200,7 @@ Conditional filters apply:
 | Large enterprise (200 networks, 2,000 devices) | ~15,000 | ~50 min |
 | Very large (500 networks, 30K devices) | ~30–50K | ~2–3 hours |
 
-Steady-state (change-log-driven) load is unaffected by scale: 1 change-log poll + typically 0–20 targeted pulls per 5-minute cycle.
+Steady-state (change-log-driven) load is unaffected by scale: 1 change-log poll + typically 0–50 targeted pulls per 30-minute cycle (range reflects the larger window capturing more change events per cycle).
 
 ---
 
@@ -218,7 +218,7 @@ Phase 1 extends the existing Topology Maps services with a new config-collection
                   ▼                                         ▼
       ┌──────────────────────┐                ┌──────────────────────┐
       │  change_log_poller   │                │   baseline_runner    │
-      │  (every 5 min / org) │                │  (on-demand / weekly)│
+      │  (every 30 min / org)│                │  (on-demand / weekly)│
       └──────────┬───────────┘                └──────────┬───────────┘
                  │                                       │
                  └───────────────┬───────────────────────┘
@@ -259,7 +259,7 @@ Phase 1 extends the existing Topology Maps services with a new config-collection
 | `server/config_collector/__init__.py` | Package init |
 | `server/config_collector/endpoints_catalog.py` | Endpoint definitions, product-type filters, change-log event → endpoint mappings, secret-field catalog |
 | `server/config_collector/scanner.py` | Baseline runner and anti-drift sweep orchestrator |
-| `server/config_collector/change_log_poller.py` | Per-org 5-minute change-log fetch loop |
+| `server/config_collector/change_log_poller.py` | Per-org 30-minute change-log fetch loop |
 | `server/config_collector/targeted_puller.py` | Endpoint fetch dispatcher, coalescing, rate-limit enforcement |
 | `server/config_collector/redactor.py` | Secret masking + SHA256 hashing |
 | `server/config_collector/store.py` | SQLite access layer for blobs, observations, change events, sweep runs |
@@ -270,6 +270,24 @@ Phase 1 extends the existing Topology Maps services with a new config-collection
 | `ui/src/components/ConfigBrowser/` | New component tree: `ConfigBrowser.tsx`, `ConfigTree.tsx`, `ConfigEntityView.tsx`, `ConfigAreaViewer.tsx`, `CollectionStatusBar.tsx`, `BaselineProgressOverlay.tsx` |
 | `ui/src/hooks/useConfigCollection.ts` | Hook for progress/status SSE |
 | `ui/src/types/config.ts` | TypeScript types for config data |
+
+### Pagination handling
+
+Meraki paginates large list endpoints via RFC 5988 `Link` headers: a `Link: <url>; rel="next"` header on a response indicates another page. `MerakiClient` is extended with a `_get_paginated(path, params)` helper that transparently follows these headers until exhausted, returning the concatenated list. Each page fetch flows through the same per-org `RateLimiter`, so pagination does not bypass the 5 req/sec cap.
+
+**Endpoints that require pagination in Phase 1 scope:**
+
+| Endpoint | Typical page size | Notes |
+|---|---|---|
+| `GET /organizations/{id}/configurationChanges` | 100 default, up to 5000 | Default to `perPage=1000`; a busy 30K-device org can easily produce 1000+ events in a 60-min window, so pagination must never be silently truncated |
+| `GET /organizations/{id}/inventory/devices` | 1000 default | Paginated when claimed inventory is large |
+| `GET /organizations/{id}/networks` | 100000 default | Rarely paginates in practice but supported |
+| `GET /organizations/{id}/devices` | 1000 default | Device list enumeration |
+| `GET /organizations/{id}/licenses` | 1000 default | Per-device licensing mode only |
+
+**Endpoints NOT paginated in Phase 1 scope** (return a complete object or a small fixed array): all per-network config endpoints (`/appliance/vlans`, `/appliance/firewall/*`, `/wireless/ssids` — always 15 entries, `/switch/accessPolicies`, `/switch/stacks`, etc.) and all per-device config endpoints (`/switch/ports` — capped at ~48 ports, `/wireless/radio/settings`, etc.). These call `_get` directly without pagination overhead.
+
+**Safety: never silently truncate.** If the paginated helper reaches a configurable hard ceiling (`CONFIG_MAX_PAGES`, default 100), it logs an `ERROR` and aborts the entire poll cycle. Silent truncation of the change log would create invisible drift gaps, which is worse than a visible failure that operators can diagnose.
 
 ---
 
@@ -289,11 +307,11 @@ Triggered when an organization is first connected or when a user explicitly requ
 5. On completion: `status='complete'`, `completed_at=now()`. On failure: `status='failed'` with `error_summary` populated, partial observations preserved.
 6. Baseline runs are **resumable at the config-area granularity**: on restart, the runner queries `config_observations` for this sweep_run_id, identifies completed `(entity_id, config_area)` pairs, and skips them.
 
-### Flow B: 5-minute incremental (per organization)
+### Flow B: 30-minute incremental (per organization)
 
 A single `change_log_poller` task per organization runs continuously.
 
-1. Every `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` (default 300), the poller calls `GET /organizations/{orgId}/configurationChanges?timespan=900` (15-minute window for 10-minute overlap against poller downtime).
+1. Every `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` (default 1800, i.e. 30 min), the poller calls `GET /organizations/{orgId}/configurationChanges?timespan=3600&perPage=1000` (60-minute window for 30-minute overlap against poller downtime). Pagination is followed via `Link` headers until exhausted — see the Pagination section below.
 2. For each event returned, the store checks the `config_change_events` unique index `(org_id, ts, network_id, label, old_value, new_value)`. Duplicate events are skipped.
 3. New events are inserted and mapped via `endpoints_catalog.event_to_endpoints()`:
    - Event keyed by `page`, `label`, `ssidNumber`, and `clientId` is looked up in a mapping table. Example: `page="Wireless → Access Control"` + `ssidNumber=3` → pull `/wireless/ssids`, `/wireless/ssids/3/firewall/l3FirewallRules`, `/wireless/ssids/3/firewall/l7FirewallRules`.
@@ -671,8 +689,10 @@ Phase 1 introduces the following environment variables, each with a sensible def
 |---|---|---|
 | `MERAKI_API_KEY` | (existing) | Meraki Dashboard API key |
 | `CONFIG_RATE_LIMIT_REQUESTS_PER_SEC` | `5` | Hard cap on API rate per org (must stay ≤ Meraki's 10 req/sec limit; 5 leaves headroom for other integrations sharing the key) |
-| `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` | `300` | How often the change-log poller runs per org |
-| `CONFIG_CHANGE_LOG_TIMESPAN_SECONDS` | `900` | Lookback window per poll (15 min). With a 5-min interval, this gives a 10-min overlap between consecutive polls, which tolerates poller downtime up to 10 min without event loss. |
+| `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` | `1800` | How often the change-log poller runs per org (30 min — config change detection does not require sub-minute latency) |
+| `CONFIG_CHANGE_LOG_TIMESPAN_SECONDS` | `3600` | Lookback window per poll (60 min). With a 30-min interval, this gives a 30-min overlap between consecutive polls, which tolerates poller downtime up to 30 min without event loss. |
+| `CONFIG_CHANGE_LOG_PER_PAGE` | `1000` | Page size for `configurationChanges` pagination. Meraki allows up to 5000; 1000 is a conservative default that keeps individual response payloads small without excessive round trips. |
+| `CONFIG_MAX_PAGES` | `100` | Hard ceiling on paginated fetches per call. Exceeding this aborts the poll with an `ERROR` log to prevent silent truncation. |
 | `CONFIG_WEEKLY_SWEEP_CRON` | `0 2 * * 0` | Anti-drift sweep schedule (Sunday 02:00 by default) |
 | `CONFIG_BASELINE_CONCURRENCY` | `3` | Max concurrent endpoint fetches per org during baseline/sweep (bounded by rate limit anyway) |
 | `CONFIG_ENABLE_AUTO_POLLER` | `true` | Allow disabling the change-log poller for testing |
