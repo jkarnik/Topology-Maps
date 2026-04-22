@@ -33,3 +33,10 @@ class EndpointSpec:
     product_filter: tuple[str, ...]
     tier: int
     paginated: bool
+
+
+from server.config_collector._endpoints_org import ORG_ENDPOINTS
+
+# Aggregate list of every endpoint the collector knows about.
+# More tuples will be added in subsequent tasks (_endpoints_network, _endpoints_device).
+ENDPOINTS: tuple[EndpointSpec, ...] = ORG_ENDPOINTS
