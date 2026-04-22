@@ -29,3 +29,21 @@ def test_sha256_different_for_different_payloads():
 def test_sha256_empty_object_is_stable():
     # Known SHA-256 of '{}' (canonical form of empty dict)
     assert sha256_canonical({}) == "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+
+
+from server.config_collector.hashing import canonical_payload
+
+
+def test_canonical_payload_returns_hash_payload_and_size():
+    payload, hash_hex, byte_size = canonical_payload({"a": 1, "b": [1, 2]})
+    assert payload == '{"a":1,"b":[1,2]}'
+    assert len(hash_hex) == 64
+    assert byte_size == len(payload.encode("utf-8"))
+
+
+def test_canonical_payload_unicode_byte_size():
+    """Byte size reflects UTF-8 encoding, not char count."""
+    payload, _, byte_size = canonical_payload({"name": "café"})
+    # 'café' is 4 characters but 5 bytes in UTF-8 (é = 2 bytes)
+    assert byte_size == len(payload.encode("utf-8"))
+    assert byte_size > len(payload)  # because of multi-byte char
