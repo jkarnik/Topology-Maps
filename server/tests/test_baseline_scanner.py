@@ -85,3 +85,31 @@ async def test_run_baseline_writes_observations_and_marks_complete(client, conn)
 
     count = conn.execute("SELECT COUNT(*) AS n FROM config_observations").fetchone()["n"]
     assert count > 0
+
+
+@pytest.mark.asyncio
+async def test_run_baseline_resume_skips_completed(client, conn):
+    """Re-running with resume_run_id only fetches remaining jobs."""
+    from server.config_collector.scanner import run_baseline
+    from server.config_collector.store import create_sweep_run, insert_observation_if_changed
+
+    run_id = create_sweep_run(conn, org_id="o1", kind="baseline", total_calls=100)
+    conn.execute("INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
+                 ("seed", "{}", 2, "t"))
+    conn.commit()
+    insert_observation_if_changed(
+        conn, org_id="o1", entity_type="org", entity_id="o1",
+        config_area="org_admins", sub_key=None, hash_hex="seed",
+        source_event="baseline", change_event_id=None, sweep_run_id=run_id,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+
+    async with respx.mock(base_url="https://api.meraki.com/api/v1", assert_all_called=False) as mock:
+        mock.get("/organizations/o1/networks").mock(return_value=httpx.Response(200, json=[]))
+        mock.get("/organizations/o1/devices").mock(return_value=httpx.Response(200, json=[]))
+        admins_mock = mock.get("/organizations/o1/admins").mock(return_value=httpx.Response(200, json=[]))
+        mock.get(url__regex=r".*").mock(return_value=httpx.Response(200, json={}))
+
+        await run_baseline(client, conn, org_id="o1", resume_run_id=run_id)
+
+    assert admins_mock.call_count == 0
