@@ -10,12 +10,24 @@ interface Props {
   entityId: string;
 }
 
+const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
+
 export const ConfigEntityView: React.FC<Props> = ({ orgId, entityType, entityId }) => {
   const { entity, loading, reload } = useConfigEntity(orgId, entityType, entityId);
   const [refreshingArea, setRefreshingArea] = useState<string | null>(null);
 
-  if (loading && !entity) return <div className="text-sm text-gray-500">Loading…</div>;
-  if (!entity) return <div className="text-sm text-gray-500">No data for this entity yet.</div>;
+  if (loading && !entity) {
+    return (
+      <div style={{ fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>Loading…</div>
+    );
+  }
+  if (!entity) {
+    return (
+      <div style={{ fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>
+        No data for this entity yet.
+      </div>
+    );
+  }
 
   const handleRefresh = async (configArea: string) => {
     setRefreshingArea(configArea);
@@ -28,22 +40,45 @@ export const ConfigEntityView: React.FC<Props> = ({ orgId, entityType, entityId 
   };
 
   return (
-    <div>
-      <div className="mb-4">
-        <div className="text-xs uppercase tracking-wide text-gray-500">{entityType}</div>
-        <div className="text-xl font-semibold">{entityId}</div>
+    <div style={{ color: 'var(--text-primary)' }}>
+      <div style={{ marginBottom: '18px' }}>
+        <div
+          style={{
+            fontSize: '10px',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--text-muted)',
+            marginBottom: '4px',
+            ...MONO,
+          }}
+        >
+          {entityType}
+        </div>
+        <div
+          style={{
+            fontSize: '18px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            ...MONO,
+          }}
+        >
+          {entityId}
+        </div>
       </div>
-      {entity.areas.length === 0
-        ? <div className="text-sm text-gray-500">No observations yet. Try running a baseline.</div>
-        : entity.areas.map((area) => (
-            <ConfigAreaViewer
-              key={`${area.config_area}:${area.sub_key ?? ''}`}
-              area={area}
-              onRefresh={() => handleRefresh(area.config_area)}
-              refreshing={refreshingArea === area.config_area}
-            />
-          ))
-      }
+      {entity.areas.length === 0 ? (
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>
+          No observations yet. Try running a baseline.
+        </div>
+      ) : (
+        entity.areas.map((area) => (
+          <ConfigAreaViewer
+            key={`${area.config_area}:${area.sub_key ?? ''}`}
+            area={area}
+            onRefresh={() => handleRefresh(area.config_area)}
+            refreshing={refreshingArea === area.config_area}
+          />
+        ))
+      )}
     </div>
   );
 };
