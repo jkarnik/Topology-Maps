@@ -254,3 +254,18 @@ def mark_sweep_failed(conn: sqlite3.Connection, run_id: int, *, error_summary: s
         (_now_iso(), error_summary, run_id),
     )
     conn.commit()
+
+
+def list_completed_entity_areas(
+    conn: sqlite3.Connection,
+    *,
+    sweep_run_id: int,
+) -> set[tuple[str, str, str, Optional[str]]]:
+    """Return set of (entity_type, entity_id, config_area, sub_key) tuples with
+    at least one observation under this sweep_run_id. Used for resumability."""
+    rows = conn.execute(
+        """SELECT DISTINCT entity_type, entity_id, config_area, sub_key
+           FROM config_observations WHERE sweep_run_id=?""",
+        (sweep_run_id,),
+    ).fetchall()
+    return {(r["entity_type"], r["entity_id"], r["config_area"], r["sub_key"]) for r in rows}

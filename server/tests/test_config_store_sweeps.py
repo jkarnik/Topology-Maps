@@ -70,3 +70,34 @@ def test_mark_sweep_failed_stores_error_summary(conn):
     row = conn.execute("SELECT status, error_summary FROM config_sweep_runs WHERE id=?", (run_id,)).fetchone()
     assert row["status"] == "failed"
     assert row["error_summary"] == "rate limit exhausted"
+
+
+def test_list_completed_entity_areas_for_sweep(conn):
+    from server.config_collector.store import (
+        create_sweep_run, insert_observation_if_changed,
+        list_completed_entity_areas,
+    )
+
+    run_id = create_sweep_run(conn, org_id="o1", kind="baseline", total_calls=100)
+
+    conn.execute("INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
+                 ("h1", "{}", 2, "t"))
+    conn.commit()
+
+    insert_observation_if_changed(
+        conn, org_id="o1", entity_type="network", entity_id="N_1",
+        config_area="appliance_vlans", sub_key=None, hash_hex="h1",
+        source_event="baseline", change_event_id=None, sweep_run_id=run_id,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+    insert_observation_if_changed(
+        conn, org_id="o1", entity_type="device", entity_id="Q2-A",
+        config_area="switch_device_ports", sub_key=None, hash_hex="h1",
+        source_event="baseline", change_event_id=None, sweep_run_id=run_id,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+
+    done = list_completed_entity_areas(conn, sweep_run_id=run_id)
+    assert ("network", "N_1", "appliance_vlans", None) in done
+    assert ("device", "Q2-A", "switch_device_ports", None) in done
+    assert len(done) == 2
