@@ -75,3 +75,17 @@ async def test_mv_mg_sm_network_methods(client, method, path, body):
     async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
         mock.get(path).mock(return_value=httpx.Response(200, json=body))
         assert await getattr(client, method)("N_1") == body
+
+
+@pytest.mark.asyncio
+async def test_get_org_configuration_changes(client):
+    """Change-log endpoint is paginated; timespan + perPage passed through."""
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/organizations/123/configurationChanges").mock(
+            return_value=httpx.Response(200, json=[
+                {"ts": "2026-04-22T10:00:00Z", "label": "VLAN", "networkId": "N_1"},
+            ])
+        )
+        result = await client.get_org_configuration_changes("123", timespan=3600, per_page=1000)
+    assert len(result) == 1
+    assert result[0]["label"] == "VLAN"

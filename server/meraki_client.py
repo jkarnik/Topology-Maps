@@ -476,5 +476,19 @@ class MerakiClient:
     async def get_sm_profiles(self, network_id: str) -> list[dict]:
         return await self._get(f"/networks/{network_id}/sm/profiles")
 
+    async def get_org_configuration_changes(
+        self, org_id: str, *, timespan: int = 3600, per_page: int = 1000,
+    ) -> list[dict]:
+        """Fetch the organization's configuration change log.
+
+        `timespan` is in seconds (Meraki supports up to 2678400 = 31 days).
+        The endpoint is paginated; Link headers are followed until exhausted.
+        """
+        return await self._get_paginated(
+            f"/organizations/{org_id}/configurationChanges",
+            params={"timespan": timespan},
+            per_page=per_page,
+        )
+
     async def close(self) -> None:
         await self._client.aclose()
