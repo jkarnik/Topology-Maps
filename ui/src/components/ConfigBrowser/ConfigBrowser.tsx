@@ -44,7 +44,15 @@ export const ConfigBrowser: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        background: 'var(--bg-primary)',
+        color: 'var(--text-primary)',
+      }}
+    >
       <CollectionStatusBar
         orgs={orgs}
         selectedOrgId={selectedOrgId}
@@ -53,8 +61,15 @@ export const ConfigBrowser: React.FC = () => {
         onStartBaseline={handleBaseline}
         onStartSweep={handleSweep}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-80 border-r overflow-y-auto">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div
+          style={{
+            width: '320px',
+            borderRight: '1px solid var(--border-subtle)',
+            overflowY: 'auto',
+            background: 'var(--bg-primary)',
+          }}
+        >
           <ConfigTree
             tree={tree}
             loading={treeLoading}
@@ -62,11 +77,31 @@ export const ConfigBrowser: React.FC = () => {
             selected={selected}
           />
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
-          {selected && selectedOrgId
-            ? <ConfigEntityView orgId={selectedOrgId} entityType={selected.entityType} entityId={selected.entityId} />
-            : <div className="text-sm text-gray-500">Select an entity from the tree.</div>
-          }
+        <div
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '18px 22px',
+            background: 'var(--bg-primary)',
+          }}
+        >
+          {selected && selectedOrgId ? (
+            <ConfigEntityView
+              orgId={selectedOrgId}
+              entityType={selected.entityType}
+              entityId={selected.entityId}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: '12px',
+                color: 'var(--text-muted)',
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
+              Select an entity from the tree.
+            </div>
+          )}
         </div>
       </div>
       {lastEvent?.type === 'sweep.progress' && (
