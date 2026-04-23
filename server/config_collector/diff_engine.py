@@ -82,9 +82,8 @@ def _object_diff(a: dict, b: dict, prefix: str = "") -> tuple[list, int]:
     return changes, unchanged
 
 def compute_diff(blob_a: dict, blob_b: dict) -> DiffResult:
-    vals_a = list(blob_a.values())
-    vals_b = list(blob_b.values())
-    is_array = (vals_a and isinstance(vals_a[0], list)) or (vals_b and isinstance(vals_b[0], list))
+    is_array = any(isinstance(v, list) for v in blob_a.values()) or \
+               any(isinstance(v, list) for v in blob_b.values())
     if is_array:
         raise NotImplementedError("Array mode implemented in Task 2")
     changes, unchanged = _object_diff(blob_a, blob_b)
