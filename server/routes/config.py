@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import json
 import logging
 from typing import Optional
@@ -16,7 +17,9 @@ from server.config_collector.store import (
     get_latest_observation, get_observation_history,
     get_blob_by_hash, get_change_events,
     create_sweep_run, get_active_sweep_run,
+    get_observations_in_window,
 )
+from server.config_collector.diff_engine import compute_diff
 from server.meraki_client import MerakiClient
 
 logger = logging.getLogger(__name__)
@@ -374,6 +377,59 @@ async def list_change_events(
         }
     finally:
         conn.close()
+
+
+@router.get("/diff/org")
+def get_org_diff(
+    org_id: str,
+    from_ts: str,
+    to_ts: Optional[str] = None,
+) -> dict:
+    import datetime
+    if to_ts is None:
+        to_ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    conn = get_connection()
+    try:
+        pairs = get_observations_in_window(conn, org_id=org_id, from_ts=from_ts, to_ts=to_ts)
+        results = []
+        for p in pairs:
+            from_hash = p["from_hash"]
+            to_hash = p["to_hash"]
+            blob_a: dict = {}
+            blob_b: dict = {}
+            if from_hash:
+                row_a = get_blob_by_hash(conn, from_hash)
+                if row_a:
+                    blob_a = json.loads(row_a["payload"])
+            if to_hash:
+                row_b = get_blob_by_hash(conn, to_hash)
+                if row_b:
+                    blob_b = json.loads(row_b["payload"])
+
+            diff = compute_diff(blob_a, blob_b)
+            results.append({
+                "entity_type": p["entity_type"],
+                "entity_id": p["entity_id"],
+                "config_area": p["config_area"],
+                "sub_key": p["sub_key"],
+                "name_hint": p.get("name_hint", ""),
+                "to_observed_at": p["to_observed_at"],
+                "diff": dataclasses.asdict(diff),
+            })
+    finally:
+        conn.close()
+
+    estimated = max(1, int(len(pairs) * 0.2))
+    from fastapi.responses import JSONResponse
+    content = {
+        "from_ts": from_ts,
+        "to_ts": to_ts,
+        "total_entities_checked": len(pairs),
+        "changed_count": len(results),
+        "results": results,
+    }
+    return JSONResponse(content=content, headers={"X-Estimated-Seconds": str(estimated)})
 
 
 class ConfigWebSocketHub:
