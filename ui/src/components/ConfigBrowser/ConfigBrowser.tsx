@@ -8,7 +8,7 @@ import { useConfigTree } from '../../hooks/useConfigTree'
 import { useConfigCollection } from '../../hooks/useConfigCollection'
 import { useOrgDiff } from '../../hooks/useOrgDiff'
 import { startBaseline, startSweep } from '../../api/config'
-import type { EntityType } from '../../types/config'
+import type { EntityType, ConfigStatus } from '../../types/config'
 
 export function ConfigBrowser() {
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
@@ -60,7 +60,22 @@ export function ConfigBrowser() {
     return []
   }, [orgs, selectedOrgId])
 
-  const selectedOrg = orgs.find(o => o.org_id === selectedOrgId)
+  const selectedOrg = useMemo(
+    () => orgs.find(o => o.org_id === selectedOrgId) ?? null,
+    [orgs, selectedOrgId],
+  )
+
+  // Derive status from org data so CollectionStatusBar can show the sweep button
+  const derivedStatus = useMemo((): ConfigStatus | null => {
+    if (!selectedOrg) return null
+    return {
+      baseline_state: selectedOrg.baseline_state,
+      last_sync: selectedOrg.last_baseline_at,
+      active_sweep: selectedOrg.active_sweep_run_id
+        ? { id: selectedOrg.active_sweep_run_id, kind: 'sweep', status: 'running' }
+        : null,
+    }
+  }, [selectedOrg])
 
   // Determine entity to show in overview tab
   const entityViewProps = useMemo(() => {
@@ -76,7 +91,7 @@ export function ConfigBrowser() {
       <CollectionStatusBar
         orgs={orgs}
         selectedOrgId={selectedOrgId}
-        status={null}
+        status={derivedStatus}
         onOrgChange={setSelectedOrgId}
         onStartBaseline={async () => { if (selectedOrgId) await startBaseline(selectedOrgId) }}
         onStartSweep={async () => { if (selectedOrgId) await startSweep(selectedOrgId) }}

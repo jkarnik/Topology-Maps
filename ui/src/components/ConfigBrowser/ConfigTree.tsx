@@ -98,7 +98,7 @@ export function ConfigTree({
             <div key={net.id}>
               <div className={nodeClass(netSel)} onClick={() => onSelect(netSel)}>
                 <span className="opacity-40">▾</span>
-                <span className="flex-1 truncate">{net.name}</span>
+                <span className="flex-1 truncate">{net.name ?? net.id}</span>
                 {netCount !== null && netCount > 0 && (
                   <span className="text-[9px] bg-amber-500/20 text-amber-300 rounded px-1">{netCount}</span>
                 )}
