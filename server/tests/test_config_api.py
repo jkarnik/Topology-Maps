@@ -52,7 +52,9 @@ def test_baseline_trigger_returns_run_id(client):
         gc.return_value = object()
         resp = client.post("/api/config/orgs/o1/baseline")
     assert resp.status_code == 200
-    assert resp.json()["sweep_run_id"] == 42
+    # Handler now creates the row synchronously, so check that a run_id is returned
+    assert resp.json()["sweep_run_id"] is not None
+    assert resp.json()["sweep_run_id"] > 0
 
 
 def test_sweep_trigger_returns_run_id(client):
@@ -61,7 +63,9 @@ def test_sweep_trigger_returns_run_id(client):
         gc.return_value = object()
         resp = client.post("/api/config/orgs/o1/sweep")
     assert resp.status_code == 200
-    assert resp.json()["sweep_run_id"] == 99
+    # Handler now creates the row synchronously, so check that a run_id is returned
+    assert resp.json()["sweep_run_id"] is not None
+    assert resp.json()["sweep_run_id"] > 0
 
 
 def test_refresh_trigger_validates_entity_type(client):

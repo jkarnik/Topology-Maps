@@ -11,6 +11,7 @@ from server.config_collector.store import (
     create_sweep_run, mark_sweep_running, mark_sweep_complete,
     mark_sweep_failed, increment_sweep_counters,
     list_completed_entity_areas, get_active_sweep_run,
+    update_sweep_total_calls,
     upsert_blob, get_latest_observation, insert_observation_if_changed,
 )
 from server.config_collector.targeted_puller import pull_many, coalesce_jobs
@@ -78,6 +79,9 @@ async def run_baseline(
 
     if resume_run_id is not None:
         run_id = resume_run_id
+        # Now that enumeration is complete, fill in total_calls for sweep rows
+        # pre-created by the REST handler.
+        update_sweep_total_calls(conn, run_id, len(all_jobs))
         done = list_completed_entity_areas(conn, sweep_run_id=run_id)
         remaining = [j for j in all_jobs if (
             j["entity_type"], j["entity_id"], j["config_area"], j.get("sub_key")
@@ -137,6 +141,7 @@ async def run_anti_drift_sweep(
     *,
     org_id: str,
     progress_callback: Optional[Callable[[dict], Awaitable[None]]] = None,
+    resume_run_id: Optional[int] = None,
 ) -> int:
     """Run a full sweep and annotate each observation with confirm or discrepancy.
 
@@ -144,9 +149,10 @@ async def run_anti_drift_sweep(
     source_event distinguishes confirms (hash matched) from discrepancies
     (hash changed without a corresponding change-log event).
     """
-    active = get_active_sweep_run(conn, org_id=org_id, kind="anti_drift")
-    if active is not None:
-        return active["id"]
+    if resume_run_id is None:
+        active = get_active_sweep_run(conn, org_id=org_id, kind="anti_drift")
+        if active is not None:
+            return active["id"]
 
     composition = await enumerate_org_composition(client, org_id)
     jobs = list(coalesce_jobs(expand_for_org(
@@ -156,7 +162,11 @@ async def run_anti_drift_sweep(
         enabled_ssids_by_network=composition["enabled_ssids_by_network"],
     )))
 
-    run_id = create_sweep_run(conn, org_id=org_id, kind="anti_drift", total_calls=len(jobs))
+    if resume_run_id is not None:
+        run_id = resume_run_id
+        update_sweep_total_calls(conn, run_id, len(jobs))
+    else:
+        run_id = create_sweep_run(conn, org_id=org_id, kind="anti_drift", total_calls=len(jobs))
     mark_sweep_running(conn, run_id)
     if progress_callback:
         await progress_callback({

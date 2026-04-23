@@ -1,6 +1,7 @@
 """REST API for Meraki config collection (Plan 1.17)."""
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from typing import Optional
@@ -14,6 +15,7 @@ from server.config_collector.manual_refresh import refresh_entity
 from server.config_collector.store import (
     get_latest_observation, get_observation_history,
     get_blob_by_hash, get_change_events,
+    create_sweep_run, get_active_sweep_run,
 )
 from server.meraki_client import MerakiClient
 
@@ -122,27 +124,61 @@ async def get_status(org_id: str) -> dict:
     }
 
 
-@router.post("/orgs/{org_id}/baseline")
-async def start_baseline(org_id: str) -> dict:
-    conn = get_connection()
+async def _run_baseline_bg(org_id: str, run_id: int) -> None:
+    """Background task: performs the full baseline after the HTTP response returns."""
     client = _get_meraki_client()
+    conn = get_connection()
     cb = await _broadcast_callback_for_org(org_id)
     try:
-        run_id = await run_baseline(client, conn, org_id=org_id, progress_callback=cb)
+        await run_baseline(client, conn, org_id=org_id, progress_callback=cb, resume_run_id=run_id)
+    except Exception:
+        logger.exception("Background baseline failed for org %s (run_id=%s)", org_id, run_id)
     finally:
         conn.close()
+
+
+@router.post("/orgs/{org_id}/baseline")
+async def start_baseline(org_id: str) -> dict:
+    """Queue a baseline sweep. Returns immediately with sweep_run_id; work runs in background."""
+    conn = get_connection()
+    try:
+        active = get_active_sweep_run(conn, org_id=org_id, kind="baseline")
+        if active is not None:
+            return {"sweep_run_id": active["id"]}
+        run_id = create_sweep_run(conn, org_id=org_id, kind="baseline", total_calls=None)
+    finally:
+        conn.close()
+
+    asyncio.create_task(_run_baseline_bg(org_id, run_id))
     return {"sweep_run_id": run_id}
+
+
+async def _run_sweep_bg(org_id: str, run_id: int) -> None:
+    """Background task: performs the full anti-drift sweep after the HTTP response returns."""
+    client = _get_meraki_client()
+    conn = get_connection()
+    cb = await _broadcast_callback_for_org(org_id)
+    try:
+        await run_anti_drift_sweep(client, conn, org_id=org_id, progress_callback=cb, resume_run_id=run_id)
+    except Exception:
+        logger.exception("Background anti-drift sweep failed for org %s (run_id=%s)", org_id, run_id)
+    finally:
+        conn.close()
 
 
 @router.post("/orgs/{org_id}/sweep")
 async def start_sweep(org_id: str) -> dict:
+    """Queue an anti-drift sweep. Returns immediately with sweep_run_id; work runs in background."""
     conn = get_connection()
-    client = _get_meraki_client()
-    cb = await _broadcast_callback_for_org(org_id)
     try:
-        run_id = await run_anti_drift_sweep(client, conn, org_id=org_id, progress_callback=cb)
+        active = get_active_sweep_run(conn, org_id=org_id, kind="anti_drift")
+        if active is not None:
+            return {"sweep_run_id": active["id"]}
+        run_id = create_sweep_run(conn, org_id=org_id, kind="anti_drift", total_calls=None)
     finally:
         conn.close()
+
+    asyncio.create_task(_run_sweep_bg(org_id, run_id))
     return {"sweep_run_id": run_id}
 
 

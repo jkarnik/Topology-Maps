@@ -285,3 +285,16 @@ def get_active_sweep_run(
         (org_id, kind),
     ).fetchone()
     return dict(row) if row else None
+
+
+def update_sweep_total_calls(
+    conn: sqlite3.Connection,
+    run_id: int,
+    total_calls: int,
+) -> None:
+    """Set total_calls on an existing sweep_runs row (used after enumeration)."""
+    conn.execute(
+        "UPDATE config_sweep_runs SET total_calls=? WHERE id=?",
+        (total_calls, run_id),
+    )
+    conn.commit()
