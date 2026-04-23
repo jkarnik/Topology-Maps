@@ -47,3 +47,15 @@ async def test_device_specific_methods(client, method, path, body):
     async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
         mock.get(path).mock(return_value=httpx.Response(200, json=body))
         assert await getattr(client, method)(serial) == body
+
+
+@pytest.mark.parametrize("method,path,body", [
+    ("get_camera_device_quality_retention", "/devices/MV-001/camera/qualityAndRetention",  {"motionBasedRetentionEnabled": False}),
+    ("get_camera_device_video_settings",    "/devices/MV-001/camera/videoSettings",        {"externalRtspEnabled": False}),
+    ("get_camera_device_sense",             "/devices/MV-001/camera/sense",                {"senseEnabled": False}),
+])
+@pytest.mark.asyncio
+async def test_camera_methods(client, method, path, body):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get(path).mock(return_value=httpx.Response(200, json=body))
+        assert await getattr(client, method)("MV-001") == body

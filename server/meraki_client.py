@@ -442,5 +442,16 @@ class MerakiClient:
     async def get_appliance_device_uplinks(self, serial: str) -> dict:
         return await self._get(f"/devices/{serial}/appliance/uplinks/settings")
 
+    # --- Plan 1.09: MV camera device methods -----------------------------
+
+    async def get_camera_device_quality_retention(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/camera/qualityAndRetention")
+
+    async def get_camera_device_video_settings(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/camera/videoSettings")
+
+    async def get_camera_device_sense(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/camera/sense")
+
     async def close(self) -> None:
         await self._client.aclose()
