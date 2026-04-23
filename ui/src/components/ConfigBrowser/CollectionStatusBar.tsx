@@ -47,7 +47,7 @@ export const CollectionStatusBar: React.FC<Props> = ({
     if (!fromTs && baselineTimestamps.length > 0) {
       setFromTs(baselineTimestamps[0]);
     }
-  }, [baselineTimestamps]);
+  }, [baselineTimestamps, fromTs]);
 
   const selectStyle: React.CSSProperties = {
     background: 'var(--bg-tertiary)',
