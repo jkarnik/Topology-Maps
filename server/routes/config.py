@@ -432,6 +432,62 @@ async def get_org_diff(
     return JSONResponse(content=content, headers={"X-Estimated-Seconds": str(estimated)})
 
 
+@router.get("/entities/{entity_type}/{entity_id}/timeline")
+async def get_entity_timeline(
+    entity_type: str,
+    entity_id: str,
+    org_id: str = Query(...),
+) -> dict:
+    conn = get_connection()
+    try:
+        observations = get_observation_history(
+            conn,
+            org_id=org_id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            limit=200,
+        )
+        entries = []
+        # Build timeline: each obs that differs from its predecessor has a diff
+        # Process oldest-first to build prev map, then reverse at the end
+        prev_hashes: dict[tuple, str] = {}
+        for obs in reversed(observations):  # oldest first
+            key = (obs["config_area"], obs.get("sub_key") or "")
+            prior_hash = prev_hashes.get(key)
+            has_diff = prior_hash is not None and prior_hash != obs["hash"]
+            entries.append({
+                "config_area": obs["config_area"],
+                "sub_key": obs.get("sub_key") or "",
+                "observed_at": obs["observed_at"],
+                "source_event": obs["source_event"],
+                "hash": obs["hash"],
+                "has_diff": has_diff,
+                "prior_hash": prior_hash if has_diff else None,
+                "admin_email": None,
+            })
+            prev_hashes[key] = obs["hash"]
+
+        # Enrich with admin info from linked change events
+        event_ids = {o.get("change_event_id") for o in observations if o.get("change_event_id")}
+        admin_map: dict[int, str] = {}
+        for eid in event_ids:
+            row = conn.execute(
+                "SELECT admin_email FROM config_change_events WHERE id=?", (eid,)
+            ).fetchone()
+            if row:
+                admin_map[eid] = row["admin_email"]
+        for i, obs in enumerate(reversed(observations)):
+            eid = obs.get("change_event_id")
+            if eid and eid in admin_map:
+                entries[i]["admin_email"] = admin_map[eid]
+
+        # Return newest-first
+        entries.reverse()
+        return {"entity_type": entity_type, "entity_id": entity_id, "entries": entries}
+    finally:
+        conn.close()
+
+
 class ConfigWebSocketHub:
     """Per-org WebSocket broadcast hub for config events."""
 

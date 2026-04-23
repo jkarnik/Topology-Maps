@@ -67,3 +67,24 @@ def test_org_diff_missing_org_id(client):
         "to_ts": "2026-04-23T00:00:00Z",
     })
     assert resp.status_code == 422
+
+def test_entity_timeline_returns_entries(app, client, monkeypatch):
+    from server import database
+    conn = database.get_connection()
+    _seed_two_obs(conn)
+    conn.close()
+    resp = client.get("/api/config/entities/network/N1/timeline",
+                      params={"org_id": "O1"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body["entries"]) >= 1
+    entry = body["entries"][0]
+    assert "config_area" in entry
+    assert "observed_at" in entry
+    assert "has_diff" in entry
+
+def test_entity_timeline_404_unknown(client):
+    resp = client.get("/api/config/entities/network/MISSING/timeline",
+                      params={"org_id": "O1"})
+    assert resp.status_code == 200
+    assert resp.json()["entries"] == []
