@@ -8,19 +8,51 @@ interface Props {
   selected: { entityType: EntityType; entityId: string } | null;
 }
 
+const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
+
 const caret = (open: boolean) => (open ? '▾' : '▸');
 
 export const ConfigTree: React.FC<Props> = ({ tree, loading, onSelect, selected }) => {
   const [openNetworks, setOpenNetworks] = useState<Set<string>>(new Set());
 
-  if (loading) return <div className="p-3 text-sm text-gray-500">Loading…</div>;
-  if (!tree) return <div className="p-3 text-sm text-gray-500">No data yet.</div>;
+  if (loading) {
+    return (
+      <div style={{ padding: '14px', fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>
+        Loading…
+      </div>
+    );
+  }
+  if (!tree) {
+    return (
+      <div style={{ padding: '14px', fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>
+        No data yet.
+      </div>
+    );
+  }
 
   const isSelected = (t: EntityType, id: string) =>
     selected?.entityType === t && selected.entityId === id;
 
-  const rowClass = (t: EntityType, id: string) =>
-    `cursor-pointer px-2 py-1 rounded text-sm ${isSelected(t, id) ? 'bg-blue-100 font-semibold' : 'hover:bg-gray-100'}`;
+  const rowStyle = (t: EntityType, id: string): React.CSSProperties => ({
+    cursor: 'pointer',
+    padding: '5px 10px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    color: isSelected(t, id) ? 'var(--accent-amber)' : 'var(--text-primary)',
+    background: isSelected(t, id) ? 'var(--accent-amber-glow)' : 'transparent',
+    fontWeight: isSelected(t, id) ? 600 : 400,
+    transition: 'background 0.1s ease',
+  });
+
+  const sectionLabelStyle: React.CSSProperties = {
+    marginTop: '12px',
+    marginBottom: '6px',
+    fontSize: '10px',
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+    color: 'var(--text-muted)',
+    fontWeight: 600,
+  };
 
   const toggleNetwork = (id: string) => {
     setOpenNetworks((prev) => {
@@ -31,39 +63,86 @@ export const ConfigTree: React.FC<Props> = ({ tree, loading, onSelect, selected 
   };
 
   return (
-    <div className="p-2 text-sm overflow-y-auto h-full">
-      <div className="mb-2 text-xs uppercase tracking-wide text-gray-500">Org configs</div>
+    <div style={{ padding: '10px 8px', overflowY: 'auto', height: '100%', ...MONO }}>
+      <div style={sectionLabelStyle}>Org configs</div>
       <div
-        className={rowClass('org', tree.org.id)}
+        style={rowStyle('org', tree.org.id)}
         onClick={() => onSelect('org', tree.org.id)}
+        onMouseEnter={(e) => {
+          if (!isSelected('org', tree.org.id)) {
+            (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isSelected('org', tree.org.id)) {
+            (e.currentTarget as HTMLElement).style.background = 'transparent';
+          }
+        }}
       >
         {tree.org.id}
-        <span className="ml-2 text-gray-400">({tree.org.config_areas.length} areas)</span>
+        <span style={{ marginLeft: '8px', color: 'var(--text-muted)' }}>
+          ({tree.org.config_areas.length} areas)
+        </span>
       </div>
 
-      <div className="mt-3 mb-2 text-xs uppercase tracking-wide text-gray-500">Networks</div>
+      <div style={sectionLabelStyle}>Networks</div>
+      {tree.networks.length === 0 && (
+        <div style={{ padding: '5px 10px', fontSize: '11px', color: 'var(--text-muted)' }}>
+          No networks yet.
+        </div>
+      )}
       {tree.networks.map((net) => {
         const open = openNetworks.has(net.id);
         return (
           <div key={net.id}>
             <div
-              className="flex items-center gap-1 cursor-pointer hover:bg-gray-50 px-1"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                padding: '3px 4px',
+              }}
               onClick={() => toggleNetwork(net.id)}
             >
-              <span className="w-4">{caret(open)}</span>
+              <span style={{ width: '14px', color: 'var(--text-muted)', fontSize: '11px' }}>
+                {caret(open)}
+              </span>
               <span
+                style={{ flex: 1, ...rowStyle('network', net.id) }}
                 onClick={(e) => { e.stopPropagation(); onSelect('network', net.id); }}
-                className={`flex-1 ${rowClass('network', net.id)}`}
+                onMouseEnter={(e) => {
+                  if (!isSelected('network', net.id)) {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected('network', net.id)) {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }
+                }}
               >
                 {net.name ?? net.id}
-                <span className="ml-2 text-gray-400">({net.config_areas.length})</span>
+                <span style={{ marginLeft: '8px', color: 'var(--text-muted)' }}>
+                  ({net.config_areas.length})
+                </span>
               </span>
             </div>
             {open && net.devices.map((d) => (
               <div
                 key={d.serial}
-                className={`ml-6 ${rowClass('device', d.serial)}`}
+                style={{ ...rowStyle('device', d.serial), marginLeft: '24px' }}
                 onClick={() => onSelect('device', d.serial)}
+                onMouseEnter={(e) => {
+                  if (!isSelected('device', d.serial)) {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected('device', d.serial)) {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }
+                }}
               >
                 {d.name ?? d.serial}
               </div>
