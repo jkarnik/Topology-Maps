@@ -119,6 +119,7 @@ def _array_diff(area_name: str, rows_a: list[dict], rows_b: list[dict]) -> tuple
             changes.append(RowAdded(identity=i, row=rows_b[i]))
         return changes, unchanged
 
+    # Rows lacking id_key are silently excluded — matches Meraki clean-response assumption
     map_a = {r[id_key]: r for r in rows_a if id_key in r}
     map_b = {r[id_key]: r for r in rows_b if id_key in r}
     all_ids = list(map_a) + [k for k in map_b if k not in map_a]
@@ -140,8 +141,9 @@ def compute_diff(blob_a: dict, blob_b: dict) -> DiffResult:
     is_array = any(isinstance(v, list) for v in blob_a.values()) or \
                any(isinstance(v, list) for v in blob_b.values())
     if is_array:
-        # area_name is the first key present in either blob
-        area_name = next(iter(blob_b or blob_a), "")
+        # area_name is the first list-valued key present in either blob
+        _merged = {**blob_a, **blob_b}
+        area_name = next((k for k in _merged if isinstance(_merged[k], list)), next(iter(blob_b or blob_a), ""))
         rows_a = blob_a.get(area_name, [])
         rows_b = blob_b.get(area_name, [])
         changes, unchanged = _array_diff(area_name, rows_a, rows_b)
