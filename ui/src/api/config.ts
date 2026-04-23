@@ -1,7 +1,7 @@
 // Thin fetch wrappers for /api/config/* (Plan 1.19)
 import type {
   ConfigOrg, ConfigStatus, ConfigEntity, ConfigTree, ConfigChangeEvent,
-  ConfigObservation, EntityType,
+  ConfigObservation, EntityType, OrgDiffResponse, EntityTimelineResponse,
 } from '../types/config';
 
 const BASE = '/api/config';
@@ -63,4 +63,25 @@ export function listChangeEvents(orgId: string, opts?: { network_id?: string; li
   if (opts?.limit) qs.set('limit', String(opts.limit));
   if (opts?.before) qs.set('before', opts.before);
   return _fetch(`/change-events?${qs}`);
+}
+
+export async function fetchOrgDiff(
+  orgId: string,
+  fromTs: string,
+  toTs?: string,
+): Promise<OrgDiffResponse> {
+  const params = new URLSearchParams({ org_id: orgId, from_ts: fromTs })
+  if (toTs) params.set('to_ts', toTs)
+  return _fetch<OrgDiffResponse>(`/diff/org?${params}`)
+}
+
+export async function fetchEntityTimeline(
+  orgId: string,
+  entityType: EntityType,
+  entityId: string,
+): Promise<EntityTimelineResponse> {
+  const params = new URLSearchParams({ org_id: orgId })
+  return _fetch<EntityTimelineResponse>(
+    `/entities/${entityType}/${entityId}/timeline?${params}`,
+  )
 }

@@ -87,3 +87,55 @@ export type ConfigWsEvent =
   | { type: 'sweep.failed'; sweep_run_id: number; org_id: string; error_summary: string }
   | { type: 'observation.updated'; org_id: string; entity_type: string; entity_id: string; config_area: string }
   | { type: 'change_event.new'; org_id: string; event_id: number; network_id: string | null; label: string | null; ts: string };
+
+// ── Diff types ────────────────────────────────────────────────────────────────
+
+export type DiffChangeType =
+  | { type: 'FieldChanged'; key: string; before: unknown; after: unknown }
+  | { type: 'FieldAdded';   key: string; value: unknown }
+  | { type: 'FieldRemoved'; key: string; value: unknown }
+  | { type: 'SecretChanged'; key: string }
+  | { type: 'RowAdded';    identity: unknown; row: Record<string, unknown> }
+  | { type: 'RowRemoved';  identity: unknown; row: Record<string, unknown> }
+  | { type: 'RowChanged';  identity: unknown; field_changes: DiffChangeType[] }
+
+export interface DiffResult {
+  shape: 'object' | 'array'
+  changes: DiffChangeType[]
+  unchanged_count: number
+}
+
+export interface OrgDiffResultItem {
+  entity_type: string
+  entity_id: string
+  config_area: string
+  sub_key: string
+  name_hint: string
+  to_observed_at: string
+  diff: DiffResult
+}
+
+export interface OrgDiffResponse {
+  from_ts: string
+  to_ts: string
+  total_entities_checked: number
+  changed_count: number
+  results: OrgDiffResultItem[]
+}
+
+export interface TimelineEntry {
+  config_area: string
+  sub_key: string
+  observed_at: string
+  source_event: string
+  hash: string
+  has_diff: boolean
+  prior_hash: string | null
+  admin_email: string | null
+}
+
+export interface EntityTimelineResponse {
+  entity_type: string
+  entity_id: string
+  entries: TimelineEntry[]
+}
