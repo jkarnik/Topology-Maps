@@ -269,3 +269,19 @@ def list_completed_entity_areas(
         (sweep_run_id,),
     ).fetchall()
     return {(r["entity_type"], r["entity_id"], r["config_area"], r["sub_key"]) for r in rows}
+
+
+def get_active_sweep_run(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    kind: str,
+) -> Optional[dict]:
+    """Return the most recent queued/running sweep of `kind` for `org_id`, or None."""
+    row = conn.execute(
+        """SELECT * FROM config_sweep_runs
+           WHERE org_id=? AND kind=? AND status IN ('queued', 'running')
+           ORDER BY id DESC LIMIT 1""",
+        (org_id, kind),
+    ).fetchone()
+    return dict(row) if row else None

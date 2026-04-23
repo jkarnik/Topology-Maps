@@ -101,3 +101,21 @@ def test_list_completed_entity_areas_for_sweep(conn):
     assert ("network", "N_1", "appliance_vlans", None) in done
     assert ("device", "Q2-A", "switch_device_ports", None) in done
     assert len(done) == 2
+
+
+def test_get_active_sweep_run_returns_queued_or_running(conn):
+    from server.config_collector.store import create_sweep_run, mark_sweep_running, mark_sweep_complete, get_active_sweep_run
+
+    assert get_active_sweep_run(conn, org_id="o1", kind="baseline") is None
+
+    run_id = create_sweep_run(conn, org_id="o1", kind="baseline", total_calls=10)
+    active = get_active_sweep_run(conn, org_id="o1", kind="baseline")
+    assert active["id"] == run_id
+
+    mark_sweep_running(conn, run_id)
+    active = get_active_sweep_run(conn, org_id="o1", kind="baseline")
+    assert active["id"] == run_id
+    assert active["status"] == "running"
+
+    mark_sweep_complete(conn, run_id)
+    assert get_active_sweep_run(conn, org_id="o1", kind="baseline") is None
