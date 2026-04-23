@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import datetime
 import json
 import logging
 from typing import Optional
 
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse
 
 from server.database import get_connection
 from server.config_collector.scanner import run_baseline, run_anti_drift_sweep
@@ -380,12 +382,11 @@ async def list_change_events(
 
 
 @router.get("/diff/org")
-def get_org_diff(
+async def get_org_diff(
     org_id: str,
     from_ts: str,
     to_ts: Optional[str] = None,
 ) -> dict:
-    import datetime
     if to_ts is None:
         to_ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -421,7 +422,6 @@ def get_org_diff(
         conn.close()
 
     estimated = max(1, int(len(pairs) * 0.2))
-    from fastapi.responses import JSONResponse
     content = {
         "from_ts": from_ts,
         "to_ts": to_ts,
