@@ -93,3 +93,33 @@ def test_anti_drift_confirm_always_writes(conn):
 
     rows = conn.execute("SELECT source_event FROM config_observations ORDER BY id").fetchall()
     assert [r["source_event"] for r in rows] == ["baseline", "anti_drift_confirm"]
+
+
+def test_get_latest_observation_returns_most_recent(conn):
+    from server.config_collector.store import insert_observation_if_changed, get_latest_observation
+
+    base = dict(
+        org_id="o1", entity_type="network", entity_id="N_1",
+        config_area="appliance_vlans", sub_key=None,
+        change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+    insert_observation_if_changed(conn, hash_hex="hash1", source_event="baseline", **base)
+    insert_observation_if_changed(conn, hash_hex="hash2", source_event="change_log", **base)
+
+    latest = get_latest_observation(
+        conn,
+        org_id="o1", entity_type="network", entity_id="N_1",
+        config_area="appliance_vlans", sub_key=None,
+    )
+    assert latest["hash"] == "hash2"
+    assert latest["source_event"] == "change_log"
+
+
+def test_get_latest_observation_missing_returns_none(conn):
+    from server.config_collector.store import get_latest_observation
+
+    assert get_latest_observation(
+        conn, org_id="x", entity_type="network", entity_id="Y",
+        config_area="z", sub_key=None,
+    ) is None

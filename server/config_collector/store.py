@@ -81,3 +81,22 @@ def insert_observation_if_changed(
     )
     conn.commit()
     return True
+
+
+def get_latest_observation(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    entity_type: str,
+    entity_id: str,
+    config_area: str,
+    sub_key: Optional[str],
+) -> Optional[dict]:
+    row = conn.execute(
+        """SELECT * FROM config_observations
+           WHERE org_id=? AND entity_type=? AND entity_id=?
+             AND config_area=? AND sub_key IS ?
+           ORDER BY observed_at DESC LIMIT 1""",
+        (org_id, entity_type, entity_id, config_area, sub_key),
+    ).fetchone()
+    return dict(row) if row else None
