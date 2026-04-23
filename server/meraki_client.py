@@ -419,5 +419,28 @@ class MerakiClient:
     async def get_device_management_interface(self, serial: str) -> dict:
         return await self._get(f"/devices/{serial}/managementInterface")
 
+    # --- Plan 1.09: Device-level per-product methods ---------------------
+
+    async def get_switch_device_ports(self, serial: str) -> list[dict]:
+        return await self._get(f"/devices/{serial}/switch/ports")
+
+    async def get_switch_device_routing_interfaces(self, serial: str) -> list[dict]:
+        return await self._get(f"/devices/{serial}/switch/routing/interfaces")
+
+    async def get_switch_device_routing_static_routes(self, serial: str) -> list[dict]:
+        return await self._get(f"/devices/{serial}/switch/routing/staticRoutes")
+
+    async def get_switch_device_warm_spare(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/switch/warmSpare")
+
+    async def get_wireless_device_radio_settings(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/wireless/radio/settings")
+
+    async def get_wireless_device_bluetooth(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/wireless/bluetooth/settings")
+
+    async def get_appliance_device_uplinks(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/appliance/uplinks/settings")
+
     async def close(self) -> None:
         await self._client.aclose()

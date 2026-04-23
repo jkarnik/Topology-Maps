@@ -30,3 +30,20 @@ async def test_get_device_management_interface(client):
             return_value=httpx.Response(200, json={"wan1": {"usingStaticIp": False}})
         )
         assert "wan1" in await client.get_device_management_interface("Q2AB-CDEF-GHIJ")
+
+
+@pytest.mark.parametrize("method,path,body", [
+    ("get_switch_device_ports",                 "/devices/SW-001/switch/ports",                      []),
+    ("get_switch_device_routing_interfaces",    "/devices/SW-001/switch/routing/interfaces",         []),
+    ("get_switch_device_routing_static_routes", "/devices/SW-001/switch/routing/staticRoutes",       []),
+    ("get_switch_device_warm_spare",            "/devices/SW-001/switch/warmSpare",                  {"enabled": False}),
+    ("get_wireless_device_radio_settings",      "/devices/AP-001/wireless/radio/settings",           {"rfProfileId": None}),
+    ("get_wireless_device_bluetooth",           "/devices/AP-001/wireless/bluetooth/settings",       {"uuid": ""}),
+    ("get_appliance_device_uplinks",            "/devices/MX-001/appliance/uplinks/settings",        {"interfaces": {}}),
+])
+@pytest.mark.asyncio
+async def test_device_specific_methods(client, method, path, body):
+    serial = path.split("/")[2]
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get(path).mock(return_value=httpx.Response(200, json=body))
+        assert await getattr(client, method)(serial) == body
