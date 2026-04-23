@@ -55,6 +55,7 @@ export function ConfigTree({
   showAll = false,
   onShowAll,
 }: Props) {
+  const [orgOpen, setOrgOpen] = useState(true)
   const [openNetworks, setOpenNetworks] = useState<Set<string>>(new Set())
 
   if (loading) {
@@ -77,7 +78,7 @@ export function ConfigTree({
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
-    padding: '5px 10px',
+    padding: '5px 8px',
     borderRadius: '4px',
     fontSize: '12px',
     color: isSelected(sel) ? 'var(--accent-amber)' : 'var(--text-primary)',
@@ -96,15 +97,14 @@ export function ConfigTree({
     },
   })
 
-  const sectionLabel: React.CSSProperties = {
-    marginTop: '12px',
-    marginBottom: '4px',
-    padding: '0 10px',
-    fontSize: '10px',
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
+  const caretStyle: React.CSSProperties = {
+    width: '16px',
+    fontSize: '11px',
     color: 'var(--text-muted)',
-    fontWeight: 600,
+    cursor: 'pointer',
+    flexShrink: 0,
+    userSelect: 'none',
+    textAlign: 'center',
   }
 
   const toggleNetwork = (id: string) => {
@@ -129,80 +129,87 @@ export function ConfigTree({
     : allNetworks
 
   return (
-    <div style={{ padding: '10px 8px', overflowY: 'auto', height: '100%', ...MONO }}>
+    <div style={{ padding: '8px 6px', overflowY: 'auto', height: '100%', ...MONO }}>
 
-      {/* Org root */}
-      <div style={sectionLabel}>Org</div>
-      <div style={rowStyle(orgSel)} onClick={() => onSelect(orgSel)} {...hover(orgSel)}>
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{orgName}</span>
-        {orgCount !== null && orgCount > 0 && <span style={badgeStyle}>{orgCount}</span>}
+      {/* Org row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+        <span style={caretStyle} onClick={() => setOrgOpen(o => !o)}>
+          {orgOpen ? '▾' : '▸'}
+        </span>
+        <div style={{ ...rowStyle(orgSel), flex: 1 }} onClick={() => onSelect(orgSel)} {...hover(orgSel)}>
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>
+            {orgName}
+          </span>
+          {orgCount !== null && orgCount > 0 && <span style={badgeStyle}>{orgCount}</span>}
+        </div>
       </div>
 
-      {/* Networks */}
-      <div style={sectionLabel}>Networks</div>
-      {visibleNetworks.length === 0 && (
-        <div style={{ padding: '5px 10px', fontSize: '11px', color: 'var(--text-muted)' }}>
-          {allNetworks.length === 0 ? 'No networks yet.' : 'No changed networks.'}
-        </div>
-      )}
-      {visibleNetworks.map(net => {
-        const netSel: TreeSelection = { level: 'network', networkId: net.id }
-        const open = openNetworks.has(net.id)
-        const deviceSerials = net.devices.map(d => d.serial)
-        const netCount = diffResult ? changeCountForNetwork(diffResult, net.id, deviceSerials) : null
-
-        return (
-          <div key={net.id}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', padding: '2px 4px' }}>
-              <span
-                style={{ width: '18px', fontSize: '11px', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0, textAlign: 'center' }}
-                onClick={() => toggleNetwork(net.id)}
-              >
-                {open ? '▾' : '▸'}
-              </span>
-              <div
-                style={{ ...rowStyle(netSel), flex: 1, padding: '4px 8px' }}
-                onClick={() => onSelect(netSel)}
-                {...hover(netSel)}
-              >
-                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {net.name ?? net.id}
-                </span>
-                {netCount !== null && netCount > 0 && <span style={badgeStyle}>{netCount}</span>}
-              </div>
+      {/* Networks (children of org) */}
+      {orgOpen && (
+        <div style={{ paddingLeft: '18px' }}>
+          {visibleNetworks.length === 0 && (
+            <div style={{ padding: '4px 10px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              {allNetworks.length === 0 ? 'No networks yet.' : 'No changed networks.'}
             </div>
+          )}
+          {visibleNetworks.map(net => {
+            const netSel: TreeSelection = { level: 'network', networkId: net.id }
+            const open = openNetworks.has(net.id)
+            const deviceSerials = net.devices.map(d => d.serial)
+            const netCount = diffResult ? changeCountForNetwork(diffResult, net.id, deviceSerials) : null
 
-            {open && net.devices.map(dev => {
-              const devSel: TreeSelection = { level: 'device', entityType: 'device', entityId: dev.serial }
-              const devCount = diffResult ? changeCountForEntity(diffResult, dev.serial) : null
-              const dimmed = diffResult !== null && devCount === 0 && !isSelected(devSel)
-              return (
-                <div
-                  key={dev.serial}
-                  style={{ ...rowStyle(devSel, { marginLeft: '24px', opacity: dimmed ? 0.4 : 1 }) }}
-                  onClick={() => onSelect(devSel)}
-                  {...hover(devSel)}
-                >
-                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {dev.name ?? dev.serial}
+            return (
+              <div key={net.id}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <span style={caretStyle} onClick={() => toggleNetwork(net.id)}>
+                    {open ? '▾' : '▸'}
                   </span>
-                  {devCount !== null && devCount > 0 && <span style={badgeStyle}>{devCount}</span>}
+                  <div style={{ ...rowStyle(netSel), flex: 1 }} onClick={() => onSelect(netSel)} {...hover(netSel)}>
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {net.name ?? net.id}
+                    </span>
+                    {netCount !== null && netCount > 0 && <span style={badgeStyle}>{netCount}</span>}
+                  </div>
                 </div>
-              )
-            })}
-          </div>
-        )
-      })}
 
-      {/* Show all footer */}
-      {diffResult && !showAll && visibleNetworks.length < allNetworks.length && (
-        <div style={{ marginTop: '8px', padding: '0 10px' }}>
-          <button
-            style={{ fontSize: '10px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-            onClick={() => onShowAll?.()}
-          >
-            Show all networks & devices
-          </button>
+                {/* Devices (children of network) */}
+                {open && net.devices.length > 0 && (
+                  <div style={{ paddingLeft: '18px' }}>
+                    {net.devices.map(dev => {
+                      const devSel: TreeSelection = { level: 'device', entityType: 'device', entityId: dev.serial }
+                      const devCount = diffResult ? changeCountForEntity(diffResult, dev.serial) : null
+                      const dimmed = diffResult !== null && devCount === 0 && !isSelected(devSel)
+                      return (
+                        <div
+                          key={dev.serial}
+                          style={{ ...rowStyle(devSel), opacity: dimmed ? 0.4 : 1 }}
+                          onClick={() => onSelect(devSel)}
+                          {...hover(devSel)}
+                        >
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {dev.name ?? dev.serial}
+                          </span>
+                          {devCount !== null && devCount > 0 && <span style={badgeStyle}>{devCount}</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+
+          {/* Show all footer */}
+          {diffResult && !showAll && visibleNetworks.length < allNetworks.length && (
+            <div style={{ padding: '6px 8px' }}>
+              <button
+                style={{ fontSize: '10px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                onClick={() => onShowAll?.()}
+              >
+                Show all networks & devices
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

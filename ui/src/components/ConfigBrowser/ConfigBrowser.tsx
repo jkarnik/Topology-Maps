@@ -15,6 +15,21 @@ export function ConfigBrowser() {
   const [treeSelected, setTreeSelected] = useState<TreeSelection | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview')
   const [showAllTree, setShowAllTree] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(220)
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    const startX = e.clientX
+    const startWidth = sidebarWidth
+    const onMove = (me: MouseEvent) => {
+      setSidebarWidth(Math.max(150, Math.min(480, startWidth + me.clientX - startX)))
+    }
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   const { orgs } = useConfigOrgs()
   const { tree, loading: treeLoading, reload: reloadTree } = useConfigTree(selectedOrgId)
@@ -79,7 +94,10 @@ export function ConfigBrowser() {
 
   // Determine entity to show in overview tab
   const entityViewProps = useMemo(() => {
-    if (!treeSelected || treeSelected.level === 'org') return null
+    if (!treeSelected) return null
+    if (treeSelected.level === 'org') {
+      return { entityType: 'org' as EntityType, entityId: treeSelected.orgId }
+    }
     if (treeSelected.level === 'network') {
       return { entityType: 'network' as EntityType, entityId: treeSelected.networkId }
     }
@@ -104,7 +122,7 @@ export function ConfigBrowser() {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar tree */}
-        <div className="w-52 shrink-0 border-r border-white/8 overflow-y-auto">
+        <div style={{ width: sidebarWidth, flexShrink: 0, borderRight: '1px solid var(--border-subtle)', overflowY: 'auto' }}>
           <ConfigTree
             orgId={selectedOrgId ?? ''}
             orgName={selectedOrg?.name ?? 'Org'}
@@ -117,6 +135,14 @@ export function ConfigBrowser() {
             diffResult={orgDiff.result}
           />
         </div>
+
+        {/* Resize handle */}
+        <div
+          style={{ width: '4px', cursor: 'col-resize', flexShrink: 0, background: 'transparent' }}
+          onMouseDown={handleResizeStart}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-amber-glow)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        />
 
         {/* Right panel */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -141,7 +167,7 @@ export function ConfigBrowser() {
                 entityId={entityViewProps.entityId}
               />
             )}
-            {activeTab === 'overview' && !entityViewProps && (
+            {activeTab === 'overview' && !entityViewProps && !treeSelected && (
               <div className="p-4 text-xs opacity-40">Select an entity from the tree.</div>
             )}
             {activeTab === 'history' && (
