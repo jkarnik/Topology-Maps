@@ -100,3 +100,34 @@ def get_latest_observation(
         (org_id, entity_type, entity_id, config_area, sub_key),
     ).fetchone()
     return dict(row) if row else None
+
+
+def get_observation_history(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    entity_type: str,
+    entity_id: str,
+    config_area: Optional[str] = None,
+    sub_key: Optional[str] = None,
+    limit: int = 100,
+    before_observed_at: Optional[str] = None,
+) -> list[dict]:
+    """Observations for an entity, newest first. Optional filter by config_area."""
+    sql = """SELECT * FROM config_observations
+             WHERE org_id=? AND entity_type=? AND entity_id=?"""
+    params: list = [org_id, entity_type, entity_id]
+    if config_area is not None:
+        sql += " AND config_area=?"
+        params.append(config_area)
+    if sub_key is not None or config_area is not None:
+        sql += " AND sub_key IS ?"
+        params.append(sub_key)
+    if before_observed_at is not None:
+        sql += " AND observed_at < ?"
+        params.append(before_observed_at)
+    sql += " ORDER BY observed_at DESC LIMIT ?"
+    params.append(limit)
+
+    rows = conn.execute(sql, params).fetchall()
+    return [dict(r) for r in rows]

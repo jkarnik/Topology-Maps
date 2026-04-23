@@ -24,6 +24,18 @@ def conn(monkeypatch):
             "INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
             ("hash2", '{"a":1}', 7, "2026-04-22T00:00:00Z"),
         )
+        c.execute(
+            "INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
+            ("h1", '{}', 2, "2026-04-22T00:00:00Z"),
+        )
+        c.execute(
+            "INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
+            ("h2", '{}', 2, "2026-04-22T00:00:00Z"),
+        )
+        c.execute(
+            "INSERT INTO config_blobs (hash, payload, byte_size, first_seen_at) VALUES (?,?,?,?)",
+            ("h3", '{}', 2, "2026-04-22T00:00:00Z"),
+        )
         c.commit()
         yield c
         c.close()
@@ -123,3 +135,47 @@ def test_get_latest_observation_missing_returns_none(conn):
         conn, org_id="x", entity_type="network", entity_id="Y",
         config_area="z", sub_key=None,
     ) is None
+
+
+def test_get_observation_history_pagination(conn):
+    from server.config_collector.store import insert_observation_if_changed, get_observation_history
+
+    base = dict(
+        org_id="o1", entity_type="network", entity_id="N_1",
+        config_area="appliance_vlans", sub_key=None,
+        change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+    insert_observation_if_changed(conn, hash_hex="h1", source_event="baseline", **base)
+    insert_observation_if_changed(conn, hash_hex="h2", source_event="change_log", **base)
+    insert_observation_if_changed(conn, hash_hex="h3", source_event="change_log", **base)
+
+    hist = get_observation_history(
+        conn, org_id="o1", entity_type="network", entity_id="N_1",
+        config_area="appliance_vlans", sub_key=None, limit=2,
+    )
+    assert [r["hash"] for r in hist] == ["h3", "h2"]
+
+
+def test_get_observation_history_filters_by_config_area(conn):
+    from server.config_collector.store import insert_observation_if_changed, get_observation_history
+
+    insert_observation_if_changed(
+        conn, org_id="o", entity_type="network", entity_id="N", config_area="area_a",
+        sub_key=None, hash_hex="hash1", source_event="baseline",
+        change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+    insert_observation_if_changed(
+        conn, org_id="o", entity_type="network", entity_id="N", config_area="area_b",
+        sub_key=None, hash_hex="hash2", source_event="baseline",
+        change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": None, "enabled_hint": None},
+    )
+
+    hist = get_observation_history(
+        conn, org_id="o", entity_type="network", entity_id="N",
+        config_area="area_a", sub_key=None, limit=10,
+    )
+    assert len(hist) == 1
+    assert hist[0]["config_area"] == "area_a"
