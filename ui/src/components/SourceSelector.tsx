@@ -21,6 +21,13 @@ const SOURCES: { id: DataSource; label: string; tag: string; accent: string; tag
     accent: 'var(--accent-cyan)',
     tagBg: 'rgba(0, 229, 200, 0.12)',
   },
+  {
+    id: 'configs',
+    label: 'Configs',
+    tag: 'CONFIG',
+    accent: 'var(--accent-purple)',
+    tagBg: 'rgba(168, 85, 247, 0.12)',
+  },
 ];
 
 export const SourceSelector: React.FC<SourceSelectorProps> = ({ value, onChange }) => {
