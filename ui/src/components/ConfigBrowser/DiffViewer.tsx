@@ -1,4 +1,3 @@
-import React from 'react'
 import type { DiffResult, DiffChangeType } from '../../types/config'
 
 interface Props {
@@ -14,34 +13,34 @@ function renderValue(v: unknown): string {
 function ObjectDiff({ changes, unchangedCount }: { changes: DiffChangeType[]; unchangedCount: number }) {
   return (
     <div>
-      <div className="grid gap-x-2" style={{ gridTemplateColumns: '140px 1fr 1fr' }}>
+      <div className="grid gap-x-2 gap-y-1" role="grid" style={{ gridTemplateColumns: '140px 1fr 1fr' }}>
         {changes.map((c, i) => {
           if (c.type === 'FieldChanged') return (
-            <React.Fragment key={i}>
-              <span className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
-              <span className="font-mono text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.before)}</span>
-              <span className="font-mono text-[10px] bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.after)}</span>
-            </React.Fragment>
+            <div key={i} role="row" className="contents">
+              <span role="gridcell" className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
+              <span role="gridcell" className="font-mono text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.before)}</span>
+              <span role="gridcell" className="font-mono text-[10px] bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.after)}</span>
+            </div>
           )
           if (c.type === 'FieldAdded') return (
-            <React.Fragment key={i}>
-              <span className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
-              <span className="opacity-30 text-[10px] italic self-center">—</span>
-              <span className="font-mono text-[10px] bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.value)}</span>
-            </React.Fragment>
+            <div key={i} role="row" className="contents">
+              <span role="gridcell" className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
+              <span role="gridcell" className="opacity-30 text-[10px] italic self-center">—</span>
+              <span role="gridcell" className="font-mono text-[10px] bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.value)}</span>
+            </div>
           )
           if (c.type === 'FieldRemoved') return (
-            <React.Fragment key={i}>
-              <span className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
-              <span className="font-mono text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.value)}</span>
-              <span className="opacity-30 text-[10px] italic self-center">—</span>
-            </React.Fragment>
+            <div key={i} role="row" className="contents">
+              <span role="gridcell" className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
+              <span role="gridcell" className="font-mono text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded truncate">{renderValue(c.value)}</span>
+              <span role="gridcell" className="opacity-30 text-[10px] italic self-center">—</span>
+            </div>
           )
           if (c.type === 'SecretChanged') return (
-            <React.Fragment key={i}>
-              <span className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
-              <span className="text-purple-400 italic text-[9px] col-span-2 self-center">🔒 Secret changed — value not stored</span>
-            </React.Fragment>
+            <div key={i} role="row" className="contents">
+              <span role="gridcell" className="font-mono text-[9px] opacity-60 truncate self-center">{c.key}</span>
+              <span role="gridcell" className="text-purple-400 italic text-[9px] col-span-2 self-center">🔒 Secret changed — value not stored</span>
+            </div>
           )
           return null
         })}
