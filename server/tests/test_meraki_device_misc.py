@@ -59,3 +59,19 @@ async def test_camera_methods(client, method, path, body):
     async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
         mock.get(path).mock(return_value=httpx.Response(200, json=body))
         assert await getattr(client, method)("MV-001") == body
+
+
+@pytest.mark.parametrize("method,path,body", [
+    ("get_camera_quality_retention_profiles", "/networks/N_1/camera/qualityRetentionProfiles",               []),
+    ("get_camera_schedules",                  "/networks/N_1/camera/schedules",                              []),
+    ("get_cellular_dhcp",                     "/networks/N_1/cellularGateway/dhcp",                          {"dhcpLeaseTime": "1 day"}),
+    ("get_cellular_subnet_pool",              "/networks/N_1/cellularGateway/subnetPool",                    {"subnets": []}),
+    ("get_cellular_uplink",                   "/networks/N_1/cellularGateway/uplink",                        {"bandwidthLimits": {}}),
+    ("get_cellular_connectivity_monitoring",  "/networks/N_1/cellularGateway/connectivityMonitoringDestinations", {"destinations": []}),
+    ("get_sm_profiles",                       "/networks/N_1/sm/profiles",                                   []),
+])
+@pytest.mark.asyncio
+async def test_mv_mg_sm_network_methods(client, method, path, body):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get(path).mock(return_value=httpx.Response(200, json=body))
+        assert await getattr(client, method)("N_1") == body

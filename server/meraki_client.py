@@ -453,5 +453,28 @@ class MerakiClient:
     async def get_camera_device_sense(self, serial: str) -> dict:
         return await self._get(f"/devices/{serial}/camera/sense")
 
+    # --- Plan 1.09: MV/MG/SM network-level methods ------------------------
+
+    async def get_camera_quality_retention_profiles(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/camera/qualityRetentionProfiles")
+
+    async def get_camera_schedules(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/camera/schedules")
+
+    async def get_cellular_dhcp(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/cellularGateway/dhcp")
+
+    async def get_cellular_subnet_pool(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/cellularGateway/subnetPool")
+
+    async def get_cellular_uplink(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/cellularGateway/uplink")
+
+    async def get_cellular_connectivity_monitoring(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/cellularGateway/connectivityMonitoringDestinations")
+
+    async def get_sm_profiles(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/sm/profiles")
+
     async def close(self) -> None:
         await self._client.aclose()
