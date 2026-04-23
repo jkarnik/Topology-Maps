@@ -65,7 +65,7 @@ export function listChangeEvents(orgId: string, opts?: { network_id?: string; li
   return _fetch(`/change-events?${qs}`);
 }
 
-export async function fetchOrgDiff(
+export function fetchOrgDiff(
   orgId: string,
   fromTs: string,
   toTs?: string,
@@ -75,7 +75,7 @@ export async function fetchOrgDiff(
   return _fetch<OrgDiffResponse>(`/diff/org?${params}`)
 }
 
-export async function fetchEntityTimeline(
+export function fetchEntityTimeline(
   orgId: string,
   entityType: EntityType,
   entityId: string,
