@@ -115,3 +115,44 @@ async def inject_state(request, call_next):
     request.state.poller = poller
     request.state.ws_manager = ws_manager
     return await call_next(request)
+
+
+# --------------------------------------------------------------------------- #
+# Config WebSocket poller startup (Plan 1.18)
+# --------------------------------------------------------------------------- #
+
+import asyncio as _asyncio
+import os as _os
+from contextlib import asynccontextmanager as _asynccontextmanager
+
+from server.config_collector.change_log_poller import run_poller as _run_poller
+from server.routes.config import _config_ws_hub as _cfg_ws_hub
+
+
+async def _poller_for_org(org_id: str) -> None:
+    from server.meraki_client import MerakiClient as _MC
+    from server.database import get_connection as _get_conn
+
+    client = _MC()
+    conn = _get_conn()
+
+    async def cb(event: dict) -> None:
+        await _cfg_ws_hub.broadcast(org_id, event)
+
+    interval = int(_os.environ.get("CONFIG_CHANGE_LOG_INTERVAL_SECONDS", "1800"))
+    timespan = int(_os.environ.get("CONFIG_CHANGE_LOG_TIMESPAN_SECONDS", "3600"))
+    await _run_poller(client, conn, org_id=org_id, interval=interval, timespan=timespan, progress_callback=cb)
+
+
+@app.on_event("startup")
+async def _start_config_pollers():
+    if _os.environ.get("CONFIG_ENABLE_AUTO_POLLER", "true").lower() != "true":
+        return
+    if not _os.environ.get("MERAKI_API_KEY"):
+        return
+    from server.database import get_connection as _get_conn
+    conn = _get_conn()
+    rows = conn.execute("SELECT DISTINCT org_id FROM config_sweep_runs").fetchall()
+    conn.close()
+    for r in rows:
+        _asyncio.create_task(_poller_for_org(r["org_id"]))
