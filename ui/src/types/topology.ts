@@ -94,7 +94,7 @@ export interface TopologyUpdate {
   l3: L3Topology | null;
 }
 
-export type DataSource = 'simulated' | 'meraki';
+export type DataSource = 'simulated' | 'meraki' | 'configs';
 
 // View modes
 export type ViewMode = 'l2' | 'l3' | 'hybrid';

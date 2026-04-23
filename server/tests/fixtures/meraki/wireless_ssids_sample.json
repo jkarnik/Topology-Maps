@@ -1,0 +1,24 @@
+[
+  {
+    "number": 0,
+    "name": "Corp",
+    "enabled": true,
+    "authMode": "psk",
+    "encryptionMode": "wpa",
+    "psk": "corporatesecret123",
+    "radiusServers": [
+      {"host": "10.0.0.5", "port": 1812, "secret": "radius-shared-secret"}
+    ]
+  },
+  {
+    "number": 1,
+    "name": "Guest",
+    "enabled": true,
+    "authMode": "open"
+  },
+  {
+    "number": 2,
+    "name": "Unconfigured SSID 3",
+    "enabled": false
+  }
+]

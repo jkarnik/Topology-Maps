@@ -76,6 +76,78 @@ def _create_tables(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target);
         CREATE INDEX IF NOT EXISTS idx_devices_type ON devices(type);
         CREATE INDEX IF NOT EXISTS idx_connection_history_device ON connection_history(device);
+
+        CREATE TABLE IF NOT EXISTS config_blobs (
+            hash TEXT PRIMARY KEY,
+            payload TEXT NOT NULL,
+            byte_size INTEGER NOT NULL,
+            first_seen_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS config_observations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            config_area TEXT NOT NULL,
+            sub_key TEXT,
+            hash TEXT NOT NULL REFERENCES config_blobs(hash),
+            observed_at TEXT NOT NULL,
+            source_event TEXT NOT NULL,
+            change_event_id INTEGER,
+            sweep_run_id INTEGER,
+            name_hint TEXT,
+            enabled_hint INTEGER
+        );
+
+        CREATE TABLE IF NOT EXISTS config_change_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            ts TEXT NOT NULL,
+            admin_id TEXT,
+            admin_name TEXT,
+            admin_email TEXT,
+            network_id TEXT,
+            network_name TEXT,
+            ssid_number INTEGER,
+            ssid_name TEXT,
+            page TEXT,
+            label TEXT,
+            old_value TEXT,
+            new_value TEXT,
+            client_id TEXT,
+            client_description TEXT,
+            raw_json TEXT NOT NULL,
+            fetched_at TEXT NOT NULL,
+            UNIQUE(org_id, ts, network_id, label, old_value, new_value)
+        );
+
+        CREATE TABLE IF NOT EXISTS config_sweep_runs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            status TEXT NOT NULL,
+            started_at TEXT,
+            completed_at TEXT,
+            total_calls INTEGER,
+            completed_calls INTEGER DEFAULT 0,
+            failed_calls INTEGER DEFAULT 0,
+            skipped_calls INTEGER DEFAULT 0,
+            error_summary TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_obs_entity_latest
+            ON config_observations(org_id, entity_type, entity_id, config_area, sub_key, observed_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_obs_area_time
+            ON config_observations(config_area, observed_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_obs_hash
+            ON config_observations(hash);
+        CREATE INDEX IF NOT EXISTS idx_events_org_ts
+            ON config_change_events(org_id, ts DESC);
+        CREATE INDEX IF NOT EXISTS idx_events_network
+            ON config_change_events(network_id, ts DESC);
+        CREATE INDEX IF NOT EXISTS idx_runs_org_kind
+            ON config_sweep_runs(org_id, kind, started_at DESC);
     """)
     conn.commit()
 

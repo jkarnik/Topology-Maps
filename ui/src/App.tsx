@@ -10,6 +10,7 @@ import MerakiDetailPanel from './components/MerakiDetailPanel';
 import RefreshOverlay from './components/RefreshOverlay';
 import L3View from './components/L3View';
 import HybridView from './components/HybridView';
+import { ConfigBrowser } from './components/ConfigBrowser';
 import type { DataSource } from './types/topology';
 
 function App() {
@@ -74,7 +75,9 @@ function App() {
         onSaveSnapshot={meraki.saveSnapshot}
       />
       <div className="flex-1 relative overflow-hidden">
-        {showSimStopped ? (
+        {dataSource === 'configs' ? (
+          <ConfigBrowser />
+        ) : showSimStopped ? (
           <div className="flex items-center justify-center h-full">
             <div style={{ fontFamily: "'JetBrains Mono', monospace", color: 'var(--text-muted)', textAlign: 'center' }}>
               <div style={{ fontSize: '14px', marginBottom: '8px' }}>Simulation stopped.</div>

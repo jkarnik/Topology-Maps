@@ -1,0 +1,7 @@
+{
+  "access": "community",
+  "communityString": "meraki-community-secret",
+  "users": [
+    {"username": "operator", "passphrase": "user-snmp-pass"}
+  ]
+}
