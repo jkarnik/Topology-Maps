@@ -411,5 +411,13 @@ class MerakiClient:
     async def get_wireless_ssid_identity_psks(self, network_id: str, ssid_number: int) -> list[dict]:
         return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/identityPsks")
 
+    # --- Plan 1.09: Device metadata + mgmt interface ----------------------
+
+    async def get_device_metadata(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}")
+
+    async def get_device_management_interface(self, serial: str) -> dict:
+        return await self._get(f"/devices/{serial}/managementInterface")
+
     async def close(self) -> None:
         await self._client.aclose()
