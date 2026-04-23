@@ -59,3 +59,29 @@ async def test_enumerate_org_composition(client):
     ]
     assert composition["enabled_ssids_by_network"]["N_1"] == [0, 2]
     assert composition["enabled_ssids_by_network"]["N_2"] == [0]
+
+
+@pytest.mark.asyncio
+async def test_run_baseline_writes_observations_and_marks_complete(client, conn):
+    """Minimal happy-path baseline: one wireless-only network, one AP."""
+    from server.config_collector.scanner import run_baseline
+
+    async with respx.mock(base_url="https://api.meraki.com/api/v1", assert_all_called=False) as mock:
+        mock.get("/organizations/o1/networks").mock(return_value=httpx.Response(200, json=[
+            {"id": "N_W", "productTypes": ["wireless"]},
+        ]))
+        mock.get("/organizations/o1/devices").mock(return_value=httpx.Response(200, json=[
+            {"serial": "Q2MR-1", "networkId": "N_W", "productType": "wireless"},
+        ]))
+        mock.get("/networks/N_W/wireless/ssids").mock(return_value=httpx.Response(200, json=[
+            {"number": 0, "enabled": True},
+        ]))
+        mock.get(url__regex=r".*").mock(return_value=httpx.Response(200, json={}))
+
+        run_id = await run_baseline(client, conn, org_id="o1")
+
+    row = conn.execute("SELECT status FROM config_sweep_runs WHERE id=?", (run_id,)).fetchone()
+    assert row["status"] == "complete"
+
+    count = conn.execute("SELECT COUNT(*) AS n FROM config_observations").fetchone()["n"]
+    assert count > 0
