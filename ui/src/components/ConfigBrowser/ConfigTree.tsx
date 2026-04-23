@@ -46,6 +46,10 @@ export function ConfigTree({
     return <div className="p-3 text-xs opacity-40">Loading…</div>
   }
 
+  if (!tree) {
+    return <div className="p-3 text-xs opacity-40">No configuration data</div>
+  }
+
   const isSelected = (sel: TreeSelection): boolean => {
     if (!selected) return false
     if (sel.level !== selected.level) return false
@@ -108,7 +112,7 @@ export function ConfigTree({
                   return (
                     <div
                       key={dev.serial}
-                      className={`${nodeClass(devSel)} ${devCount === 0 ? 'opacity-40' : ''}`}
+                      className={`${nodeClass(devSel)} ${devCount === 0 && !isSelected(devSel) ? 'opacity-40' : ''}`}
                       onClick={() => onSelect(devSel)}
                     >
                       <span className="opacity-30">▸</span>
