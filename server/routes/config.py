@@ -209,33 +209,84 @@ async def refresh(org_id: str, req: RefreshRequest) -> dict:
 
 @router.get("/orgs/{org_id}/tree")
 async def get_tree(org_id: str) -> dict:
-    """Hierarchical tree of entities with observations."""
+    """Hierarchical tree of entities with observations.
+
+    Dedupes by entity_id and picks the non-null name_hint when multiple
+    observations for the same entity carry different hints. Device→network
+    association is resolved from the Meraki /organizations/{id}/devices
+    endpoint (one extra API call per tree render).
+    """
     conn = get_connection()
     try:
+        # Org-level config areas seen locally
         org_areas = [r["config_area"] for r in conn.execute(
-            "SELECT DISTINCT config_area FROM config_observations WHERE org_id=? AND entity_type='org'",
+            """SELECT DISTINCT config_area FROM config_observations
+               WHERE org_id=? AND entity_type='org'""",
             (org_id,),
         ).fetchall()]
 
+        # Networks: one row per entity_id, keeping the best name_hint (non-null wins)
         net_rows = conn.execute(
-            "SELECT DISTINCT entity_id, name_hint FROM config_observations WHERE org_id=? AND entity_type='network'",
+            """SELECT entity_id, MAX(name_hint) AS name_hint
+               FROM config_observations
+               WHERE org_id=? AND entity_type='network'
+               GROUP BY entity_id""",
             (org_id,),
         ).fetchall()
-        networks = []
+
+        # Devices: one row per serial, keeping the best name_hint
+        device_rows = conn.execute(
+            """SELECT entity_id, MAX(name_hint) AS name_hint
+               FROM config_observations
+               WHERE org_id=? AND entity_type='device'
+               GROUP BY entity_id""",
+            (org_id,),
+        ).fetchall()
+        local_devices = {
+            r["entity_id"]: {"serial": r["entity_id"], "name": r["name_hint"]}
+            for r in device_rows
+        }
+
+        # Device → network mapping from Meraki (best-effort; if the API is
+        # unreachable, devices will just hang off each network they were
+        # observed under, sans the mapping).
+        network_for_device: dict[str, str] = {}
+        client = _get_meraki_client()
+        if client.is_configured and local_devices:
+            try:
+                meraki_devices = await client.get_org_inventory_devices(org_id)
+                for d in meraki_devices:
+                    serial = d.get("serial")
+                    nid = d.get("networkId")
+                    if serial and nid:
+                        network_for_device[serial] = nid
+                    # Also fill in a better name if we didn't have one
+                    if serial in local_devices and not local_devices[serial]["name"]:
+                        local_devices[serial]["name"] = d.get("name")
+            except Exception as exc:
+                logger.warning("Tree: could not fetch device inventory: %s", exc)
+
+        # Per-network payload: own config areas + the devices that belong to it
+        networks: list[dict] = []
         for nr in net_rows:
             nid = nr["entity_id"]
             net_areas = [r["config_area"] for r in conn.execute(
-                "SELECT DISTINCT config_area FROM config_observations WHERE org_id=? AND entity_type='network' AND entity_id=?",
+                """SELECT DISTINCT config_area FROM config_observations
+                   WHERE org_id=? AND entity_type='network' AND entity_id=?""",
                 (org_id, nid),
             ).fetchall()]
-            dev_rows = conn.execute(
-                "SELECT DISTINCT entity_id, name_hint FROM config_observations WHERE org_id=? AND entity_type='device'",
-                (org_id,),
-            ).fetchall()
+            devices_in_net = [
+                local_devices[s]
+                for s, mapped_nid in network_for_device.items()
+                if mapped_nid == nid and s in local_devices
+            ]
             networks.append({
-                "id": nid, "name": nr["name_hint"], "config_areas": net_areas,
-                "devices": [{"serial": d["entity_id"], "name": d["name_hint"]} for d in dev_rows],
+                "id": nid,
+                "name": nr["name_hint"],
+                "config_areas": net_areas,
+                "devices": devices_in_net,
             })
+
         return {"org": {"id": org_id, "config_areas": org_areas}, "networks": networks}
     finally:
         conn.close()
