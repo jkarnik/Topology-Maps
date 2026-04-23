@@ -464,22 +464,26 @@ async def get_entity_timeline(
                 "has_diff": has_diff,
                 "prior_hash": prior_hash if has_diff else None,
                 "admin_email": None,
+                "_eid": obs.get("change_event_id"),
             })
             prev_hashes[key] = obs["hash"]
 
-        # Enrich with admin info from linked change events
-        event_ids = {o.get("change_event_id") for o in observations if o.get("change_event_id")}
+        # Batch-fetch admin info from linked change events (single IN query)
+        event_ids = [o.get("change_event_id") for o in observations if o.get("change_event_id")]
         admin_map: dict[int, str] = {}
-        for eid in event_ids:
-            row = conn.execute(
-                "SELECT admin_email FROM config_change_events WHERE id=?", (eid,)
-            ).fetchone()
-            if row:
-                admin_map[eid] = row["admin_email"]
-        for i, obs in enumerate(reversed(observations)):
-            eid = obs.get("change_event_id")
+        if event_ids:
+            placeholders = ",".join("?" * len(event_ids))
+            rows = conn.execute(
+                f"SELECT id, admin_email FROM config_change_events WHERE id IN ({placeholders})",
+                tuple(event_ids),
+            ).fetchall()
+            admin_map = {r["id"]: r["admin_email"] for r in rows if r["admin_email"]}
+
+        # Enrich entries with admin emails from the batch-fetched map
+        for entry in entries:
+            eid = entry.pop("_eid", None)
             if eid and eid in admin_map:
-                entries[i]["admin_email"] = admin_map[eid]
+                entry["admin_email"] = admin_map[eid]
 
         # Return newest-first
         entries.reverse()
