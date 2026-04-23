@@ -78,6 +78,10 @@ app.include_router(simulation.router)
 app.include_router(meraki.router)
 app.include_router(config.router)
 
+# Register config WebSocket route
+from server.routes.config import config_ws as _config_ws
+app.add_api_websocket_route("/ws/config", _config_ws)
+
 
 # --------------------------------------------------------------------------- #
 # WebSocket endpoint

@@ -5,7 +5,7 @@ import json
 from typing import Optional
 
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from server.database import get_connection
 from server.config_collector.scanner import run_baseline, run_anti_drift_sweep
@@ -245,3 +245,39 @@ async def list_change_events(
         }
     finally:
         conn.close()
+
+
+class ConfigWebSocketHub:
+    """Per-org WebSocket broadcast hub for config events."""
+
+    def __init__(self):
+        self._subscribers: dict[str, set[WebSocket]] = {}
+
+    async def subscribe(self, org_id: str, ws: WebSocket) -> None:
+        await ws.accept()
+        self._subscribers.setdefault(org_id, set()).add(ws)
+
+    def unsubscribe(self, org_id: str, ws: WebSocket) -> None:
+        self._subscribers.get(org_id, set()).discard(ws)
+
+    async def broadcast(self, org_id: str, event: dict) -> None:
+        dead: list[WebSocket] = []
+        for ws in list(self._subscribers.get(org_id, ())):
+            try:
+                await ws.send_json(event)
+            except Exception:
+                dead.append(ws)
+        for d in dead:
+            self.unsubscribe(org_id, d)
+
+
+_config_ws_hub = ConfigWebSocketHub()
+
+
+async def config_ws(ws: WebSocket, org_id: str = Query(...)):
+    await _config_ws_hub.subscribe(org_id, ws)
+    try:
+        while True:
+            await ws.receive_text()
+    except WebSocketDisconnect:
+        _config_ws_hub.unsubscribe(org_id, ws)
