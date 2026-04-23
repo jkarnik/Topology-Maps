@@ -66,3 +66,26 @@ async def test_poll_once_dedupes_previously_seen(client, conn):
     assert count == 1
     assert summary["new_events"] == 1
     assert summary["duplicates"] == 1
+
+
+@pytest.mark.asyncio
+async def test_ssid_event_triggers_sub_endpoint_pulls(client, conn):
+    """An event with ssidNumber=3 triggers pulls of per-SSID sub-endpoints."""
+    from server.config_collector.change_log_poller import poll_once
+
+    async with respx.mock(base_url="https://api.meraki.com/api/v1", assert_all_called=False) as mock:
+        mock.get("/organizations/o1/configurationChanges").mock(return_value=httpx.Response(200, json=[
+            {"ts": "2026-04-22T10:00:00Z", "page": "Wireless > Access Control",
+             "label": "Bandwidth limit", "networkId": "N_W",
+             "oldValue": "11", "newValue": "24", "ssidNumber": 3},
+        ]))
+        l3_mock = mock.get("/networks/N_W/wireless/ssids/3/firewall/l3FirewallRules").mock(return_value=httpx.Response(200, json={"rules": []}))
+        l7_mock = mock.get("/networks/N_W/wireless/ssids/3/firewall/l7FirewallRules").mock(return_value=httpx.Response(200, json={"rules": []}))
+        ssids_mock = mock.get("/networks/N_W/wireless/ssids").mock(return_value=httpx.Response(200, json=[]))
+        mock.get(url__regex=r".*").mock(return_value=httpx.Response(200, json={}))
+
+        await poll_once(client, conn, org_id="o1", timespan=3600)
+
+    assert l3_mock.call_count >= 1
+    assert l7_mock.call_count >= 1
+    assert ssids_mock.call_count >= 1
