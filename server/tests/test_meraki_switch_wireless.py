@@ -36,3 +36,17 @@ async def test_switch_methods(client, method, path, body):
     async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
         mock.get(path).mock(return_value=httpx.Response(200, json=body))
         assert await getattr(client, method)("N_1") == body
+
+
+@pytest.mark.parametrize("method,path,body", [
+    ("get_wireless_ssids",            "/networks/N_1/wireless/ssids",                    []),
+    ("get_wireless_rf_profiles",      "/networks/N_1/wireless/rfProfiles",               []),
+    ("get_wireless_settings",         "/networks/N_1/wireless/settings",                 {"meshingEnabled": True}),
+    ("get_wireless_bluetooth",        "/networks/N_1/wireless/bluetooth/settings",       {"scanningEnabled": False}),
+    ("get_wireless_ap_port_profiles", "/networks/N_1/wireless/ethernet/ports/profiles",  []),
+])
+@pytest.mark.asyncio
+async def test_wireless_network_methods(client, method, path, body):
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get(path).mock(return_value=httpx.Response(200, json=body))
+        assert await getattr(client, method)("N_1") == body

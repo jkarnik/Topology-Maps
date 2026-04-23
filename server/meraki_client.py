@@ -368,5 +368,22 @@ class MerakiClient:
     async def get_switch_ospf(self, network_id: str) -> dict:
         return await self._get(f"/networks/{network_id}/switch/routing/ospf")
 
+    # --- Plan 1.08: MR wireless (network-level) --------------------------
+
+    async def get_wireless_ssids(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/wireless/ssids")
+
+    async def get_wireless_rf_profiles(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/wireless/rfProfiles")
+
+    async def get_wireless_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/settings")
+
+    async def get_wireless_bluetooth(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/bluetooth/settings")
+
+    async def get_wireless_ap_port_profiles(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/wireless/ethernet/ports/profiles")
+
     async def close(self) -> None:
         await self._client.aclose()
