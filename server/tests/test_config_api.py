@@ -33,3 +33,39 @@ def test_list_orgs_empty(client):
     resp = client.get("/api/config/orgs")
     assert resp.status_code == 200
     assert resp.json() == []
+
+
+from unittest.mock import AsyncMock, patch
+
+
+def test_status_empty_org(client):
+    resp = client.get("/api/config/orgs/o1/status")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["baseline_state"] == "none"
+    assert body["active_sweep"] is None
+
+
+def test_baseline_trigger_returns_run_id(client):
+    with patch("server.routes.config._get_meraki_client") as gc, \
+         patch("server.routes.config.run_baseline", new=AsyncMock(return_value=42)):
+        gc.return_value = object()
+        resp = client.post("/api/config/orgs/o1/baseline")
+    assert resp.status_code == 200
+    assert resp.json()["sweep_run_id"] == 42
+
+
+def test_sweep_trigger_returns_run_id(client):
+    with patch("server.routes.config._get_meraki_client") as gc, \
+         patch("server.routes.config.run_anti_drift_sweep", new=AsyncMock(return_value=99)):
+        gc.return_value = object()
+        resp = client.post("/api/config/orgs/o1/sweep")
+    assert resp.status_code == 200
+    assert resp.json()["sweep_run_id"] == 99
+
+
+def test_refresh_trigger_validates_entity_type(client):
+    resp = client.post("/api/config/orgs/o1/refresh", json={
+        "entity_type": "bogus", "entity_id": "x",
+    })
+    assert resp.status_code == 400
