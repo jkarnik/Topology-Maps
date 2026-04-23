@@ -10,30 +10,61 @@ interface Props {
   onStartSweep: () => void;
 }
 
-function statusChip(state: string): { bg: string; label: string } {
+function statusChip(state: string): { color: string; label: string; dotGlow: string } {
   switch (state) {
-    case 'complete':     return { bg: 'bg-green-500',  label: 'Synced' };
-    case 'in_progress':  return { bg: 'bg-yellow-500', label: 'Syncing' };
-    case 'running':      return { bg: 'bg-yellow-500', label: 'Running' };
-    case 'failed':       return { bg: 'bg-red-500',    label: 'Failed' };
-    default:             return { bg: 'bg-gray-400',   label: 'Never baselined' };
+    case 'complete':
+      return { color: 'var(--accent-green)', label: 'Synced', dotGlow: 'rgba(0, 214, 143, 0.6)' };
+    case 'in_progress':
+    case 'running':
+    case 'queued':
+      return { color: 'var(--accent-cyan)', label: 'Syncing', dotGlow: 'rgba(0, 229, 200, 0.6)' };
+    case 'failed':
+      return { color: 'var(--accent-red)', label: 'Failed', dotGlow: 'rgba(255, 71, 87, 0.6)' };
+    default:
+      return { color: 'var(--text-muted)', label: 'Never baselined', dotGlow: 'rgba(85, 102, 119, 0.3)' };
   }
 }
+
+const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
 
 export const CollectionStatusBar: React.FC<Props> = ({
   orgs, selectedOrgId, status, onOrgChange, onStartBaseline, onStartSweep,
 }) => {
   const state = status?.active_sweep?.status ?? status?.baseline_state ?? 'none';
   const chip = statusChip(state);
-  const baselineStarted = status?.baseline_state !== 'none';
+
+  // FIX: only true when we have a status AND it's not 'none'
+  const hasBaselined = !!status && status.baseline_state !== 'none';
 
   return (
-    <div className="flex items-center gap-4 p-3 border-b bg-white">
-      <label className="text-sm text-gray-700">Org:</label>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '10px 20px',
+        background: 'var(--bg-secondary)',
+        borderBottom: '1px solid var(--border-subtle)',
+        ...MONO,
+      }}
+    >
+      <label style={{ fontSize: '11px', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
+        Org:
+      </label>
       <select
         value={selectedOrgId ?? ''}
         onChange={(e) => onOrgChange(e.target.value)}
-        className="border rounded px-2 py-1 text-sm"
+        style={{
+          background: 'var(--bg-tertiary)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '5px',
+          padding: '5px 10px',
+          fontSize: '12px',
+          ...MONO,
+          minWidth: '220px',
+          cursor: 'pointer',
+        }}
       >
         <option value="">Select an org…</option>
         {orgs.map((o) => (
@@ -43,29 +74,90 @@ export const CollectionStatusBar: React.FC<Props> = ({
         ))}
       </select>
 
-      <span className={`inline-flex items-center gap-2 px-2 py-1 rounded text-xs text-white ${chip.bg}`}>
-        <span className="w-2 h-2 rounded-full bg-white/80" />
-        {chip.label}
+      {/* Status chip */}
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '7px',
+          padding: '4px 10px',
+          borderRadius: '5px',
+          background: 'var(--bg-tertiary)',
+          border: '1px solid var(--border-subtle)',
+          fontSize: '11px',
+          color: chip.color,
+          letterSpacing: '0.06em',
+        }}
+      >
+        <span
+          style={{
+            display: 'inline-block',
+            width: '7px',
+            height: '7px',
+            borderRadius: '50%',
+            background: chip.color,
+            boxShadow: `0 0 5px ${chip.dotGlow}`,
+          }}
+        />
+        <span style={{ fontWeight: 600 }}>{chip.label}</span>
         {status?.last_sync && (
-          <span className="ml-1 text-white/80">{new Date(status.last_sync).toLocaleString()}</span>
+          <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '4px' }}>
+            {new Date(status.last_sync).toLocaleString()}
+          </span>
         )}
       </span>
 
-      <div className="ml-auto flex gap-2">
-        {!baselineStarted ? (
-          <button
-            className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
-            disabled={!selectedOrgId}
-            onClick={onStartBaseline}
-          >Start baseline</button>
-        ) : (
-          <button
-            className="px-3 py-1 text-sm rounded bg-gray-700 text-white hover:bg-gray-800"
-            disabled={!selectedOrgId || state === 'running'}
-            onClick={onStartSweep}
-          >Run full sweep</button>
-        )}
-      </div>
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Action button */}
+      {!hasBaselined ? (
+        <button
+          onClick={onStartBaseline}
+          disabled={!selectedOrgId}
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '6px 16px',
+            height: '30px',
+            borderRadius: '5px',
+            border: `1px solid ${selectedOrgId ? 'var(--accent-amber)' : 'var(--border-subtle)'}`,
+            cursor: selectedOrgId ? 'pointer' : 'not-allowed',
+            background: selectedOrgId ? 'var(--accent-amber-glow)' : 'transparent',
+            color: selectedOrgId ? 'var(--accent-amber)' : 'var(--text-muted)',
+            opacity: selectedOrgId ? 1 : 0.5,
+            transition: 'background 0.15s ease',
+          }}
+        >
+          Start baseline
+        </button>
+      ) : (
+        <button
+          onClick={onStartSweep}
+          disabled={!selectedOrgId || state === 'running' || state === 'queued'}
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '6px 16px',
+            height: '30px',
+            borderRadius: '5px',
+            border: '1px solid var(--border-subtle)',
+            cursor: (!selectedOrgId || state === 'running' || state === 'queued') ? 'not-allowed' : 'pointer',
+            background: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            opacity: (state === 'running' || state === 'queued') ? 0.5 : 1,
+            transition: 'background 0.15s ease',
+          }}
+        >
+          Run full sweep
+        </button>
+      )}
     </div>
   );
 };
