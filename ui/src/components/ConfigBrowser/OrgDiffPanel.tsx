@@ -63,7 +63,7 @@ export function OrgDiffPanel({
             style={{ width: `${pct ?? 30}%` }}
           />
         </div>
-        {estimatedSeconds && (
+        {estimatedSeconds != null && (
           <div className="text-[10px] opacity-40">
             ~{Math.max(0, estimatedSeconds - elapsed)}s remaining
           </div>
@@ -99,15 +99,15 @@ export function OrgDiffPanel({
       <div className="text-[10px] opacity-40 mb-1">
         {filtered.length} change{filtered.length !== 1 ? 's' : ''} · {scopeLabel(selected, networkNameMap)}
       </div>
-      {filtered.map((item, i) => (
-        <div key={i} className="rounded border border-amber-500/20 overflow-hidden">
+      {filtered.map((item) => (
+        <div key={`${item.entity_id}:${item.config_area}:${item.sub_key}`} className="rounded border border-amber-500/20 overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/7">
             <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-xs truncate">
                 {item.config_area.replace(/_/g, ' ')}
                 <span className="font-normal opacity-50 ml-1.5">
-                  · {item.diff.changes.length} change{item.diff.changes.length !== 1 ? 's' : ''}
+                  · {item.diff?.changes.length ?? 0} change{(item.diff?.changes.length ?? 0) !== 1 ? 's' : ''}
                 </span>
               </div>
               <div className="text-[9px] opacity-45 mt-0.5">
@@ -116,9 +116,11 @@ export function OrgDiffPanel({
               </div>
             </div>
           </div>
-          <div className="px-3 py-2 bg-black/20 border-t border-white/5 text-[10px]">
-            <DiffViewer diff={item.diff} />
-          </div>
+          {item.diff && (
+            <div className="px-3 py-2 bg-black/20 border-t border-white/5 text-[10px]">
+              <DiffViewer diff={item.diff} />
+            </div>
+          )}
         </div>
       ))}
     </div>
