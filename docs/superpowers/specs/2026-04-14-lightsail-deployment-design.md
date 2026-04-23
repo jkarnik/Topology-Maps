@@ -155,6 +155,51 @@ instance will automatically pull and redeploy.
 - **Rebuild from scratch**: `docker compose down && docker compose up -d --build`
 - **Check disk space**: `df -h` (the $10 plan has 60 GB)
 
+## Phase 1 additions (2026-04-23)
+
+Phase 1 of the Network Configuration Management initiative added new runtime requirements that are not reflected in the original setup steps above.
+
+### New environment variables
+
+The following must be present in the environment when the server container starts. Add them to a `.env` file at the project root (picked up automatically by Docker Compose) or as GitHub Secrets surfaced through the deploy workflow.
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `MERAKI_API_KEY` | Yes (already existed) | — | Meraki Dashboard API key used for topology AND config collection |
+| `CONFIG_RATE_LIMIT_REQUESTS_PER_SEC` | No | `5` | Hard cap on Meraki API calls per org per second |
+| `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` | No | `1800` | How often the change-log poller runs (30 min) |
+| `CONFIG_CHANGE_LOG_TIMESPAN_SECONDS` | No | `3600` | Lookback window per poll (60 min, covers 30 min of poller downtime) |
+| `CONFIG_CHANGE_LOG_PER_PAGE` | No | `1000` | Page size for `configurationChanges` pagination |
+| `CONFIG_MAX_PAGES` | No | `100` | Abort pagination if this ceiling is hit (prevents silent truncation) |
+| `CONFIG_WEEKLY_SWEEP_CRON` | No | `0 2 * * 0` | Schedule for the weekly anti-drift sweep (Sunday 02:00) |
+| `CONFIG_ENABLE_AUTO_POLLER` | No | `true` | Set to `false` to disable the background change-log poller (useful in staging) |
+
+### Background pollers
+
+On startup, the server now spawns one background task per configured organization:
+
+- **`change_log_poller`** — runs every `CONFIG_CHANGE_LOG_INTERVAL_SECONDS` seconds per org, calling Meraki's `configurationChanges` endpoint and triggering targeted pulls for any changed entities.
+- **`anti_drift_scheduler`** — fires the weekly anti-drift sweep per the `CONFIG_WEEKLY_SWEEP_CRON` schedule.
+
+These tasks run inside the existing `server` container process (no new container or process needed). They consume the same SQLite DB at `data/topology.db`.
+
+### New SQLite tables
+
+`database.py` creates four new tables on startup (idempotent `CREATE TABLE IF NOT EXISTS`):
+
+- `config_blobs` — content-addressed payload store
+- `config_observations` — observation history per entity/area
+- `config_change_events` — raw Meraki change-log events
+- `config_sweep_runs` — baseline and sweep run metadata
+
+No migration script is needed; the tables are created automatically on the next `docker compose up` after the Phase 1 code is deployed.
+
+### Nginx routing
+
+No changes required. The existing Nginx config inside the `ui` container already reverse-proxies `/api/` and `/ws/` to the server container. The Phase 1 routes (`/api/config/*`, `/ws/config`) are served through the same proxy without any Nginx config edits.
+
+---
+
 ## Future Improvements (Not in Scope Now)
 
 - Add HTTPS via Let's Encrypt + Certbot

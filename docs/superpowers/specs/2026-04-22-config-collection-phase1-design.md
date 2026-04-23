@@ -805,6 +805,48 @@ Phase 1 is the foundation for a multi-phase Network Configuration Management ini
 
 This design is ready for user review. On approval, the next step is to invoke the `superpowers:writing-plans` skill to produce an implementation plan with concrete task breakdown, ordering, and checkpoints.
 
+---
+
+## Post-ship amendments (2026-04-23)
+
+The following implementation details diverged from the spec after Phase 1 shipped. The spec's architectural intent is unchanged; these notes document what was built.
+
+### `GET /api/config/orgs` — Meraki-first discovery
+
+**Spec said:** The endpoint returns orgs from local DB tables (`config_sweep_runs`, `config_observations`). On a fresh install the list would be empty until a baseline ran.
+
+**Shipped:** `list_orgs()` calls Meraki `GET /organizations` on every request. Meraki-discovered orgs appear with `baseline_state='none'` even before any local data exists, so the org dropdown is populated immediately after entering a valid API key. Local-only orgs (key rotated, org removed from Meraki) are still appended from the DB to preserve history access.
+
+### `POST /baseline` and `POST /sweep` — fire-and-forget handlers
+
+**Spec said:** The handlers were described in terms of the baseline running and returning a `sweep_run_id`. The spec was silent on whether the HTTP response waited for the sweep to complete.
+
+**Shipped:** Both handlers are explicitly fire-and-forget. The sweep_run row is created synchronously (so the `sweep_run_id` is stable and returnable), the HTTP response is sent immediately, and `asyncio.create_task()` dispatches the work. `total_calls` in the sweep row is initially `NULL` and filled in by an `update_sweep_total_calls(conn, run_id, total)` helper once the runner has enumerated the full work set. This prevents very-large-org baselines from blocking the HTTP response for hours.
+
+### Tree deduplication — `GROUP BY` + `MAX(name_hint)`
+
+**Spec said:** The tree endpoint returns "one entry per entity" (implied de-duplicate). The implementation detail was unspecified.
+
+**Shipped:** The query uses `GROUP BY entity_id` with `MAX(name_hint)`. SQL `MAX` ignores `NULL`, so when some observations for the same entity carry a non-null `name_hint` and others carry `NULL`, the non-null value wins. A `SELECT DISTINCT entity_id, name_hint` would return two rows (one for each name_hint variant), which is incorrect.
+
+### Device → network mapping via inventory API
+
+**Spec said:** The tree `devices` array under each network assumed devices were associated to networks via observation metadata.
+
+**Shipped:** Device-to-network association is resolved at tree-render time by calling Meraki `GET /organizations/{id}/devices` (inventory endpoint). This is authoritative and avoids the case where a device observed under one network has since been moved to another. Best-effort: if the API is unreachable, devices with no mapping are omitted from the per-network device lists.
+
+### `CollectionStatusBar` button guard
+
+**Spec said:** The "Start baseline" button should appear when no baseline exists; the "Run full sweep" button otherwise.
+
+**Shipped:** The condition `hasBaselined = status?.baseline_state !== 'none'` evaluates to `true` when `status` is `null` (because `null?.baseline_state` is `undefined`, and `undefined !== 'none'` is `true`). Fixed to `hasBaselined = !!status && status.baseline_state !== 'none'`.
+
+### Empty config area filtering
+
+**Spec said:** The `ConfigEntityView` renders all config areas for the selected entity.
+
+**Shipped:** Areas whose payload is recursively empty — `[]`, `{}`, `{"rules": []}`, deeply nested empty collections — are hidden from the card list, with a footer showing how many were hidden. The check preserves areas whose payload is a primitive, `null`, or contains any `{"_redacted": true}` sentinel (a secret is present and should be visible). This avoids cluttering the view with Meraki endpoints that returned empty data for a given network/device type.
+
 
 
 
