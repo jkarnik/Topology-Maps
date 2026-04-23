@@ -222,9 +222,7 @@ Renders a `DiffResult` inline within a tile. Two modes driven by `shape`:
 
 **General diff engine replaces "rich renderers":** The original roadmap called for purpose-built renderers for VLANs, firewall rules, SSIDs, and switch ports. During design it was recognised that 98 of 104 collected config areas are flat objects and the remaining ~6 array areas share the same table-diff pattern. A single general-purpose DiffEngine covers all 104 areas without per-area code. The identity key registry handles the array cases. The four originally named areas are not special-cased — they fall naturally out of the general engine.
 
-**Entry points are co-primary:** Both the org-level history view (clicking the org root) and the device-level history view (clicking a device in the tree) are first-class entry points. The org-level view is considered slightly more primary since it gives the broadest picture and is the natural landing state after a diff loads.
-
-**Default state on first Compare:** After a diff result loads, the org root node is auto-selected, showing all changes across the org grouped by network and device. The user can then drill down by clicking any network or device node.
+**Default state on first Compare:** After a diff result loads, the org root node is auto-selected, showing all changes across the org grouped by network and device. The user can then drill down by clicking any network or device node. The unified tree makes a separate "entry point" distinction irrelevant — clicking the org root serves the org-wide view; clicking a device serves the entity-level view.
 
 **Default time range:** On first load (before the user has run a Compare), the From selector defaults to the most recent baseline timestamp. If no baseline exists, it defaults to "Last 30 days."
 
