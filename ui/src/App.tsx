@@ -14,7 +14,7 @@ import { ConfigBrowser } from './components/ConfigBrowser';
 import type { DataSource } from './types/topology';
 
 function App() {
-  const [dataSource, setDataSource] = useState<DataSource>('meraki');
+  const [dataSource, setDataSource] = useState<DataSource>('configs');
   const sim = useSimulation();
   const topo = useTopology();
   const meraki = useMerakiTopology();

@@ -106,46 +106,48 @@ export const TopBar: React.FC<TopBarProps> = ({
         />
       )}
 
-      {/* Center: View mode pills */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'var(--bg-primary)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: '999px',
-          padding: '3px',
-          gap: '2px',
-          marginLeft: dataSource === 'meraki' ? '0' : '4px',
-        }}
-      >
-        {VIEW_MODES.map(({ id, label }) => {
-          const isActive = viewMode === id;
-          return (
-            <button
-              key={id}
-              onClick={() => onViewModeChange(id)}
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '12px',
-                fontWeight: 600,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                padding: '5px 18px',
-                borderRadius: '999px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'background 0.15s ease, color 0.15s ease',
-                background: isActive ? accentColor : 'transparent',
-                color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
-                lineHeight: 1,
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Center: View mode pills — not applicable to Configs workspace */}
+      {dataSource !== 'configs' && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg-primary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '999px',
+            padding: '3px',
+            gap: '2px',
+            marginLeft: dataSource === 'meraki' ? '0' : '4px',
+          }}
+        >
+          {VIEW_MODES.map(({ id, label }) => {
+            const isActive = viewMode === id;
+            return (
+              <button
+                key={id}
+                onClick={() => onViewModeChange(id)}
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '5px 18px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s ease, color 0.15s ease',
+                  background: isActive ? accentColor : 'transparent',
+                  color: isActive ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                  lineHeight: 1,
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
