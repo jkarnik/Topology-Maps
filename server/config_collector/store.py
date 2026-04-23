@@ -5,6 +5,7 @@ commit on successful writes. Reads do not commit.
 """
 from __future__ import annotations
 
+import json as _json
 import sqlite3
 from datetime import datetime, timezone
 from typing import Optional
@@ -131,3 +132,44 @@ def get_observation_history(
 
     rows = conn.execute(sql, params).fetchall()
     return [dict(r) for r in rows]
+
+
+def insert_change_event(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    event: dict,
+) -> Optional[int]:
+    """Insert a change-log event; return its row id, or None if it was a duplicate."""
+    try:
+        cursor = conn.execute(
+            """INSERT INTO config_change_events
+               (org_id, ts, admin_id, admin_name, admin_email,
+                network_id, network_name, ssid_number, ssid_name,
+                page, label, old_value, new_value,
+                client_id, client_description, raw_json, fetched_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                org_id,
+                event.get("ts"),
+                event.get("adminId"),
+                event.get("adminName"),
+                event.get("adminEmail"),
+                event.get("networkId"),
+                event.get("networkName"),
+                event.get("ssidNumber"),
+                event.get("ssidName"),
+                event.get("page"),
+                event.get("label"),
+                event.get("oldValue"),
+                event.get("newValue"),
+                event.get("clientId"),
+                event.get("clientDescription"),
+                _json.dumps(event),
+                _now_iso(),
+            ),
+        )
+        conn.commit()
+        return cursor.lastrowid
+    except sqlite3.IntegrityError:
+        return None
