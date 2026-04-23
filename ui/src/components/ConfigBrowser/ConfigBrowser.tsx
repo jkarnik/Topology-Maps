@@ -16,6 +16,8 @@ export function ConfigBrowser() {
   const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview')
   const [showAllTree, setShowAllTree] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState(220)
+  const [fromTs, setFromTs] = useState('')
+  const [toTs, setToTs] = useState('')
 
   const handleResizeStart = (e: React.MouseEvent) => {
     const startX = e.clientX
@@ -75,6 +77,11 @@ export function ConfigBrowser() {
     return []
   }, [orgs, selectedOrgId])
 
+  // Default fromTs to first baseline timestamp when it becomes available
+  useEffect(() => {
+    if (!fromTs && baselineTimestamps.length > 0) setFromTs(baselineTimestamps[0])
+  }, [baselineTimestamps, fromTs])
+
   const selectedOrg = useMemo(
     () => orgs.find(o => o.org_id === selectedOrgId) ?? null,
     [orgs, selectedOrgId],
@@ -113,11 +120,6 @@ export function ConfigBrowser() {
         onOrgChange={setSelectedOrgId}
         onStartBaseline={async () => { if (selectedOrgId) await startBaseline(selectedOrgId) }}
         onStartSweep={async () => { if (selectedOrgId) await startSweep(selectedOrgId) }}
-        baselineTimestamps={baselineTimestamps}
-        comparing={orgDiff.loading}
-        onCompare={(fromTs, toTs) => {
-          if (selectedOrgId) orgDiff.compare(selectedOrgId, fromTs, toTs)
-        }}
       />
 
       <div className="flex flex-1 min-h-0">
@@ -130,7 +132,7 @@ export function ConfigBrowser() {
             loading={treeLoading}
             selected={treeSelected}
             onSelect={sel => { setTreeSelected(sel); setActiveTab('overview') }}
-            showAll={showAllTree}
+            showAll={showAllTree || activeTab === 'overview'}
             onShowAll={() => setShowAllTree(true)}
             diffResult={orgDiff.result}
           />
@@ -171,16 +173,84 @@ export function ConfigBrowser() {
               <div className="p-4 text-xs opacity-40">Select an entity from the tree.</div>
             )}
             {activeTab === 'history' && (
-              <OrgDiffPanel
-                result={orgDiff.result}
-                loading={orgDiff.loading}
-                error={orgDiff.error}
-                estimatedSeconds={orgDiff.estimatedSeconds}
-                elapsed={orgDiff.elapsed}
-                selected={treeSelected}
-                networkNameMap={networkNameMap}
-                deviceNetworkMap={deviceNetworkMap}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                {/* Compare controls */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap',
+                  padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-secondary)', fontFamily: "'JetBrains Mono', monospace",
+                }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>Compare:</span>
+                  {(['from', 'to'] as const).map(which => (
+                    <select
+                      key={which}
+                      value={which === 'from' ? fromTs : toTs}
+                      onChange={e => which === 'from' ? setFromTs(e.target.value) : setToTs(e.target.value)}
+                      style={{
+                        background: 'var(--bg-tertiary)', color: 'var(--text-primary)',
+                        border: '1px solid var(--border-subtle)', borderRadius: '5px',
+                        padding: '4px 8px', fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", cursor: 'pointer',
+                      }}
+                    >
+                      {which === 'from'
+                        ? <option value="">— select from —</option>
+                        : <option value="">Now (latest)</option>
+                      }
+                      {baselineTimestamps.map(ts => (
+                        <option key={ts} value={ts}>{new Date(ts).toLocaleString()}</option>
+                      ))}
+                      {which === 'from' && <option value="last7">Last 7 days</option>}
+                      {which === 'from' && <option value="last30">Last 30 days</option>}
+                    </select>
+                  ))}
+                  <button
+                    disabled={!fromTs || orgDiff.loading}
+                    onClick={() => {
+                      if (!selectedOrgId) return
+                      const resolved = fromTs === 'last7'
+                        ? new Date(Date.now() - 7 * 86400_000).toISOString()
+                        : fromTs === 'last30'
+                        ? new Date(Date.now() - 30 * 86400_000).toISOString()
+                        : fromTs
+                      orgDiff.compare(selectedOrgId, resolved, toTs || undefined)
+                    }}
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', fontWeight: 600,
+                      letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 14px',
+                      borderRadius: '5px', border: '1px solid var(--border-subtle)', cursor: (!fromTs || orgDiff.loading) ? 'not-allowed' : 'pointer',
+                      background: 'var(--bg-tertiary)', color: (!fromTs || orgDiff.loading) ? 'var(--text-muted)' : 'var(--text-primary)',
+                      opacity: (!fromTs || orgDiff.loading) ? 0.5 : 1,
+                    }}
+                  >
+                    {orgDiff.loading ? 'Loading…' : 'Compare'}
+                  </button>
+                  {orgDiff.result && !orgDiff.loading && (
+                    <button
+                      onClick={() => { orgDiff.clear(); setShowAllTree(false) }}
+                      style={{
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: '11px',
+                        padding: '5px 10px', borderRadius: '5px', border: '1px solid var(--border-subtle)',
+                        cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)',
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                {/* Results */}
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                  <OrgDiffPanel
+                    result={orgDiff.result}
+                    loading={orgDiff.loading}
+                    error={orgDiff.error}
+                    estimatedSeconds={orgDiff.estimatedSeconds}
+                    elapsed={orgDiff.elapsed}
+                    selected={treeSelected}
+                    networkNameMap={networkNameMap}
+                    deviceNetworkMap={deviceNetworkMap}
+                  />
+                </div>
+              </div>
             )}
           </div>
         </div>
