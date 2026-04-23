@@ -195,3 +195,62 @@ def get_change_events(
     params.append(limit)
 
     return [dict(r) for r in conn.execute(sql, params).fetchall()]
+
+
+def create_sweep_run(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    kind: str,
+    total_calls: Optional[int] = None,
+) -> int:
+    cursor = conn.execute(
+        """INSERT INTO config_sweep_runs (org_id, kind, status, total_calls)
+           VALUES (?, ?, 'queued', ?)""",
+        (org_id, kind, total_calls),
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
+def mark_sweep_running(conn: sqlite3.Connection, run_id: int) -> None:
+    conn.execute(
+        "UPDATE config_sweep_runs SET status='running', started_at=? WHERE id=?",
+        (_now_iso(), run_id),
+    )
+    conn.commit()
+
+
+def increment_sweep_counters(
+    conn: sqlite3.Connection,
+    run_id: int,
+    *,
+    completed: int = 0,
+    failed: int = 0,
+    skipped: int = 0,
+) -> None:
+    conn.execute(
+        """UPDATE config_sweep_runs SET
+             completed_calls = completed_calls + ?,
+             failed_calls = failed_calls + ?,
+             skipped_calls = skipped_calls + ?
+           WHERE id=?""",
+        (completed, failed, skipped, run_id),
+    )
+    conn.commit()
+
+
+def mark_sweep_complete(conn: sqlite3.Connection, run_id: int) -> None:
+    conn.execute(
+        "UPDATE config_sweep_runs SET status='complete', completed_at=? WHERE id=?",
+        (_now_iso(), run_id),
+    )
+    conn.commit()
+
+
+def mark_sweep_failed(conn: sqlite3.Connection, run_id: int, *, error_summary: str) -> None:
+    conn.execute(
+        "UPDATE config_sweep_runs SET status='failed', completed_at=?, error_summary=? WHERE id=?",
+        (_now_iso(), error_summary, run_id),
+    )
+    conn.commit()
