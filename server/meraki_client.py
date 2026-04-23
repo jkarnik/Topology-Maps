@@ -318,5 +318,55 @@ class MerakiClient:
     async def get_appliance_settings(self, network_id: str) -> dict:
         return await self._get(f"/networks/{network_id}/appliance/settings")
 
+    # --- Plan 1.08: MS switch ---------------------------------------------
+
+    async def get_switch_access_policies(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/accessPolicies")
+
+    async def get_switch_acls(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/accessControlLists")
+
+    async def get_switch_qos_rules(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/qosRules")
+
+    async def get_switch_qos_order(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/qosRules/order")
+
+    async def get_switch_dscp_to_cos(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/dscpToCosMappings")
+
+    async def get_switch_settings(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/settings")
+
+    async def get_switch_stp(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/stp")
+
+    async def get_switch_storm_control(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/stormControl")
+
+    async def get_switch_mtu(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/mtu")
+
+    async def get_switch_stacks(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/stacks")
+
+    async def get_switch_port_schedules(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/portSchedules")
+
+    async def get_switch_link_aggregations(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/linkAggregations")
+
+    async def get_switch_dhcp_server_policy(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/dhcpServerPolicy")
+
+    async def get_switch_multicast(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/routing/multicast")
+
+    async def get_switch_multicast_rps(self, network_id: str) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/switch/routing/multicast/rendezvousPoints")
+
+    async def get_switch_ospf(self, network_id: str) -> dict:
+        return await self._get(f"/networks/{network_id}/switch/routing/ospf")
+
     async def close(self) -> None:
         await self._client.aclose()
