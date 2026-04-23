@@ -7,31 +7,117 @@ interface Props {
   onClose: () => void;
 }
 
+const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
+
 export const BaselineProgressOverlay: React.FC<Props> = ({ progress, kind, onClose }) => {
   if (!progress) return null;
   const pct = progress.total_calls > 0
     ? Math.round((progress.completed_calls / progress.total_calls) * 100)
     : 0;
 
+  const accent = kind === 'anti_drift' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
+
   return (
     <div
       role="dialog"
       aria-live="polite"
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0, 0, 0, 0.65)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 50,
+        backdropFilter: 'blur(2px)',
+      }}
     >
-      <div className="bg-white rounded shadow-lg p-6 w-[420px]">
-        <h3 className="text-lg font-semibold mb-2">
+      <div
+        style={{
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '8px',
+          padding: '22px 24px',
+          width: '440px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+          ...MONO,
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: '14px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            letterSpacing: '0.04em',
+            marginBottom: '14px',
+          }}
+        >
           {kind === 'anti_drift' ? 'Anti-drift sweep running' : 'Baseline in progress'}
         </h3>
-        <div className="text-sm text-gray-600 mb-4">
-          {progress.completed_calls.toLocaleString()} of {progress.total_calls.toLocaleString()} calls
+        <div
+          style={{
+            fontSize: '11px',
+            color: 'var(--text-secondary)',
+            marginBottom: '10px',
+            letterSpacing: '0.04em',
+          }}
+        >
+          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+            {progress.completed_calls.toLocaleString()}
+          </span>
+          <span style={{ color: 'var(--text-muted)' }}>{' / '}</span>
+          <span>{progress.total_calls.toLocaleString()} calls</span>
         </div>
-        <div className="h-3 bg-gray-200 rounded overflow-hidden mb-4" aria-label="progress">
-          <div className="h-full bg-blue-600" style={{ width: `${pct}%` }} />
+        <div
+          style={{
+            height: '6px',
+            background: 'var(--bg-tertiary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '3px',
+            overflow: 'hidden',
+            marginBottom: '14px',
+          }}
+          aria-label="progress"
+        >
+          <div
+            style={{
+              height: '100%',
+              background: accent,
+              boxShadow: `0 0 10px ${accent}`,
+              width: `${pct}%`,
+              transition: 'width 0.3s ease',
+            }}
+          />
         </div>
-        <div className="flex justify-between items-center text-xs text-gray-500">
-          <span>{pct}% complete</span>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700">Dismiss</button>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '10px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}
+        >
+          <span style={{ color: accent, fontWeight: 600 }}>{pct}% complete</span>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '4px',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: '4px 10px',
+              fontSize: '10px',
+              fontFamily: "'JetBrains Mono', monospace",
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Dismiss
+          </button>
         </div>
       </div>
     </div>
