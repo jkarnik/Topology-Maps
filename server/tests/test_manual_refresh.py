@@ -66,3 +66,22 @@ async def test_refresh_all_areas_for_entity(client, conn):
 
     from server.config_collector._endpoints_org import ORG_ENDPOINTS
     assert result["expected_calls"] == len(ORG_ENDPOINTS)
+
+
+@pytest.mark.asyncio
+async def test_concurrent_refresh_is_idempotent(client, conn):
+    """Two concurrent refresh calls for identical scope → only one observation row."""
+    from server.config_collector.manual_refresh import refresh_entity
+
+    async with respx.mock(base_url="https://api.meraki.com/api/v1") as mock:
+        mock.get("/networks/N_1/appliance/vlans").mock(return_value=httpx.Response(200, json=[]))
+
+        await asyncio.gather(
+            refresh_entity(client, conn, org_id="o1", entity_type="network",
+                           entity_id="N_1", config_area="appliance_vlans"),
+            refresh_entity(client, conn, org_id="o1", entity_type="network",
+                           entity_id="N_1", config_area="appliance_vlans"),
+        )
+
+    count = conn.execute("SELECT COUNT(*) AS n FROM config_observations").fetchone()["n"]
+    assert count == 1
