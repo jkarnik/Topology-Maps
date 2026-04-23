@@ -69,3 +69,19 @@ def test_refresh_trigger_validates_entity_type(client):
         "entity_type": "bogus", "entity_id": "x",
     })
     assert resp.status_code == 400
+
+
+def test_get_entity_returns_404_if_missing(client):
+    resp = client.get("/api/config/entities/network/N_MISSING?org_id=o1")
+    assert resp.status_code == 404
+
+
+def test_get_blob_returns_404_if_missing(client):
+    resp = client.get("/api/config/blobs/does-not-exist")
+    assert resp.status_code == 404
+
+
+def test_list_change_events_empty(client):
+    resp = client.get("/api/config/change-events?org_id=o1")
+    assert resp.status_code == 200
+    assert resp.json() == {"events": [], "has_more": False, "next_cursor": None}
