@@ -66,3 +66,31 @@ def test_insert_change_event_handles_missing_fields(conn):
     minimal = {"ts": "2026-04-22T10:00:00Z", "label": "VLAN"}
     event_id = insert_change_event(conn, org_id="o1", event=minimal)
     assert event_id is not None
+
+
+def test_get_change_events_newest_first(conn):
+    from server.config_collector.store import insert_change_event, get_change_events
+
+    for i, ts in enumerate(["2026-04-22T10:00:00Z", "2026-04-22T11:00:00Z", "2026-04-22T12:00:00Z"]):
+        insert_change_event(conn, org_id="o1", event={
+            "ts": ts, "label": f"lbl{i}", "networkId": "N_1",
+            "oldValue": str(i), "newValue": str(i+1),
+        })
+
+    events = get_change_events(conn, org_id="o1", limit=10)
+    assert [e["ts"] for e in events] == [
+        "2026-04-22T12:00:00Z",
+        "2026-04-22T11:00:00Z",
+        "2026-04-22T10:00:00Z",
+    ]
+
+
+def test_get_change_events_filter_by_network(conn):
+    from server.config_collector.store import insert_change_event, get_change_events
+
+    insert_change_event(conn, org_id="o1", event={"ts": "t1", "label": "x", "networkId": "N_A"})
+    insert_change_event(conn, org_id="o1", event={"ts": "t2", "label": "y", "networkId": "N_B"})
+
+    events = get_change_events(conn, org_id="o1", network_id="N_A", limit=10)
+    assert len(events) == 1
+    assert events[0]["network_id"] == "N_A"

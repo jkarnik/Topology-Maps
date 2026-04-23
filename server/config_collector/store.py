@@ -173,3 +173,25 @@ def insert_change_event(
         return cursor.lastrowid
     except sqlite3.IntegrityError:
         return None
+
+
+def get_change_events(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    network_id: Optional[str] = None,
+    limit: int = 100,
+    before_ts: Optional[str] = None,
+) -> list[dict]:
+    sql = "SELECT * FROM config_change_events WHERE org_id=?"
+    params: list = [org_id]
+    if network_id is not None:
+        sql += " AND network_id=?"
+        params.append(network_id)
+    if before_ts is not None:
+        sql += " AND ts < ?"
+        params.append(before_ts)
+    sql += " ORDER BY ts DESC LIMIT ?"
+    params.append(limit)
+
+    return [dict(r) for r in conn.execute(sql, params).fetchall()]
