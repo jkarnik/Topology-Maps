@@ -89,3 +89,18 @@ async def test_ssid_event_triggers_sub_endpoint_pulls(client, conn):
     assert l3_mock.call_count >= 1
     assert l7_mock.call_count >= 1
     assert ssids_mock.call_count >= 1
+
+
+@pytest.mark.asyncio
+async def test_run_poller_exits_on_cancel(client, conn):
+    """run_poller is a long-lived loop; verify it exits cleanly on cancel."""
+    from server.config_collector.change_log_poller import run_poller
+
+    async with respx.mock(base_url="https://api.meraki.com/api/v1", assert_all_called=False) as mock:
+        mock.get(url__regex=r".*").mock(return_value=httpx.Response(200, json=[]))
+
+        task = asyncio.create_task(run_poller(client, conn, org_id="o1", interval=60, timespan=3600))
+        await asyncio.sleep(0.05)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task

@@ -111,3 +111,32 @@ def _build_jobs_from_events(org_id: str, events_with_ids: list[tuple[dict, int]]
             change_id_by_key.setdefault(key, event_row_id)
 
     return jobs, change_id_by_key
+
+
+async def run_poller(
+    client: MerakiClient,
+    conn,
+    *,
+    org_id: str,
+    interval: int = 1800,
+    timespan: int = 3600,
+    progress_callback: Optional[Callable[[dict], Awaitable[None]]] = None,
+) -> None:
+    """Infinite loop: poll_once → sleep(interval) → poll_once → ...
+
+    Runs until the task is cancelled. Failures from poll_once are logged
+    and the loop continues (we never want a transient Meraki hiccup to
+    kill the poller entirely).
+    """
+    logger.info("starting change-log poller for org %s (interval=%ds)", org_id, interval)
+    while True:
+        try:
+            await poll_once(
+                client, conn,
+                org_id=org_id, timespan=timespan, progress_callback=progress_callback,
+            )
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("poll_once failed for org %s; will retry on next cycle", org_id)
+        await asyncio.sleep(interval)
