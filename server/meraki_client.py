@@ -385,5 +385,31 @@ class MerakiClient:
     async def get_wireless_ap_port_profiles(self, network_id: str) -> list[dict]:
         return await self._get(f"/networks/{network_id}/wireless/ethernet/ports/profiles")
 
+    # --- Plan 1.08: Per-SSID sub-endpoints --------------------------------
+
+    async def get_wireless_ssid_l3_firewall(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/firewall/l3FirewallRules")
+
+    async def get_wireless_ssid_l7_firewall(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/firewall/l7FirewallRules")
+
+    async def get_wireless_ssid_traffic_shaping(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/trafficShaping/rules")
+
+    async def get_wireless_ssid_splash(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/splash/settings")
+
+    async def get_wireless_ssid_schedules(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/schedules")
+
+    async def get_wireless_ssid_vpn(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/vpn")
+
+    async def get_wireless_ssid_device_type_policies(self, network_id: str, ssid_number: int) -> dict:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/deviceTypeGroupPolicies")
+
+    async def get_wireless_ssid_identity_psks(self, network_id: str, ssid_number: int) -> list[dict]:
+        return await self._get(f"/networks/{network_id}/wireless/ssids/{ssid_number}/identityPsks")
+
     async def close(self) -> None:
         await self._client.aclose()
