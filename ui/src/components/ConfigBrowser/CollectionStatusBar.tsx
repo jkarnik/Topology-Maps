@@ -38,7 +38,7 @@ export const CollectionStatusBar: React.FC<Props> = ({
         <option value="">Select an org…</option>
         {orgs.map((o) => (
           <option key={o.org_id} value={o.org_id}>
-            {o.org_id} ({o.observation_count} observations)
+            {o.name ? `${o.name} — ${o.observation_count} observations` : `${o.org_id} (${o.observation_count} observations)`}
           </option>
         ))}
       </select>

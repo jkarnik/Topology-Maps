@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Optional
 
 from pydantic import BaseModel
@@ -16,44 +17,77 @@ from server.config_collector.store import (
 )
 from server.meraki_client import MerakiClient
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/config", tags=["config"])
+
+
+def _row_for_org(conn, org_id: str, name: Optional[str]) -> dict:
+    obs_count = conn.execute(
+        "SELECT COUNT(*) AS n FROM config_observations WHERE org_id=?", (org_id,)
+    ).fetchone()["n"]
+    last_baseline = conn.execute(
+        """SELECT id, status, completed_at FROM config_sweep_runs
+           WHERE org_id=? AND kind='baseline'
+           ORDER BY id DESC LIMIT 1""",
+        (org_id,),
+    ).fetchone()
+    active = conn.execute(
+        """SELECT id FROM config_sweep_runs
+           WHERE org_id=? AND status IN ('queued','running')
+           ORDER BY id DESC LIMIT 1""",
+        (org_id,),
+    ).fetchone()
+    return {
+        "org_id": org_id,
+        "name": name,
+        "observation_count": obs_count,
+        "baseline_state": last_baseline["status"] if last_baseline else "none",
+        "last_baseline_at": last_baseline["completed_at"] if last_baseline else None,
+        "active_sweep_run_id": active["id"] if active else None,
+    }
 
 
 @router.get("/orgs")
 async def list_orgs() -> list[dict]:
-    """List orgs with collection status. Empty until a baseline is started."""
+    """List orgs visible to the Meraki API key, plus any with local-only data.
+
+    Returns Meraki-discovered orgs as the primary list so the dropdown is
+    populated on a fresh install. baseline_state='none' indicates an org
+    that has been discovered but never baselined.
+    """
     conn = get_connection()
-    rows = conn.execute(
-        """SELECT DISTINCT org_id FROM config_sweep_runs
-           UNION SELECT DISTINCT org_id FROM config_observations"""
-    ).fetchall()
-    result = []
-    for r in rows:
-        org_id = r["org_id"]
-        obs_count = conn.execute(
-            "SELECT COUNT(*) AS n FROM config_observations WHERE org_id=?", (org_id,)
-        ).fetchone()["n"]
-        last_baseline = conn.execute(
-            """SELECT id, status, completed_at FROM config_sweep_runs
-               WHERE org_id=? AND kind='baseline'
-               ORDER BY id DESC LIMIT 1""",
-            (org_id,),
-        ).fetchone()
-        active = conn.execute(
-            """SELECT id FROM config_sweep_runs
-               WHERE org_id=? AND status IN ('queued','running')
-               ORDER BY id DESC LIMIT 1""",
-            (org_id,),
-        ).fetchone()
-        result.append({
-            "org_id": org_id,
-            "observation_count": obs_count,
-            "baseline_state": last_baseline["status"] if last_baseline else "none",
-            "last_baseline_at": last_baseline["completed_at"] if last_baseline else None,
-            "active_sweep_run_id": active["id"] if active else None,
-        })
-    conn.close()
-    return result
+    try:
+        client = _get_meraki_client()
+        meraki_orgs: list[dict] = []
+        if client.is_configured:
+            try:
+                meraki_orgs = await client.get_organizations()
+            except Exception as exc:
+                logger.warning("Could not fetch orgs from Meraki: %s", exc)
+
+        seen: set[str] = set()
+        result: list[dict] = []
+        for mo in meraki_orgs:
+            org_id = str(mo.get("id", ""))
+            if not org_id:
+                continue
+            seen.add(org_id)
+            result.append(_row_for_org(conn, org_id, mo.get("name")))
+
+        # Include locally-known orgs that aren't in the Meraki list (e.g.
+        # key was rotated or org was removed — still want to see history).
+        local_rows = conn.execute(
+            "SELECT DISTINCT org_id FROM config_sweep_runs "
+            "UNION SELECT DISTINCT org_id FROM config_observations"
+        ).fetchall()
+        for r in local_rows:
+            if r["org_id"] not in seen:
+                result.append(_row_for_org(conn, r["org_id"], None))
+
+        return result
+    finally:
+        conn.close()
 
 
 _VALID_ENTITY_TYPES = {"org", "network", "device", "ssid"}

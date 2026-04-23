@@ -11,6 +11,7 @@ export type SourceEvent =
 
 export interface ConfigOrg {
   org_id: string;
+  name: string | null;
   observation_count: number;
   baseline_state: BaselineState;
   last_baseline_at: string | null;
