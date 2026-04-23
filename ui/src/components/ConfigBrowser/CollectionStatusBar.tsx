@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ConfigOrg, ConfigStatus } from '../../types/config';
+import type { SweepProgress } from '../../hooks/useConfigCollection';
 
 interface Props {
   orgs: ConfigOrg[];
   selectedOrgId: string | null;
   status: ConfigStatus | null;
+  sweepProgress: SweepProgress | null;
   onOrgChange: (orgId: string) => void;
   onStartBaseline: () => void;
   onStartSweep: () => void;
@@ -27,12 +29,30 @@ function statusChip(state: string): { color: string; label: string; dotGlow: str
 
 const MONO: React.CSSProperties = { fontFamily: "'JetBrains Mono', monospace" };
 
+function useElapsed(startedAt: number | null): number {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (startedAt === null) { setElapsed(0); return; }
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, [startedAt]);
+  return elapsed;
+}
+
 export const CollectionStatusBar: React.FC<Props> = ({
-  orgs, selectedOrgId, status, onOrgChange, onStartBaseline, onStartSweep,
+  orgs, selectedOrgId, status, sweepProgress, onOrgChange, onStartBaseline, onStartSweep,
 }) => {
   const state = status?.active_sweep?.status ?? status?.baseline_state ?? 'none';
   const chip = statusChip(state);
   const hasBaselined = !!status && status.baseline_state !== 'none';
+
+  const elapsed = useElapsed(sweepProgress?.startedAt ?? null);
+  const pct = sweepProgress && sweepProgress.total > 0
+    ? Math.min(99, Math.round((sweepProgress.completed / sweepProgress.total) * 100))
+    : null;
+  const secsRemaining = sweepProgress && elapsed > 2 && sweepProgress.completed > 0
+    ? Math.max(0, Math.round((elapsed / sweepProgress.completed) * (sweepProgress.total - sweepProgress.completed)))
+    : null;
 
   return (
     <div
@@ -98,7 +118,19 @@ export const CollectionStatusBar: React.FC<Props> = ({
           }}
         />
         <span style={{ fontWeight: 600 }}>{chip.label}</span>
-        {status?.last_sync && (
+        {pct !== null && (
+          <>
+            <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '4px' }}>
+              {pct}%
+            </span>
+            {secsRemaining !== null && (
+              <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                · {secsRemaining}s left
+              </span>
+            )}
+          </>
+        )}
+        {pct === null && status?.last_sync && (
           <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '4px' }}>
             {new Date(status.last_sync).toLocaleString()}
           </span>

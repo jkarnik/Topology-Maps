@@ -14,7 +14,7 @@ export function ConfigBrowser() {
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
   const [treeSelected, setTreeSelected] = useState<TreeSelection | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview')
-  const [showAllTree, setShowAllTree] = useState(false)
+
   const [sidebarWidth, setSidebarWidth] = useState(220)
   const [fromTs, setFromTs] = useState('')
   const [toTs, setToTs] = useState('')
@@ -35,7 +35,7 @@ export function ConfigBrowser() {
 
   const { orgs } = useConfigOrgs()
   const { tree, loading: treeLoading, reload: reloadTree } = useConfigTree(selectedOrgId)
-  const { lastEvent } = useConfigCollection(selectedOrgId)
+  const { lastEvent, sweepProgress } = useConfigCollection(selectedOrgId)
   const orgDiff = useOrgDiff()
 
   // Auto-select first org
@@ -43,10 +43,6 @@ export function ConfigBrowser() {
     if (!selectedOrgId && orgs.length > 0) setSelectedOrgId(orgs[0].org_id)
   }, [orgs, selectedOrgId])
 
-  // Reset showAll when a new diff result loads
-  useEffect(() => {
-    if (orgDiff.result) setShowAllTree(false)
-  }, [orgDiff.result])
 
   // Reload tree on new observations
   useEffect(() => {
@@ -117,6 +113,7 @@ export function ConfigBrowser() {
         orgs={orgs}
         selectedOrgId={selectedOrgId}
         status={derivedStatus}
+        sweepProgress={sweepProgress}
         onOrgChange={setSelectedOrgId}
         onStartBaseline={async () => { if (selectedOrgId) await startBaseline(selectedOrgId) }}
         onStartSweep={async () => { if (selectedOrgId) await startSweep(selectedOrgId) }}
@@ -148,8 +145,8 @@ export function ConfigBrowser() {
                 loading={treeLoading}
                 selected={treeSelected}
                 onSelect={sel => setTreeSelected(sel)}
-                showAll={showAllTree}
-                onShowAll={() => setShowAllTree(true)}
+                showAll={true}
+                onShowAll={() => {}}
                 diffResult={orgDiff.result}
               />
             </div>
@@ -228,7 +225,7 @@ export function ConfigBrowser() {
               </button>
               {orgDiff.result && !orgDiff.loading && (
                 <button
-                  onClick={() => { orgDiff.clear(); setShowAllTree(false) }}
+                  onClick={() => orgDiff.clear()}
                   style={{
                     fontFamily: "'JetBrains Mono', monospace", fontSize: '11px',
                     padding: '5px 10px', borderRadius: '5px', border: '1px solid var(--border-subtle)',
