@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CollectionStatusBar } from './CollectionStatusBar';
 import { ConfigTree } from './ConfigTree';
+import { ConfigEntityView } from './ConfigEntityView';
+import { BaselineProgressOverlay } from './BaselineProgressOverlay';
 import { useConfigOrgs } from '../../hooks/useConfigOrgs';
 import { useConfigTree } from '../../hooks/useConfigTree';
 import { useConfigCollection } from '../../hooks/useConfigCollection';
@@ -61,11 +63,19 @@ export const ConfigBrowser: React.FC = () => {
           />
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="text-sm text-gray-500">
-            {selected ? `Selected: ${selected.entityType} / ${selected.entityId}` : 'Select an entity from the tree.'}
-          </div>
+          {selected && selectedOrgId
+            ? <ConfigEntityView orgId={selectedOrgId} entityType={selected.entityType} entityId={selected.entityId} />
+            : <div className="text-sm text-gray-500">Select an entity from the tree.</div>
+          }
         </div>
       </div>
+      {lastEvent?.type === 'sweep.progress' && (
+        <BaselineProgressOverlay
+          progress={lastEvent}
+          kind={status?.active_sweep?.kind ?? null}
+          onClose={() => { /* dismiss handled by parent if needed */ }}
+        />
+      )}
     </div>
   );
 };
