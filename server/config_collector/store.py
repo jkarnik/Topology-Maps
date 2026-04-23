@@ -298,3 +298,61 @@ def update_sweep_total_calls(
         (total_calls, run_id),
     )
     conn.commit()
+
+
+def get_observations_in_window(
+    conn,
+    *,
+    org_id: str,
+    from_ts: str,
+    to_ts: str,
+) -> list[dict]:
+    """Return one row per (entity_type, entity_id, config_area, sub_key) that has
+    at least one observation in the org. Each row carries the latest hash at or
+    before from_ts ('from_hash') and the latest hash at or before to_ts ('to_hash').
+    Rows where both hashes are identical (no change) are excluded.
+    Uses window functions to avoid N+1 blob fetches."""
+    sql = """
+    WITH ranked AS (
+        SELECT
+            entity_type, entity_id, config_area, sub_key, hash, observed_at, name_hint,
+            ROW_NUMBER() OVER (
+                PARTITION BY entity_type, entity_id, config_area, sub_key
+                ORDER BY CASE WHEN observed_at <= :from_ts THEN 1 ELSE 2 END,
+                         observed_at DESC
+            ) AS rn_from,
+            ROW_NUMBER() OVER (
+                PARTITION BY entity_type, entity_id, config_area, sub_key
+                ORDER BY CASE WHEN observed_at <= :to_ts THEN 1 ELSE 2 END,
+                         observed_at DESC
+            ) AS rn_to
+        FROM config_observations
+        WHERE org_id = :org_id
+    ),
+    from_snap AS (
+        SELECT entity_type, entity_id, config_area, sub_key, hash AS from_hash, name_hint
+        FROM ranked
+        WHERE rn_from = 1 AND observed_at <= :from_ts
+    ),
+    to_snap AS (
+        SELECT entity_type, entity_id, config_area, sub_key, hash AS to_hash, observed_at AS to_observed_at
+        FROM ranked
+        WHERE rn_to = 1 AND observed_at <= :to_ts
+    )
+    SELECT
+        COALESCE(t.entity_type, f.entity_type) AS entity_type,
+        COALESCE(t.entity_id,   f.entity_id)   AS entity_id,
+        COALESCE(t.config_area, f.config_area) AS config_area,
+        COALESCE(t.sub_key,     f.sub_key)     AS sub_key,
+        f.from_hash,
+        t.to_hash,
+        t.to_observed_at,
+        COALESCE(f.name_hint, '') AS name_hint
+    FROM to_snap t
+    LEFT JOIN from_snap f USING (entity_type, entity_id, config_area, sub_key)
+    WHERE (f.from_hash IS NULL OR f.from_hash != t.to_hash)
+    ORDER BY entity_type, entity_id, config_area, sub_key
+    """
+    cursor = conn.execute(sql, {"org_id": org_id, "from_ts": from_ts, "to_ts": to_ts})
+    cols = [d[0] for d in cursor.description]
+    return [dict(zip(cols, row)) for row in cursor.fetchall()]
