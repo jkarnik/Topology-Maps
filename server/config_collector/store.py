@@ -28,3 +28,11 @@ def upsert_blob(
     )
     conn.commit()
     return cursor.rowcount == 1
+
+
+def get_blob_by_hash(conn: sqlite3.Connection, hash_hex: str) -> Optional[dict]:
+    row = conn.execute(
+        "SELECT hash, payload, byte_size, first_seen_at FROM config_blobs WHERE hash=?",
+        (hash_hex,),
+    ).fetchone()
+    return dict(row) if row else None

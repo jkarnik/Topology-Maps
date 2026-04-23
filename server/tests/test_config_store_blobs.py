@@ -49,3 +49,20 @@ def test_upsert_blob_different_hashes_are_separate(conn):
 
     count = conn.execute("SELECT COUNT(*) AS n FROM config_blobs").fetchone()["n"]
     assert count == 2
+
+
+def test_get_blob_by_hash_returns_payload(conn):
+    from server.config_collector.store import upsert_blob, get_blob_by_hash
+
+    upsert_blob(conn, hash_hex="abc123", payload='{"a":1}', byte_size=7)
+    blob = get_blob_by_hash(conn, "abc123")
+    assert blob is not None
+    assert blob["payload"] == '{"a":1}'
+    assert blob["byte_size"] == 7
+    assert "first_seen_at" in blob
+
+
+def test_get_blob_by_hash_missing_returns_none(conn):
+    from server.config_collector.store import get_blob_by_hash
+
+    assert get_blob_by_hash(conn, "does-not-exist") is None
