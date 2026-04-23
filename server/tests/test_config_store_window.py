@@ -67,3 +67,24 @@ def test_window_returns_empty_when_nothing_in_range(conn):
                                        from_ts="2026-04-10T00:00:00Z",
                                        to_ts="2026-04-23T00:00:00Z")
     assert pairs == []
+
+def test_window_handles_null_sub_key(conn):
+    from server.config_collector.store import get_observations_in_window
+    from server.config_collector.store import upsert_blob
+    upsert_blob(conn, "h1", '{"x":1}', 7)
+    upsert_blob(conn, "h2", '{"x":2}', 7)
+    conn.execute(
+        "INSERT INTO config_observations (org_id,entity_type,entity_id,config_area,sub_key,hash,observed_at,source_event) VALUES (?,?,?,?,?,?,?,?)",
+        ("O1","network","N9","appliance_settings",None,"h1","2026-04-01T00:00:00Z","baseline")
+    )
+    conn.execute(
+        "INSERT INTO config_observations (org_id,entity_type,entity_id,config_area,sub_key,hash,observed_at,source_event) VALUES (?,?,?,?,?,?,?,?)",
+        ("O1","network","N9","appliance_settings",None,"h2","2026-04-20T00:00:00Z","change_log")
+    )
+    conn.commit()
+    pairs = get_observations_in_window(conn, org_id="O1",
+                                       from_ts="2026-04-10T00:00:00Z",
+                                       to_ts="2026-04-23T00:00:00Z")
+    assert len(pairs) == 1
+    assert pairs[0]["from_hash"] == "h1"
+    assert pairs[0]["to_hash"] == "h2"

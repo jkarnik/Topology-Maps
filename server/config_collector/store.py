@@ -301,7 +301,7 @@ def update_sweep_total_calls(
 
 
 def get_observations_in_window(
-    conn,
+    conn: sqlite3.Connection,
     *,
     org_id: str,
     from_ts: str,
@@ -335,7 +335,7 @@ def get_observations_in_window(
         WHERE rn_from = 1 AND observed_at <= :from_ts
     ),
     to_snap AS (
-        SELECT entity_type, entity_id, config_area, sub_key, hash AS to_hash, observed_at AS to_observed_at
+        SELECT entity_type, entity_id, config_area, sub_key, hash AS to_hash, observed_at AS to_observed_at, name_hint
         FROM ranked
         WHERE rn_to = 1 AND observed_at <= :to_ts
     )
@@ -347,11 +347,16 @@ def get_observations_in_window(
         f.from_hash,
         t.to_hash,
         t.to_observed_at,
-        COALESCE(f.name_hint, '') AS name_hint
+        COALESCE(t.name_hint, f.name_hint, '') AS name_hint
     FROM to_snap t
-    LEFT JOIN from_snap f USING (entity_type, entity_id, config_area, sub_key)
+    LEFT JOIN from_snap f ON (
+        t.entity_type = f.entity_type
+        AND t.entity_id   = f.entity_id
+        AND t.config_area = f.config_area
+        AND t.sub_key IS f.sub_key
+    )
     WHERE (f.from_hash IS NULL OR f.from_hash != t.to_hash)
-    ORDER BY entity_type, entity_id, config_area, sub_key
+    ORDER BY t.entity_type, t.entity_id, t.config_area, t.sub_key
     """
     cursor = conn.execute(sql, {"org_id": org_id, "from_ts": from_ts, "to_ts": to_ts})
     cols = [d[0] for d in cursor.description]
