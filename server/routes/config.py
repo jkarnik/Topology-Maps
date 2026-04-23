@@ -63,6 +63,12 @@ def _get_meraki_client() -> MerakiClient:
     return MerakiClient()
 
 
+async def _broadcast_callback_for_org(org_id: str):
+    async def _cb(event: dict) -> None:
+        await _config_ws_hub.broadcast(org_id, event)
+    return _cb
+
+
 @router.get("/orgs/{org_id}/status")
 async def get_status(org_id: str) -> dict:
     conn = get_connection()
@@ -86,8 +92,9 @@ async def get_status(org_id: str) -> dict:
 async def start_baseline(org_id: str) -> dict:
     conn = get_connection()
     client = _get_meraki_client()
+    cb = await _broadcast_callback_for_org(org_id)
     try:
-        run_id = await run_baseline(client, conn, org_id=org_id)
+        run_id = await run_baseline(client, conn, org_id=org_id, progress_callback=cb)
     finally:
         conn.close()
     return {"sweep_run_id": run_id}
@@ -97,8 +104,9 @@ async def start_baseline(org_id: str) -> dict:
 async def start_sweep(org_id: str) -> dict:
     conn = get_connection()
     client = _get_meraki_client()
+    cb = await _broadcast_callback_for_org(org_id)
     try:
-        run_id = await run_anti_drift_sweep(client, conn, org_id=org_id)
+        run_id = await run_anti_drift_sweep(client, conn, org_id=org_id, progress_callback=cb)
     finally:
         conn.close()
     return {"sweep_run_id": run_id}
