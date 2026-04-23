@@ -75,6 +75,16 @@ export function fetchOrgDiff(
   return _fetch<OrgDiffResponse>(`/diff/org?${params}`)
 }
 
+export function fetchOrgDiffRaw(
+  orgId: string,
+  fromTs: string,
+  toTs?: string,
+): Promise<Response> {
+  const params = new URLSearchParams({ org_id: orgId, from_ts: fromTs })
+  if (toTs) params.set('to_ts', toTs)
+  return fetch(`${BASE}/diff/org?${params}`)
+}
+
 export function fetchEntityTimeline(
   orgId: string,
   entityType: EntityType,

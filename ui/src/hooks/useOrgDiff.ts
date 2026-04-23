@@ -1,5 +1,6 @@
 // ui/src/hooks/useOrgDiff.ts
 import { useState, useCallback } from 'react'
+import { fetchOrgDiffRaw } from '../api/config'
 import type { OrgDiffResponse } from '../types/config'
 
 interface OrgDiffState {
@@ -29,10 +30,8 @@ export function useOrgDiff() {
     }, 1000)
 
     try {
-      // We can't read response headers via the simple _fetch helper, so we call fetch directly
-      const params = new URLSearchParams({ org_id: orgId, from_ts: fromTs })
-      if (toTs) params.set('to_ts', toTs)
-      const resp = await fetch(`/api/config/diff/org?${params}`)
+      // Use fetchOrgDiffRaw to avoid URL duplication; we need raw Response for headers
+      const resp = await fetchOrgDiffRaw(orgId, fromTs, toTs)
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
       const estimated = parseInt(resp.headers.get('X-Estimated-Seconds') ?? '0', 10) || null
       setState(s => ({ ...s, estimatedSeconds: estimated }))
