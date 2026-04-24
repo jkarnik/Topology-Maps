@@ -1,5 +1,6 @@
 """Phase 2: Push all 149 devices (11 firewalls + 21 switches + 117 APs) + 10 networks to NR."""
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -7,8 +8,13 @@ import httpx
 
 from data_source import load_snapshot
 
-PROJECT_ROOT = Path(__file__).parent.parent
-ENV_FILE = PROJECT_ROOT / ".env"
+_ENV_FILE = Path(__file__).parent.parent / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 NR_EVENT_API_US = "https://insights-collector.newrelic.com/v1/accounts/{account_id}/events"
 
@@ -25,17 +31,6 @@ EVENTTYPE_BY_TYPE = {
     "core_switch": "KSwitch",
     "access_point": "KAccessPoint",
 }
-
-
-def load_env(path: Path) -> dict[str, str]:
-    env = {}
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        k, v = line.split("=", 1)
-        env[k.strip()] = v.strip()
-    return env
 
 
 def build_device_event(device: dict, networks_by_id: dict) -> dict:
@@ -88,9 +83,8 @@ def post_events(url, headers, events):
 
 
 def main() -> int:
-    env = load_env(ENV_FILE)
-    license_key = env["NR_LICENSE_KEY"]
-    account_id = env["NR_ACCOUNT_ID"]
+    license_key = os.environ["NR_LICENSE_KEY"]
+    account_id = os.environ["NR_ACCOUNT_ID"]
 
     snapshot = load_snapshot()
     networks = snapshot["networks"]

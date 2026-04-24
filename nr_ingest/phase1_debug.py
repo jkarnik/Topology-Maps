@@ -1,31 +1,25 @@
 """Phase 1 debug: push test events with different shapes to verify which land in NRDB."""
 import json
+import os
 import sys
 from pathlib import Path
 
 import httpx
 
-PROJECT_ROOT = Path(__file__).parent.parent
-ENV_FILE = PROJECT_ROOT / ".env"
-
 NR_EVENT_API_US = "https://insights-collector.newrelic.com/v1/accounts/{account_id}/events"
 
-
-def load_env(path: Path) -> dict[str, str]:
-    env = {}
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        k, v = line.split("=", 1)
-        env[k.strip()] = v.strip()
-    return env
+_ENV_FILE = Path(__file__).parent.parent / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 
 def main() -> int:
-    env = load_env(ENV_FILE)
-    license_key = env["NR_LICENSE_KEY"]
-    account_id = env["NR_ACCOUNT_ID"]
+    license_key = os.environ["NR_LICENSE_KEY"]
+    account_id = os.environ["NR_ACCOUNT_ID"]
 
     # Use a clearly-unique device name so we can tell our entity apart from any pre-existing one.
     unique_name = "TOPOLOGY-MAPS-TEST-SWITCH-001"

@@ -1,26 +1,23 @@
 """Phase 1: Push ONE switch to New Relic as an EXT-SWITCH entity and verify."""
 import json
+import os
 import sys
 from pathlib import Path
 
 import httpx
 
 PROJECT_ROOT = Path(__file__).parent.parent
-ENV_FILE = PROJECT_ROOT / ".env"
 SEED_FILE = PROJECT_ROOT / "ui" / "public" / "meraki-topology-seed.json"
 
 NR_EVENT_API_US = "https://insights-collector.newrelic.com/v1/accounts/{account_id}/events"
 
-
-def load_env(path: Path) -> dict[str, str]:
-    env = {}
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        k, v = line.split("=", 1)
-        env[k.strip()] = v.strip()
-    return env
+_ENV_FILE = PROJECT_ROOT / ".env"
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 
 def build_switch_event(switch: dict) -> dict:
@@ -41,11 +38,10 @@ def build_switch_event(switch: dict) -> dict:
 
 
 def main() -> int:
-    env = load_env(ENV_FILE)
-    license_key = env.get("NR_LICENSE_KEY")
-    account_id = env.get("NR_ACCOUNT_ID")
+    license_key = os.environ.get("NR_LICENSE_KEY")
+    account_id = os.environ.get("NR_ACCOUNT_ID")
     if not license_key or not account_id:
-        print("ERROR: NR_LICENSE_KEY or NR_ACCOUNT_ID missing in .env")
+        print("ERROR: NR_LICENSE_KEY or NR_ACCOUNT_ID not set in environment")
         return 1
 
     seed = json.loads(SEED_FILE.read_text())
