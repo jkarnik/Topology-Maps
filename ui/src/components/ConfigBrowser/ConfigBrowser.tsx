@@ -170,83 +170,108 @@ export function ConfigBrowser() {
           </div>
         )}
 
-        {/* History tab: compare controls + diff results (full width) */}
+        {/* History tab: tree (left) + compare controls + diff results (right) */}
         {activeTab === 'history' && (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap',
-              padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)',
-              background: 'var(--bg-secondary)', fontFamily: "'JetBrains Mono', monospace",
-              flexShrink: 0,
-            }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>Compare:</span>
-              {(['from', 'to'] as const).map(which => (
-                <select
-                  key={which}
-                  value={which === 'from' ? fromTs : toTs}
-                  onChange={e => which === 'from' ? setFromTs(e.target.value) : setToTs(e.target.value)}
-                  style={{
-                    background: 'var(--bg-tertiary)', color: 'var(--text-primary)',
-                    border: '1px solid var(--border-subtle)', borderRadius: '5px',
-                    padding: '4px 8px', fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", cursor: 'pointer',
-                  }}
-                >
-                  {which === 'from'
-                    ? <option value="">— select from —</option>
-                    : <option value="">Now (latest)</option>
-                  }
-                  {baselineTimestamps.map(ts => (
-                    <option key={ts} value={ts}>{new Date(ts).toLocaleString()}</option>
-                  ))}
-                  {which === 'from' && <option value="last7">Last 7 days</option>}
-                  {which === 'from' && <option value="last30">Last 30 days</option>}
-                </select>
-              ))}
-              <button
-                disabled={!fromTs || orgDiff.loading}
-                onClick={() => {
-                  if (!selectedOrgId) return
-                  const resolved = fromTs === 'last7'
-                    ? new Date(Date.now() - 7 * 86400_000).toISOString()
-                    : fromTs === 'last30'
-                    ? new Date(Date.now() - 30 * 86400_000).toISOString()
-                    : fromTs
-                  orgDiff.compare(selectedOrgId, resolved, toTs || undefined)
-                }}
-                style={{
-                  fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', fontWeight: 600,
-                  letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 14px',
-                  borderRadius: '5px', border: '1px solid var(--border-subtle)', cursor: (!fromTs || orgDiff.loading) ? 'not-allowed' : 'pointer',
-                  background: 'var(--bg-tertiary)', color: (!fromTs || orgDiff.loading) ? 'var(--text-muted)' : 'var(--text-primary)',
-                  opacity: (!fromTs || orgDiff.loading) ? 0.5 : 1,
-                }}
-              >
-                {orgDiff.loading ? 'Loading…' : 'Compare'}
-              </button>
-              {orgDiff.result && !orgDiff.loading && (
-                <button
-                  onClick={() => orgDiff.clear()}
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: '11px',
-                    padding: '5px 10px', borderRadius: '5px', border: '1px solid var(--border-subtle)',
-                    cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)',
-                  }}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              <OrgDiffPanel
-                result={orgDiff.result}
-                loading={orgDiff.loading}
-                error={orgDiff.error}
-                estimatedSeconds={orgDiff.estimatedSeconds}
-                elapsed={orgDiff.elapsed}
+          <div className="flex h-full">
+            {/* Tree sidebar */}
+            <div style={{ width: sidebarWidth, flexShrink: 0, borderRight: '1px solid var(--border-subtle)', overflowY: 'auto' }}>
+              <ConfigTree
+                orgId={selectedOrgId ?? ''}
+                orgName={selectedOrg?.name ?? 'Org'}
+                tree={tree}
+                loading={treeLoading}
                 selected={treeSelected}
-                networkNameMap={networkNameMap}
-                deviceNetworkMap={deviceNetworkMap}
+                onSelect={sel => setTreeSelected(sel)}
+                showAll={true}
+                onShowAll={() => {}}
+                diffResult={orgDiff.result}
               />
+            </div>
+            {/* Resize handle */}
+            <div
+              style={{ width: '4px', cursor: 'col-resize', flexShrink: 0, background: 'transparent' }}
+              onMouseDown={handleResizeStart}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-amber-glow)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            />
+            {/* Diff panel */}
+            <div className="flex-1 flex flex-col min-w-0">
+              {/* Compare controls */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap',
+                padding: '10px 16px', borderBottom: '1px solid var(--border-subtle)',
+                background: 'var(--bg-secondary)', fontFamily: "'JetBrains Mono', monospace",
+                flexShrink: 0,
+              }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>Compare:</span>
+                {(['from', 'to'] as const).map(which => (
+                  <select
+                    key={which}
+                    value={which === 'from' ? fromTs : toTs}
+                    onChange={e => which === 'from' ? setFromTs(e.target.value) : setToTs(e.target.value)}
+                    style={{
+                      background: 'var(--bg-tertiary)', color: 'var(--text-primary)',
+                      border: '1px solid var(--border-subtle)', borderRadius: '5px',
+                      padding: '4px 8px', fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", cursor: 'pointer',
+                    }}
+                  >
+                    {which === 'from'
+                      ? <option value="">— select from —</option>
+                      : <option value="">Now (latest)</option>
+                    }
+                    {baselineTimestamps.map(ts => (
+                      <option key={ts} value={ts}>{new Date(ts).toLocaleString()}</option>
+                    ))}
+                    {which === 'from' && <option value="last7">Last 7 days</option>}
+                    {which === 'from' && <option value="last30">Last 30 days</option>}
+                  </select>
+                ))}
+                <button
+                  disabled={!fromTs || orgDiff.loading}
+                  onClick={() => {
+                    if (!selectedOrgId) return
+                    const resolved = fromTs === 'last7'
+                      ? new Date(Date.now() - 7 * 86400_000).toISOString()
+                      : fromTs === 'last30'
+                      ? new Date(Date.now() - 30 * 86400_000).toISOString()
+                      : fromTs
+                    orgDiff.compare(selectedOrgId, resolved, toTs || undefined)
+                  }}
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', fontWeight: 600,
+                    letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 14px',
+                    borderRadius: '5px', border: '1px solid var(--border-subtle)', cursor: (!fromTs || orgDiff.loading) ? 'not-allowed' : 'pointer',
+                    background: 'var(--bg-tertiary)', color: (!fromTs || orgDiff.loading) ? 'var(--text-muted)' : 'var(--text-primary)',
+                    opacity: (!fromTs || orgDiff.loading) ? 0.5 : 1,
+                  }}
+                >
+                  {orgDiff.loading ? 'Loading…' : 'Compare'}
+                </button>
+                {orgDiff.result && !orgDiff.loading && (
+                  <button
+                    onClick={() => orgDiff.clear()}
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: '11px',
+                      padding: '5px 10px', borderRadius: '5px', border: '1px solid var(--border-subtle)',
+                      cursor: 'pointer', background: 'transparent', color: 'var(--text-muted)',
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                <OrgDiffPanel
+                  result={orgDiff.result}
+                  loading={orgDiff.loading}
+                  error={orgDiff.error}
+                  estimatedSeconds={orgDiff.estimatedSeconds}
+                  elapsed={orgDiff.elapsed}
+                  selected={treeSelected}
+                  networkNameMap={networkNameMap}
+                  deviceNetworkMap={deviceNetworkMap}
+                />
+              </div>
             </div>
           </div>
         )}

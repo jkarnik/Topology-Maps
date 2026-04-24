@@ -9,35 +9,42 @@ class FieldChanged:
     key: str
     before: object
     after: object
+    type: str = "FieldChanged"
 
 @dataclass
 class FieldAdded:
     key: str
     value: object
+    type: str = "FieldAdded"
 
 @dataclass
 class FieldRemoved:
     key: str
     value: object
+    type: str = "FieldRemoved"
 
 @dataclass
 class SecretChanged:
     key: str
+    type: str = "SecretChanged"
 
 @dataclass
 class RowAdded:
     identity: object
     row: dict
+    type: str = "RowAdded"
 
 @dataclass
 class RowRemoved:
     identity: object
     row: dict
+    type: str = "RowRemoved"
 
 @dataclass
 class RowChanged:
     identity: object
     field_changes: list
+    type: str = "RowChanged"
 
 DiffChange = Union[FieldChanged, FieldAdded, FieldRemoved, SecretChanged, RowAdded, RowRemoved, RowChanged]
 
@@ -136,7 +143,13 @@ def _array_diff(area_name: str, rows_a: list[dict], rows_b: list[dict]) -> tuple
                 unchanged += 1
     return changes, unchanged
 
-def compute_diff(blob_a: dict, blob_b: dict) -> DiffResult:
+def compute_diff(blob_a: dict | list, blob_b: dict | list) -> DiffResult:
+    # If the blob itself is a list (top-level array config area), wrap it
+    if isinstance(blob_a, list) or isinstance(blob_b, list):
+        rows_a = blob_a if isinstance(blob_a, list) else []
+        rows_b = blob_b if isinstance(blob_b, list) else []
+        changes, unchanged = _array_diff("items", rows_a, rows_b)
+        return DiffResult(shape="array", changes=changes, unchanged_count=unchanged)
     # Detect shape: if any top-level value is a list, use array mode
     is_array = any(isinstance(v, list) for v in blob_a.values()) or \
                any(isinstance(v, list) for v in blob_b.values())

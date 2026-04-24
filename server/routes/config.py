@@ -31,7 +31,10 @@ router = APIRouter(prefix="/api/config", tags=["config"])
 
 def _row_for_org(conn, org_id: str, name: Optional[str]) -> dict:
     obs_count = conn.execute(
-        "SELECT COUNT(*) AS n FROM config_observations WHERE org_id=?", (org_id,)
+        """SELECT COUNT(*) AS n FROM (
+               SELECT DISTINCT entity_type, entity_id, config_area, sub_key
+               FROM config_observations WHERE org_id=?
+           )""", (org_id,)
     ).fetchone()["n"]
     last_baseline = conn.execute(
         """SELECT id, status, completed_at FROM config_sweep_runs
@@ -144,13 +147,14 @@ async def _run_baseline_bg(org_id: str, run_id: int) -> None:
 
 @router.post("/orgs/{org_id}/baseline")
 async def start_baseline(org_id: str) -> dict:
-    """Queue a baseline sweep. Returns immediately with sweep_run_id; work runs in background."""
+    """Queue a baseline sweep. Returns immediately with sweep_run_id; work runs in background.
+
+    If a sweep is already running (e.g. interrupted by a server restart), resumes it.
+    """
     conn = get_connection()
     try:
         active = get_active_sweep_run(conn, org_id=org_id, kind="baseline")
-        if active is not None:
-            return {"sweep_run_id": active["id"]}
-        run_id = create_sweep_run(conn, org_id=org_id, kind="baseline", total_calls=None)
+        run_id = active["id"] if active else create_sweep_run(conn, org_id=org_id, kind="baseline", total_calls=None)
     finally:
         conn.close()
 

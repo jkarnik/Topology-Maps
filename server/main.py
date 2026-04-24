@@ -144,6 +144,24 @@ async def _poller_for_org(org_id: str) -> None:
     await _run_poller(client, conn, org_id=org_id, interval=interval, timespan=timespan, progress_callback=cb)
 
 
+async def _resume_sweep(org_id: str, run_id: int) -> None:
+    from server.meraki_client import MerakiClient as _MC
+    from server.database import get_connection as _get_conn
+    from server.config_collector.scanner import run_baseline as _run_baseline
+    import logging as _logging
+    logger = _logging.getLogger(__name__)
+    client = _MC()
+    conn = _get_conn()
+    async def cb(event: dict) -> None:
+        await _cfg_ws_hub.broadcast(org_id, event)
+    try:
+        await _run_baseline(client, conn, org_id=org_id, progress_callback=cb, resume_run_id=run_id)
+    except Exception:
+        logger.exception("Sweep resume failed for org %s run %s", org_id, run_id)
+    finally:
+        conn.close()
+
+
 @app.on_event("startup")
 async def _start_config_pollers():
     if _os.environ.get("CONFIG_ENABLE_AUTO_POLLER", "true").lower() != "true":
@@ -152,6 +170,12 @@ async def _start_config_pollers():
         return
     from server.database import get_connection as _get_conn
     conn = _get_conn()
+    # Resume any sweeps interrupted by a server restart
+    stuck = conn.execute(
+        "SELECT id, org_id FROM config_sweep_runs WHERE status='running'"
+    ).fetchall()
+    for r in stuck:
+        _asyncio.create_task(_resume_sweep(r["org_id"], r["id"]))
     rows = conn.execute("SELECT DISTINCT org_id FROM config_sweep_runs").fetchall()
     conn.close()
     for r in rows:
