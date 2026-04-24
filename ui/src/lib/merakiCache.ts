@@ -12,11 +12,11 @@ import type { MerakiNetwork, MerakiDeviceDetail } from '../types/meraki';
 
 const STORAGE_KEY = 'meraki-topology-cache';
 /**
- * Cache schema version.  Bumped to 2 when per-device detail (clients +
- * switch ports) was added to the per-network payload.  Mismatched
+ * Cache schema version.  Bumped to 3 when orgId was added as a first-class
+ * field (orgs table in SQLite, orgId in snapshot payload).  Mismatched
  * versions are discarded on load so stale payloads can't crash the UI.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export interface CachedNetwork {
   l2: L2Topology;

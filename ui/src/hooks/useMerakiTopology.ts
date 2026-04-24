@@ -195,6 +195,21 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     });
   }, [orgId, orgName, networks, selectedNetwork, lastUpdated]);
 
+  // If we booted from cache but orgId wasn't persisted yet, fetch it once.
+  useEffect(() => {
+    if (orgId || networks.length === 0) return;
+    fetch('/api/meraki/status', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then((status: { organizations?: { id: string; name: string }[] } | null) => {
+        if (status?.organizations?.[0]?.id) {
+          setOrgId(status.organizations[0].id);
+          if (!orgName) setOrgName(status.organizations[0].name ?? null);
+        }
+      })
+      .catch(() => { /* non-critical */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // -------------------------------------------------------------------------
   // fetchNetworks — calls /api/meraki/status then /api/meraki/networks
   // -------------------------------------------------------------------------
@@ -594,6 +609,19 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       setOrgId(data.orgId ?? null);
       setOrgName(data.orgName ?? null);
       setIsConfigured(true);
+      // If orgId wasn't persisted yet (e.g. snapshot saved before this feature),
+      // fetch it from the API so subsequent saves include it.
+      if (!data.orgId) {
+        fetch('/api/meraki/status', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null)
+          .then((status: { organizations?: { id: string; name: string }[] } | null) => {
+            if (status?.organizations?.[0]?.id) {
+              setOrgId(status.organizations[0].id);
+              if (!data.orgName) setOrgName(status.organizations[0].name ?? null);
+            }
+          })
+          .catch(() => { /* non-critical */ });
+      }
 
       const nextSelected: string | null = data.selectedNetwork ?? null;
       setSelectedNetwork(nextSelected);
