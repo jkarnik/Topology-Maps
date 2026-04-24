@@ -90,6 +90,7 @@ export interface UseMerakiTopologyReturn {
 
   // Meraki-specific: config
   isConfigured: boolean;
+  orgId: string | null;
   orgName: string | null;
 
   // Errors / loading
@@ -154,6 +155,9 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   // If we successfully loaded a cache, we know the key was valid at some
   // point — treat it as configured until /status says otherwise.
   const [isConfigured, setIsConfigured] = useState<boolean>(!!bootCache);
+  const [orgId, setOrgId] = useState<string | null>(
+    bootCache?.orgId ?? null,
+  );
   const [orgName, setOrgName] = useState<string | null>(
     bootCache?.orgName ?? null,
   );
@@ -182,13 +186,14 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   useEffect(() => {
     if (networks.length === 0 && cacheRef.current.size === 0) return;
     saveCache({
+      orgId,
       orgName,
       networks,
       selectedNetwork,
       topology: Object.fromEntries(cacheRef.current),
       lastUpdated: lastUpdated ? lastUpdated.toISOString() : null,
     });
-  }, [orgName, networks, selectedNetwork, lastUpdated]);
+  }, [orgId, orgName, networks, selectedNetwork, lastUpdated]);
 
   // -------------------------------------------------------------------------
   // fetchNetworks — calls /api/meraki/status then /api/meraki/networks
@@ -214,6 +219,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       setIsConfigured(statusData.configured ?? true);
       // The /status endpoint returns organizations array; pick first name
       if (statusData.organizations && statusData.organizations.length > 0) {
+        setOrgId(statusData.organizations[0].id ?? null);
         setOrgName(statusData.organizations[0].name ?? null);
       } else if (statusData.org_name) {
         setOrgName(statusData.org_name);
@@ -585,6 +591,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       cacheRef.current = new Map(entries);
 
       setNetworks(data.networks ?? []);
+      setOrgId(data.orgId ?? null);
       setOrgName(data.orgName ?? null);
       setIsConfigured(true);
 
@@ -614,6 +621,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
     }
     const payload = {
       version: SCHEMA_VERSION,
+      orgId,
       orgName,
       networks,
       selectedNetwork,
@@ -646,7 +654,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       console.error('[saveSnapshot] fetch failed:', err);
       return false;
     }
-  }, [networks, orgName, selectedNetwork, lastUpdated]);
+  }, [networks, orgId, orgName, selectedNetwork, lastUpdated]);
 
   // -------------------------------------------------------------------------
   // getDeviceDetail — cache-first device detail (clients + switch ports)
@@ -748,6 +756,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
 
     // Config
     isConfigured,
+    orgId,
     orgName,
 
     // General

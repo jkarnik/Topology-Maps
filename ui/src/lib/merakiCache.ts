@@ -27,6 +27,7 @@ export interface CachedNetwork {
 
 export interface MerakiCacheSnapshot {
   version: number;
+  orgId: string | null;
   orgName: string | null;
   networks: MerakiNetwork[];
   selectedNetwork: string | null;
