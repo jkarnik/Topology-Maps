@@ -33,6 +33,18 @@ EVENTTYPE_BY_TYPE = {
 }
 
 
+def build_org_event(org_id: str, org_name: str) -> dict:
+    return {
+        "eventType": "MerakiOrganization",
+        "instrumentation.provider": "kentik",
+        "instrumentation.name": "meraki.organization",
+        "org_id": org_id,
+        "org_name": org_name,
+        "tags.environment": "experimental",
+        "tags.source": "topology-maps-app",
+    }
+
+
 def build_device_event(device: dict, networks_by_id: dict) -> dict:
     net = networks_by_id.get(device.get("network_id") or "", {})
     return {
@@ -87,6 +99,17 @@ def main() -> int:
     account_id = os.environ["NR_ACCOUNT_ID"]
 
     snapshot = load_snapshot()
+    org_id: str = snapshot.get("orgId") or ""
+    org_name: str = snapshot.get("orgName") or ""
+
+    if not org_id:
+        print("WARNING: orgId not in snapshot — org entity will be skipped.")
+        print("  Run a topology refresh and save snapshot first to populate it.")
+        org_events: list[dict] = []
+    else:
+        org_events = [build_org_event(org_id, org_name)]
+        print(f"Org: {org_name} (id={org_id})")
+
     networks = snapshot["networks"]
     networks_by_id = {n["id"]: n for n in networks}
     topology = snapshot["topology"]
@@ -106,7 +129,7 @@ def main() -> int:
     for t, c in sorted(counts_by_type.items()):
         print(f"  {t}: {c}")
     print(f"Networks (sites): {len(site_events)}")
-    print(f"Total events to send: {len(device_events) + len(site_events)}")
+    print(f"Total events to send: {len(org_events) + len(device_events) + len(site_events)}")
 
     # Check device name uniqueness
     names = [d["name"] for d in devices]
@@ -118,7 +141,7 @@ def main() -> int:
     url = NR_EVENT_API_US.format(account_id=account_id)
     headers = {"Api-Key": license_key, "Content-Type": "application/json"}
 
-    all_events = device_events + site_events
+    all_events = org_events + device_events + site_events
     total_sent = 0
     for batch_num, batch in enumerate(chunked(all_events, 500), start=1):
         print(f"\nBatch {batch_num}: posting {len(batch)} events...")
@@ -131,8 +154,8 @@ def main() -> int:
 
     print(f"\nAll {total_sent} events accepted by NR.")
     print("\nVerification steps (wait 2-5 min for synthesis):")
-    print(f"  1. NRQL: FROM KSwitch, KFirewall, KAccessPoint, KNetwork SELECT count(*) FACET eventType SINCE 10 minutes ago")
-    print(f"     Expected: 11 firewalls, 21 switches, 117 APs, 10 networks")
+    print(f"  1. NRQL: FROM KSwitch, KFirewall, KAccessPoint, KNetwork, MerakiOrganization SELECT count(*) FACET eventType SINCE 10 minutes ago")
+    print(f"     Expected: 1 org, 11 firewalls, 21 switches, 117 APs, 10 networks")
     print(f"  2. Entity Explorer: search 'topology-maps-app' or entity types Firewall/Switch/Access Point/Site")
     print(f"  3. NRQL (count by type): FROM Entity SELECT uniqueCount(guid) WHERE `tags.source` = 'topology-maps-app' FACET entityType SINCE 10 minutes ago")
     return 0
