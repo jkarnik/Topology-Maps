@@ -315,7 +315,8 @@ def get_observations_in_window(
     sql = """
     WITH ranked AS (
         SELECT
-            entity_type, entity_id, config_area, sub_key, hash, observed_at, name_hint,
+            entity_type, entity_id, config_area, sub_key, hash, observed_at,
+            change_event_id, name_hint,
             ROW_NUMBER() OVER (
                 PARTITION BY entity_type, entity_id, config_area, sub_key
                 ORDER BY CASE WHEN observed_at <= :from_ts THEN 1 ELSE 2 END,
@@ -335,7 +336,8 @@ def get_observations_in_window(
         WHERE rn_from = 1 AND observed_at <= :from_ts
     ),
     to_snap AS (
-        SELECT entity_type, entity_id, config_area, sub_key, hash AS to_hash, observed_at AS to_observed_at, name_hint
+        SELECT entity_type, entity_id, config_area, sub_key, hash AS to_hash,
+               observed_at AS to_observed_at, change_event_id, name_hint
         FROM ranked
         WHERE rn_to = 1 AND observed_at <= :to_ts
     )
@@ -346,7 +348,7 @@ def get_observations_in_window(
         COALESCE(t.sub_key,     f.sub_key)     AS sub_key,
         f.from_hash,
         t.to_hash,
-        t.to_observed_at,
+        COALESCE(ce.ts, t.to_observed_at)      AS to_observed_at,
         COALESCE(t.name_hint, f.name_hint, '') AS name_hint
     FROM to_snap t
     LEFT JOIN from_snap f ON (
@@ -355,6 +357,7 @@ def get_observations_in_window(
         AND t.config_area = f.config_area
         AND t.sub_key IS f.sub_key
     )
+    LEFT JOIN config_change_events ce ON ce.id = t.change_event_id
     WHERE (f.from_hash IS NULL OR f.from_hash != t.to_hash)
     ORDER BY t.entity_type, t.entity_id, t.config_area, t.sub_key
     """

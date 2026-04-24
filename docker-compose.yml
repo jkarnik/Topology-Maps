@@ -46,7 +46,7 @@ services:
       context: ./ui
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       server:
         condition: service_healthy
