@@ -51,10 +51,10 @@ def _connect() -> sqlite3.Connection:
 def init_db() -> None:
     """Open the connection and ensure all tables exist."""
     global _connection
-    if _connection is not None:
-        return
-    _connection = _connect()
     with _write_lock:
+        if _connection is not None:
+            return
+        _connection = _connect()
         _connection.executescript(
             """
             -- Scalar metadata (orgName, selectedNetwork, lastUpdated, schema_version, …).
@@ -63,11 +63,18 @@ def init_db() -> None:
                 value TEXT
             );
 
+            -- Org registry: one row per Meraki organisation.
+            CREATE TABLE IF NOT EXISTS orgs (
+                id   TEXT PRIMARY KEY,
+                name TEXT NOT NULL
+            );
+
             -- Flat Meraki networks list used to populate the dropdown.
             CREATE TABLE IF NOT EXISTS networks (
                 id            TEXT PRIMARY KEY,
                 name          TEXT NOT NULL,
-                product_types TEXT NOT NULL  -- JSON array
+                product_types TEXT NOT NULL,  -- JSON array
+                org_id        TEXT REFERENCES orgs(id)
             );
 
             -- Per-network topology cache.  Key is a Meraki network ID or the
@@ -79,6 +86,7 @@ def init_db() -> None:
             );
             """
         )
+        _migrate(_connection)
     logger.info("SQLite DB initialised at %s", DB_PATH)
 
 
@@ -87,6 +95,25 @@ def close_db() -> None:
     if _connection is not None:
         _connection.close()
         _connection = None
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Apply incremental schema migrations based on schema_version in meta."""
+    version_str = conn.execute(
+        "SELECT value FROM meta WHERE key = 'schema_version'"
+    ).fetchone()
+    version = int(version_str[0]) if version_str and version_str[0] else 0
+
+    if version < 3:
+        conn.execute("BEGIN")
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(networks)").fetchall()}
+        if "org_id" not in cols:
+            conn.execute("ALTER TABLE networks ADD COLUMN org_id TEXT REFERENCES orgs(id)")
+        conn.execute(
+            "INSERT INTO meta(key, value) VALUES ('schema_version', '3') "
+            "ON CONFLICT(key) DO UPDATE SET value = '3'"
+        )
+        conn.execute("COMMIT")
 
 
 def _conn() -> sqlite3.Connection:
@@ -149,7 +176,7 @@ def save_snapshot(snapshot: dict[str, Any]) -> int:
 
             # Scalar meta
             for key, value in {
-                "schema_version": str(version) if version is not None else None,
+                "schema_version": "3",
                 "orgName": org_name,
                 "selectedNetwork": selected_network,
                 "lastUpdated": last_updated,
