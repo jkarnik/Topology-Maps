@@ -153,6 +153,7 @@ def save_snapshot(snapshot: dict[str, Any]) -> int:
     Shape mirrors the old `meraki-topology-seed.json` schema v2:
         {
             "version": 2,
+            "orgId": str | None,       # Optional org ID
             "orgName": str | None,
             "networks": [{id, name, productTypes}, ...],
             "selectedNetwork": str | None,
@@ -163,6 +164,7 @@ def save_snapshot(snapshot: dict[str, Any]) -> int:
     Returns the number of topology cache rows written.
     """
     version = snapshot.get("version")
+    org_id = snapshot.get("orgId")
     org_name = snapshot.get("orgName")
     networks: list[dict[str, Any]] = snapshot.get("networks") or []
     selected_network = snapshot.get("selectedNetwork")
@@ -173,6 +175,14 @@ def save_snapshot(snapshot: dict[str, Any]) -> int:
         conn = _conn()
         try:
             conn.execute("BEGIN")
+
+            # Upsert org if provided
+            if org_id:
+                conn.execute(
+                    "INSERT INTO orgs(id, name) VALUES (?, ?) "
+                    "ON CONFLICT(id) DO UPDATE SET name = excluded.name",
+                    (org_id, org_name or ""),
+                )
 
             # Scalar meta
             for key, value in {
@@ -190,12 +200,13 @@ def save_snapshot(snapshot: dict[str, Any]) -> int:
             # Networks — full replace
             conn.execute("DELETE FROM networks")
             conn.executemany(
-                "INSERT INTO networks(id, name, product_types) VALUES (?, ?, ?)",
+                "INSERT INTO networks(id, name, product_types, org_id) VALUES (?, ?, ?, ?)",
                 [
                     (
                         n.get("id"),
                         n.get("name"),
                         json.dumps(n.get("productTypes") or []),
+                        org_id,
                     )
                     for n in networks
                     if n.get("id")
@@ -226,6 +237,9 @@ def load_snapshot() -> Optional[dict[str, Any]]:
         return None
     meta = {row["key"]: row["value"] for row in meta_rows}
 
+    org_row = conn.execute("SELECT id FROM orgs LIMIT 1").fetchone()
+    org_id = org_row["id"] if org_row else None
+
     network_rows = conn.execute(
         "SELECT id, name, product_types FROM networks"
     ).fetchall()
@@ -249,6 +263,7 @@ def load_snapshot() -> Optional[dict[str, Any]]:
 
     return {
         "version": int(meta["schema_version"]) if meta.get("schema_version") else None,
+        "orgId": org_id,
         "orgName": meta.get("orgName"),
         "networks": networks,
         "selectedNetwork": meta.get("selectedNetwork"),
