@@ -175,10 +175,12 @@ def parse_since(since_str: Optional[str]) -> Optional[str]:
     """Convert a duration string like '2h' or '30m' to an ISO UTC timestamp."""
     if since_str is None:
         return None
-    m = re.fullmatch(r"(\d+)([hm])", since_str.strip())
+    m = re.fullmatch(r"(\d+)([hm])", since_str.strip(), re.IGNORECASE)
     if not m:
         raise ValueError(f"Invalid --since format: {since_str!r}. Use e.g. '2h' or '30m'.")
-    value, unit = int(m.group(1)), m.group(2)
+    value, unit = int(m.group(1)), m.group(2).lower()
+    if value == 0:
+        raise ValueError(f"--since value must be > 0, got: {since_str!r}")
     delta = timedelta(hours=value) if unit == "h" else timedelta(minutes=value)
     cutoff = datetime.now(timezone.utc) - delta
     return cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")

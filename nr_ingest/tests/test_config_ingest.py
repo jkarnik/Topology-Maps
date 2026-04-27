@@ -201,3 +201,16 @@ def test_parse_since_minutes():
 
 def test_parse_since_none():
     assert parse_since(None) is None
+
+
+def test_parse_since_uppercase():
+    ts = parse_since("2H")
+    now = datetime.now(timezone.utc)
+    delta = now - datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    assert 1.9 * 3600 < delta.total_seconds() < 2.1 * 3600
+
+
+def test_parse_since_zero_raises():
+    import pytest
+    with pytest.raises(ValueError, match="must be > 0"):
+        parse_since("0h")
