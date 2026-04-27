@@ -53,6 +53,8 @@ def test_build_snapshot_events_basic(test_db):
     assert ev["org_id"] == "org1"
     assert ev["tags.source"] == "topology-maps-app"
     assert ev["sweep_run_id"] == 1
+    assert ev["sub_key"] == ""
+    assert ev["network_id"] == ""
 
 
 def test_build_snapshot_events_dedupes_to_latest(test_db):
