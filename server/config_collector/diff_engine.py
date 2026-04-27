@@ -150,13 +150,18 @@ def compute_diff(blob_a: dict | list, blob_b: dict | list) -> DiffResult:
         rows_b = blob_b if isinstance(blob_b, list) else []
         changes, unchanged = _array_diff("items", rows_a, rows_b)
         return DiffResult(shape="array", changes=changes, unchanged_count=unchanged)
-    # Detect shape: if any top-level value is a list, use array mode
-    is_array = any(isinstance(v, list) for v in blob_a.values()) or \
-               any(isinstance(v, list) for v in blob_b.values())
+    # Detect shape: only use array mode when a top-level value is a non-empty list of
+    # dicts (a real row table). Lists of scalars (strings, numbers, booleans) are plain
+    # fields and must stay in object mode — passing them to _array_diff causes
+    # "string indices must be integers" because _object_diff receives str rows.
+    def _is_row_list(v: object) -> bool:
+        return isinstance(v, list) and bool(v) and isinstance(v[0], dict)
+
+    is_array = any(_is_row_list(v) for v in blob_a.values()) or \
+               any(_is_row_list(v) for v in blob_b.values())
     if is_array:
-        # area_name is the first list-valued key present in either blob
         _merged = {**blob_a, **blob_b}
-        area_name = next((k for k in _merged if isinstance(_merged[k], list)), next(iter(blob_b or blob_a), ""))
+        area_name = next((k for k in _merged if _is_row_list(_merged[k])), next(iter(blob_b or blob_a), ""))
         rows_a = blob_a.get(area_name, [])
         rows_b = blob_b.get(area_name, [])
         changes, unchanged = _array_diff(area_name, rows_a, rows_b)

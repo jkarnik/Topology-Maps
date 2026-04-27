@@ -116,6 +116,34 @@ def test_compare_networks_mixed_sub_keys(client, monkeypatch, tmp_path):
     assert resp.status_code == 200
 
 
+def test_compare_networks_blob_with_string_list(client, monkeypatch, tmp_path):
+    """Regression: compute_diff crashes when a blob has a top-level list of strings.
+    is_array detection must require list-of-dicts, not any list."""
+    db_path = tmp_path / "topology.db"
+    monkeypatch.setattr(database, "DB_PATH", db_path)
+    conn = database.get_connection()
+    import hashlib
+    # Blob whose top-level value is a list of strings (e.g. Meraki tags)
+    payload_a = json.dumps({"tags": ["tag1", "tag2"], "name": "net1"})
+    payload_b = json.dumps({"tags": ["tag1", "tag3"], "name": "net1"})
+    h1 = hashlib.sha256(payload_a.encode()).hexdigest()
+    h2 = hashlib.sha256(payload_b.encode()).hexdigest()
+    store.upsert_blob(conn, h1, payload_a, len(payload_a))
+    store.upsert_blob(conn, h2, payload_b, len(payload_b))
+    store.insert_observation_if_changed(conn, org_id="org1", entity_type="network",
+        entity_id="net1", config_area="network_settings", sub_key=None, hash_hex=h1,
+        source_event="baseline", change_event_id=None, sweep_run_id=None, hot_columns={})
+    store.insert_observation_if_changed(conn, org_id="org1", entity_type="network",
+        entity_id="net2", config_area="network_settings", sub_key=None, hash_hex=h2,
+        source_event="baseline", change_event_id=None, sweep_run_id=None, hot_columns={})
+    conn.close()
+
+    resp = client.get("/api/config/compare/networks?org_id=org1&network_a=net1&network_b=net2")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["areas"][0]["status"] == "differs"
+
+
 def test_template_scores(client, monkeypatch, tmp_path):
     _seed(monkeypatch, tmp_path)
     # Create template from net1
