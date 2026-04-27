@@ -51,7 +51,7 @@ def build_snapshot_events(conn: sqlite3.Connection) -> list[dict]:
             WHERE i.org_id = o.org_id AND i.entity_type = o.entity_type
               AND i.entity_id = o.entity_id AND i.config_area = o.config_area
               AND i.sub_key IS o.sub_key
-            ORDER BY i.observed_at DESC LIMIT 1
+            ORDER BY i.observed_at DESC, i.id DESC LIMIT 1
         )
         ORDER BY o.entity_type, o.entity_id, o.config_area
     """
