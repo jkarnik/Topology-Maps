@@ -1,4 +1,4 @@
-"""Phase 2: Push all 149 devices (11 firewalls + 21 switches + 117 APs) + 10 networks to NR."""
+"""Phase 2: Push all entities to NR — devices, networks, org, clients, VLANs, switch ports."""
 import json
 import os
 import sys
@@ -84,6 +84,53 @@ def build_site_event(network: dict) -> dict:
     }
 
 
+def build_client_event(endpoint: dict, networks_by_id: dict) -> dict:
+    net = networks_by_id.get(endpoint.get("network_id") or "", {})
+    return {
+        "eventType": "FlexSystemSample",
+        "displayName": endpoint["name"] or endpoint["id"],
+        "src_addr": endpoint.get("ip") or "",
+        "tags.mac": endpoint.get("mac") or "",
+        "tags.vlan": endpoint.get("vlan") or "",
+        "tags.connected_ap": endpoint.get("connected_ap") or "",
+        "tags.network_id": endpoint.get("network_id") or "",
+        "tags.network_name": net.get("name") or "",
+        "tags.environment": "experimental",
+        "tags.source": "topology-maps-app",
+    }
+
+
+def build_vlan_event(subnet: dict) -> dict:
+    return {
+        "eventType": "MerakiVlan",
+        "service_name": f"vlan-{subnet['network_id']}-{subnet['vlan']}",
+        "tags.subtype": "vlan",
+        "tags.vlan_id": subnet.get("vlan") or "",
+        "tags.vlan_name": subnet.get("name") or "",
+        "tags.cidr": subnet.get("cidr") or "",
+        "tags.gateway": subnet.get("gateway") or "",
+        "tags.network_id": subnet.get("network_id") or "",
+        "tags.environment": "experimental",
+        "tags.source": "topology-maps-app",
+    }
+
+
+def build_port_event(serial: str, port: dict, network_id: str) -> dict:
+    return {
+        "eventType": "MerakiSwitchPort",
+        "service_name": f"port-{serial}-{port['portId']}",
+        "tags.subtype": "switch_port",
+        "tags.port_id": port.get("portId") or "",
+        "tags.switch_serial": serial,
+        "tags.enabled": port.get("enabled", False),
+        "tags.status": port.get("status") or "",
+        "tags.is_uplink": port.get("isUplink", False),
+        "tags.network_id": network_id,
+        "tags.environment": "experimental",
+        "tags.source": "topology-maps-app",
+    }
+
+
 def chunked(lst, size):
     for i in range(0, len(lst), size):
         yield lst[i:i + size]
@@ -122,6 +169,23 @@ def main() -> int:
     device_events = [build_device_event(d, networks_by_id) for d in devices]
     site_events = [build_site_event(n) for n in networks]
 
+    endpoints = [n for n in nodes if n["type"] == "endpoint"]
+    client_events = [build_client_event(e, networks_by_id) for e in endpoints]
+
+    subnets = topology["__all__"]["l3"]["subnets"]
+    vlan_events = [build_vlan_event(s) for s in subnets]
+
+    port_events = []
+    for net_key, net_topo in topology.items():
+        if net_key == "__all__":
+            continue
+        for serial, dev_detail in net_topo.get("deviceDetails", {}).items():
+            net_id = next(
+                (n["network_id"] for n in devices if n["id"] == serial), ""
+            )
+            for port in dev_detail.get("switch_ports", []):
+                port_events.append(build_port_event(serial, port, net_id))
+
     counts_by_type = {}
     for d in devices:
         counts_by_type[d["type"]] = counts_by_type.get(d["type"], 0) + 1
@@ -129,7 +193,10 @@ def main() -> int:
     for t, c in sorted(counts_by_type.items()):
         print(f"  {t}: {c}")
     print(f"Networks (sites): {len(site_events)}")
-    print(f"Total events to send: {len(org_events) + len(device_events) + len(site_events)}")
+    print(f"Clients:          {len(client_events)}")
+    print(f"VLANs:            {len(vlan_events)}")
+    print(f"Switch ports:     {len(port_events)}")
+    print(f"Total events to send: {len(org_events) + len(device_events) + len(site_events) + len(client_events) + len(vlan_events) + len(port_events)}")
 
     # Check device name uniqueness
     names = [d["name"] for d in devices]
@@ -141,7 +208,7 @@ def main() -> int:
     url = NR_EVENT_API_US.format(account_id=account_id)
     headers = {"Api-Key": license_key, "Content-Type": "application/json"}
 
-    all_events = org_events + device_events + site_events
+    all_events = org_events + device_events + site_events + client_events + vlan_events + port_events
     total_sent = 0
     for batch_num, batch in enumerate(chunked(all_events, 500), start=1):
         print(f"\nBatch {batch_num}: posting {len(batch)} events...")
@@ -154,10 +221,9 @@ def main() -> int:
 
     print(f"\nAll {total_sent} events accepted by NR.")
     print("\nVerification steps (wait 2-5 min for synthesis):")
-    print(f"  1. NRQL: FROM KSwitch, KFirewall, KAccessPoint, KNetwork, MerakiOrganization SELECT count(*) FACET eventType SINCE 10 minutes ago")
-    print(f"     Expected: 1 org, 11 firewalls, 21 switches, 117 APs, 10 networks")
-    print(f"  2. Entity Explorer: search 'topology-maps-app' or entity types Firewall/Switch/Access Point/Site")
-    print(f"  3. NRQL (count by type): FROM Entity SELECT uniqueCount(guid) WHERE `tags.source` = 'topology-maps-app' FACET entityType SINCE 10 minutes ago")
+    print(f"  1. NRQL (count by type): FROM Entity SELECT uniqueCount(guid) WHERE `tags.source` = 'topology-maps-app' FACET entityType SINCE 10 minutes ago")
+    print(f"     Expected: 1 org, 11 firewalls, 21 switches, 117 APs, 10 sites, ~147 hosts, 81 VLANs, 1034 ports")
+    print(f"  2. Raw events: FROM MerakiVlan, MerakiSwitchPort, FlexSystemSample SELECT count(*) FACET eventType SINCE 10 minutes ago")
     return 0
 
 

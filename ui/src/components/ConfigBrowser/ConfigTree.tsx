@@ -119,7 +119,7 @@ export function ConfigTree({
   const orgCount = diffResult ? changeCountForOrg(diffResult) : null
 
   const allNetworks = tree.networks
-  const visibleNetworks = (diffResult && !showAll)
+  const visibleNetworks = diffResult
     ? allNetworks.filter(net =>
         diffResult.results.some(r =>
           r.entity_id === net.id ||
@@ -178,11 +178,11 @@ export function ConfigTree({
                     {net.devices.map(dev => {
                       const devSel: TreeSelection = { level: 'device', entityType: 'device', entityId: dev.serial }
                       const devCount = diffResult ? changeCountForEntity(diffResult, dev.serial) : null
-                      const dimmed = diffResult !== null && devCount === 0 && !isSelected(devSel)
+                      if (diffResult !== null && devCount === 0 && !isSelected(devSel)) return null
                       return (
                         <div
                           key={dev.serial}
-                          style={{ ...rowStyle(devSel), opacity: dimmed ? 0.4 : 1 }}
+                          style={rowStyle(devSel)}
                           onClick={() => onSelect(devSel)}
                           {...hover(devSel)}
                         >

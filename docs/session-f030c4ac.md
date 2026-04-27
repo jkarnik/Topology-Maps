@@ -1572,6 +1572,7 @@ Your intuition was spot-on — distinct entity types per device class exist. The
 
 | Our Data | NR Entity Type | Synthesis Trigger | Identifier |
 |---|---|---|---|
+| Org (1) | `MERAKI_ORGANIZATION` | `instrumentation.provider=kentik` + `instrumentation.name=meraki.organization` | `org_id` |
 | Network (10) | `EXT-SITE` | `SiteID` attribute present | `SiteID` |
 | Firewall (11) | `EXT-FIREWALL` | `provider: kentik-firewall` | `device_name` |
 | Switch (21) | `EXT-SWITCH` | `provider: kentik-switch` | `device_name` |

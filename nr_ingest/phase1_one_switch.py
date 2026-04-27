@@ -6,9 +6,9 @@ from pathlib import Path
 
 import httpx
 
-PROJECT_ROOT = Path(__file__).parent.parent
-SEED_FILE = PROJECT_ROOT / "ui" / "public" / "meraki-topology-seed.json"
+from data_source import load_snapshot
 
+PROJECT_ROOT = Path(__file__).parent.parent
 NR_EVENT_API_US = "https://insights-collector.newrelic.com/v1/accounts/{account_id}/events"
 
 _ENV_FILE = PROJECT_ROOT / ".env"
@@ -44,8 +44,8 @@ def main() -> int:
         print("ERROR: NR_LICENSE_KEY or NR_ACCOUNT_ID not set in environment")
         return 1
 
-    seed = json.loads(SEED_FILE.read_text())
-    nodes = seed["topology"]["__all__"]["l2"]["nodes"]
+    snapshot = load_snapshot()
+    nodes = snapshot["topology"]["__all__"]["l2"]["nodes"]
     switches = [n for n in nodes if n["type"] == "floor_switch"]
     if not switches:
         print("ERROR: no switches found in seed data")

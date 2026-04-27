@@ -147,7 +147,7 @@ export function ConfigBrowser() {
                 onSelect={sel => setTreeSelected(sel)}
                 showAll={true}
                 onShowAll={() => {}}
-                diffResult={orgDiff.result}
+                diffResult={null}
               />
             </div>
             <div
