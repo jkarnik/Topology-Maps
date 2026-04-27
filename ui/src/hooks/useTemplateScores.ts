@@ -12,7 +12,7 @@ export function useTemplateScores(templateId: number | null, orgId: string | nul
     setLoading(true)
     setError(null)
     getTemplateScores(templateId, orgId)
-      .then(d => { setData(d); setLoading(false) })
+      .then(d => { setData(d); setLoading(false); setError(null) })
       .catch(e => { setError(String(e)); setLoading(false) })
   }, [templateId, orgId])
 

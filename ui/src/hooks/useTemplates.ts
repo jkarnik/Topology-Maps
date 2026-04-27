@@ -11,7 +11,7 @@ export function useTemplates(orgId: string | null) {
     if (!orgId) return
     setLoading(true)
     listTemplates(orgId)
-      .then(t => { setTemplates(t); setLoading(false) })
+      .then(t => { setTemplates(t); setLoading(false); setError(null) })
       .catch(e => { setError(String(e)); setLoading(false) })
   }, [orgId])
 

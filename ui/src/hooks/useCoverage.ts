@@ -12,7 +12,7 @@ export function useCoverage(orgId: string | null) {
     setLoading(true)
     setError(null)
     getCoverage(orgId)
-      .then(d => { setData(d); setLoading(false) })
+      .then(d => { setData(d); setLoading(false); setError(null) })
       .catch(e => { setError(String(e)); setLoading(false) })
   }, [orgId])
 
