@@ -1,0 +1,6 @@
+{
+  "schemaType": "NERDPACK",
+  "id": "topology-maps-config",
+  "displayName": "Topology Maps Config",
+  "description": "Meraki config management — snapshots, drift, and change history in NR One."
+}

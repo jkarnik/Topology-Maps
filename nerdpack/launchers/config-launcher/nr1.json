@@ -1,0 +1,7 @@
+{
+  "schemaType": "LAUNCHER",
+  "id": "config-launcher",
+  "displayName": "Meraki Config",
+  "description": "Browse Meraki configuration snapshots and change history",
+  "rootNerdletId": "topology-maps-config.config-app"
+}

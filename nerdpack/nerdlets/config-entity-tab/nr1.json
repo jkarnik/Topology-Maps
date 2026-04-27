@@ -1,0 +1,13 @@
+{
+  "schemaType": "NERDLET",
+  "id": "config-entity-tab",
+  "displayName": "Config",
+  "description": "Meraki config areas, drift status, and recent changes for this entity",
+  "entities": [
+    {"domain": "EXT", "type": "MERAKI_ORGANIZATION"},
+    {"domain": "EXT", "type": "SITE"},
+    {"domain": "EXT", "type": "SWITCH"},
+    {"domain": "EXT", "type": "FIREWALL"},
+    {"domain": "EXT", "type": "ACCESS_POINT"}
+  ]
+}
