@@ -1,0 +1,12 @@
+{
+  "name": "topology-maps-config",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "nr1 nerdpack:serve",
+    "build": "nr1 nerdpack:build",
+    "deploy": "nr1 nerdpack:publish && nr1 nerdpack:deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
