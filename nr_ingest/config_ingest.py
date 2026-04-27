@@ -156,3 +156,29 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str]) -> li
             "tags.source": "topology-maps-app",
         })
     return events
+
+
+def read_marker(marker_path: Path = MARKER_FILE) -> Optional[str]:
+    """Return last successful ingest timestamp, or None if no marker exists."""
+    if marker_path.exists():
+        return marker_path.read_text().strip() or None
+    return None
+
+
+def write_marker(ts: str, marker_path: Path = MARKER_FILE) -> None:
+    """Record a successful ingest timestamp."""
+    marker_path.parent.mkdir(parents=True, exist_ok=True)
+    marker_path.write_text(ts)
+
+
+def parse_since(since_str: Optional[str]) -> Optional[str]:
+    """Convert a duration string like '2h' or '30m' to an ISO UTC timestamp."""
+    if since_str is None:
+        return None
+    m = re.fullmatch(r"(\d+)([hm])", since_str.strip())
+    if not m:
+        raise ValueError(f"Invalid --since format: {since_str!r}. Use e.g. '2h' or '30m'.")
+    value, unit = int(m.group(1)), m.group(2)
+    delta = timedelta(hours=value) if unit == "h" else timedelta(minutes=value)
+    cutoff = datetime.now(timezone.utc) - delta
+    return cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")

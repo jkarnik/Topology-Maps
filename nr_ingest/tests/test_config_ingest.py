@@ -2,6 +2,7 @@ from __future__ import annotations
 import sqlite3
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 import pytest
 
@@ -11,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from config_data_source import load_config_db
 import config_data_source as _cds
 from config_ingest import build_snapshot_events
-from config_ingest import build_change_events, _compute_change_summary
+from config_ingest import build_change_events, _compute_change_summary, read_marker, write_marker, parse_since
 import json
 
 
@@ -171,3 +172,32 @@ def test_build_change_events_same_hash_no_event(test_db):
     _insert_obs(test_db, hash_="h1", ts="2026-01-02T00:00:00")
     events = build_change_events(test_db, since_ts=None)
     assert events == []
+
+
+def test_marker_round_trip(tmp_path):
+    path = tmp_path / ".last_config_ingest"
+    write_marker("2026-01-15T10:00:00Z", marker_path=path)
+    assert read_marker(marker_path=path) == "2026-01-15T10:00:00Z"
+
+
+def test_marker_read_missing(tmp_path):
+    path = tmp_path / ".last_config_ingest"
+    assert read_marker(marker_path=path) is None
+
+
+def test_parse_since_hours():
+    ts = parse_since("2h")
+    now = datetime.now(timezone.utc)
+    delta = now - datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    assert 1.9 * 3600 < delta.total_seconds() < 2.1 * 3600
+
+
+def test_parse_since_minutes():
+    ts = parse_since("30m")
+    now = datetime.now(timezone.utc)
+    delta = now - datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    assert 28 * 60 < delta.total_seconds() < 32 * 60
+
+
+def test_parse_since_none():
+    assert parse_since(None) is None
