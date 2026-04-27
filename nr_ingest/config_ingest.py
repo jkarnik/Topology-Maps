@@ -208,8 +208,12 @@ def main(
     marker_path: Path = MARKER_FILE,
 ) -> int:
     """Main entry point. Returns exit code (0 = success, 1 = failure)."""
-    license_key = os.environ["NR_LICENSE_KEY"]
-    account_id = os.environ["NR_ACCOUNT_ID"]
+    license_key = os.environ.get("NR_LICENSE_KEY")
+    account_id = os.environ.get("NR_ACCOUNT_ID")
+    if not license_key or not account_id:
+        missing = [k for k in ("NR_LICENSE_KEY", "NR_ACCOUNT_ID") if not os.environ.get(k)]
+        print(f"ERROR: missing required env vars: {', '.join(missing)}. Set them in .env or the environment.", file=sys.stderr)
+        return 1
     url = NR_EVENT_API.format(account_id=account_id)
     headers = {"Api-Key": license_key, "Content-Type": "application/json"}
 

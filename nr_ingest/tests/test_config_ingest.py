@@ -293,3 +293,5 @@ def test_main_pushes_snapshot_and_change_events(test_db, tmp_path, monkeypatch):
     assert result == 0
     assert any(e["eventType"] == "MerakiConfigSnapshot" for e in posted_events)
     assert marker.exists()
+    ts = marker.read_text().strip()
+    datetime.fromisoformat(ts.replace("Z", "+00:00"))  # raises ValueError if malformed
