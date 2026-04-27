@@ -9,11 +9,12 @@ import { useConfigCollection } from '../../hooks/useConfigCollection'
 import { useOrgDiff } from '../../hooks/useOrgDiff'
 import { startBaseline, startSweep } from '../../api/config'
 import type { EntityType, ConfigStatus } from '../../types/config'
+import { CompareTab } from './CompareTab'
 
 export function ConfigBrowser() {
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
   const [treeSelected, setTreeSelected] = useState<TreeSelection | null>(null)
-  const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'compare'>('overview')
 
   const [sidebarWidth, setSidebarWidth] = useState(220)
   const [fromTs, setFromTs] = useState('')
@@ -129,6 +130,10 @@ export function ConfigBrowser() {
           className={`px-4 py-2 ${activeTab === 'history' ? 'border-b-2 border-purple-500 bg-white/5' : 'opacity-50'}`}
           onClick={() => setActiveTab('history')}
         >History</button>
+        <button
+          className={`px-4 py-2 ${activeTab === 'compare' ? 'border-b-2 border-purple-500 bg-white/5' : 'opacity-50'}`}
+          onClick={() => setActiveTab('compare')}
+        >Compare</button>
       </div>
 
       {/* Tab content */}
@@ -274,6 +279,11 @@ export function ConfigBrowser() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Compare tab */}
+        {activeTab === 'compare' && selectedOrgId && (
+          <CompareTab orgId={selectedOrgId} tree={tree ?? null} />
         )}
       </div>
     </div>
