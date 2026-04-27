@@ -92,6 +92,30 @@ def test_coverage(client, monkeypatch, tmp_path):
     assert areas[0]["network_count"] == 2
 
 
+def test_compare_networks_mixed_sub_keys(client, monkeypatch, tmp_path):
+    """Regression: sorting fails when same config_area has sub_key=None in one network
+    and a non-null sub_key in the other."""
+    db_path = tmp_path / "topology.db"
+    monkeypatch.setattr(database, "DB_PATH", db_path)
+    conn = database.get_connection()
+    import hashlib
+    p = '{"x": 1}'
+    h = hashlib.sha256(p.encode()).hexdigest()
+    store.upsert_blob(conn, h, p, len(p))
+    # net1: appliance_vlans with sub_key=None
+    store.insert_observation_if_changed(conn, org_id="org1", entity_type="network",
+        entity_id="net1", config_area="appliance_vlans", sub_key=None, hash_hex=h,
+        source_event="baseline", change_event_id=None, sweep_run_id=None, hot_columns={})
+    # net2: appliance_vlans with a non-null sub_key
+    store.insert_observation_if_changed(conn, org_id="org1", entity_type="network",
+        entity_id="net2", config_area="appliance_vlans", sub_key="10", hash_hex=h,
+        source_event="baseline", change_event_id=None, sweep_run_id=None, hot_columns={})
+    conn.close()
+
+    resp = client.get("/api/config/compare/networks?org_id=org1&network_a=net1&network_b=net2")
+    assert resp.status_code == 200
+
+
 def test_template_scores(client, monkeypatch, tmp_path):
     _seed(monkeypatch, tmp_path)
     # Create template from net1

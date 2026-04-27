@@ -2,6 +2,29 @@ import { useState } from 'react'
 import { useCoverage } from '../../hooks/useCoverage'
 import type { CoverageArea } from '../../types/config'
 
+function usePanelResize(defaultWidth: number, min = 120, max = 480) {
+  const [width, setWidth] = useState(defaultWidth)
+
+  const onDragStart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startW = width
+
+    const onMove = (ev: MouseEvent) =>
+      setWidth(Math.max(min, Math.min(max, startW + ev.clientX - startX)))
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+
+  return { width, onDragStart }
+}
+
 function coverageColor(count: number, total: number): string {
   if (total === 0) return 'text-white/40'
   const pct = count / total
@@ -15,6 +38,7 @@ interface Props { orgId: string }
 export function CoverageView({ orgId }: Props) {
   const { data, loading, error } = useCoverage(orgId)
   const [selected, setSelected] = useState<CoverageArea | null>(null)
+  const { width: leftWidth, onDragStart } = usePanelResize(192)
 
   if (loading) return <p className="text-xs opacity-40 p-4">Loading coverage…</p>
   if (error) return <p className="text-xs text-red-400 p-4">{error}</p>
@@ -23,9 +47,9 @@ export function CoverageView({ orgId }: Props) {
   )
 
   return (
-    <div className="flex gap-3 h-full min-h-0">
+    <div className="flex h-full min-h-0">
       {/* Left: area list */}
-      <div className="w-48 shrink-0 flex flex-col gap-0.5 overflow-y-auto">
+      <div style={{ width: leftWidth }} className="shrink-0 flex flex-col gap-0.5 overflow-y-auto">
         {data.areas.map(area => (
           <button
             key={area.config_area}
@@ -45,8 +69,14 @@ export function CoverageView({ orgId }: Props) {
         ))}
       </div>
 
+      {/* Drag handle */}
+      <div
+        onMouseDown={onDragStart}
+        className="w-1 mx-1 shrink-0 cursor-col-resize rounded hover:bg-indigo-500/40 transition-colors bg-white/5"
+      />
+
       {/* Right: detail panel */}
-      <div className="flex-1 min-w-0 overflow-y-auto">
+      <div className="flex-1 min-w-0 overflow-y-auto pl-1">
         {!selected ? (
           <p className="text-xs opacity-30 p-4">Select a config area to see details.</p>
         ) : (

@@ -576,7 +576,7 @@ async def compare_networks(
         total_changes = 0
         differing_areas = 0
 
-        for key in sorted(all_keys):
+        for key in sorted(all_keys, key=lambda k: (k[0], "" if k[1] is None else k[1])):
             config_area, sub_key = key
             in_a = key in map_a
             in_b = key in map_b
