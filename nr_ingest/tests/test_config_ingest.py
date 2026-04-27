@@ -150,3 +150,24 @@ def test_compute_change_summary():
     summary = _compute_change_summary(result)
     assert "2 added" in summary
     assert "1 removed" in summary
+
+
+def test_compute_change_summary_secret():
+    from config_collector.diff_engine import DiffResult, SecretChanged
+    result = DiffResult(
+        shape="object",
+        changes=[SecretChanged(key="password_hash")],
+        unchanged_count=0,
+    )
+    summary = _compute_change_summary(result)
+    assert "secret rotated" in summary
+
+
+def test_build_change_events_same_hash_no_event(test_db):
+    """Two observations with identical hashes must not produce a change event."""
+    test_db.execute("INSERT INTO config_blobs VALUES (?,?,?,?)",
+                    ("h1", '{"mode":"access"}', 14, "2026-01-01"))
+    _insert_obs(test_db, hash_="h1", ts="2026-01-01T00:00:00")
+    _insert_obs(test_db, hash_="h1", ts="2026-01-02T00:00:00")
+    events = build_change_events(test_db, since_ts=None)
+    assert events == []

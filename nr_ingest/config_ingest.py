@@ -76,10 +76,11 @@ def build_snapshot_events(conn: sqlite3.Connection) -> list[dict]:
 
 def _compute_change_summary(diff_result) -> str:
     """Summarise a DiffResult as 'N added, M removed, K changed'."""
-    from config_collector.diff_engine import RowAdded, RowRemoved, RowChanged, FieldChanged, FieldAdded, FieldRemoved
+    from config_collector.diff_engine import RowAdded, RowRemoved, RowChanged, FieldChanged, FieldAdded, FieldRemoved, SecretChanged
     added = sum(1 for c in diff_result.changes if isinstance(c, (RowAdded, FieldAdded)))
     removed = sum(1 for c in diff_result.changes if isinstance(c, (RowRemoved, FieldRemoved)))
     changed = sum(1 for c in diff_result.changes if isinstance(c, (RowChanged, FieldChanged)))
+    secret = sum(1 for c in diff_result.changes if isinstance(c, SecretChanged))
     parts = []
     if added:
         parts.append(f"{added} added")
@@ -87,6 +88,8 @@ def _compute_change_summary(diff_result) -> str:
         parts.append(f"{removed} removed")
     if changed:
         parts.append(f"{changed} changed")
+    if secret:
+        parts.append(f"{secret} secret rotated")
     return ", ".join(parts) if parts else "no changes"
 
 
@@ -132,7 +135,8 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str]) -> li
             diff = compute_diff(json.loads(row["from_payload"]), json.loads(row["to_payload"]))
             diff_json = _serialize_diff(diff)
             summary = _compute_change_summary(diff)
-        except Exception:
+        except Exception as exc:
+            print(f"[warn] diff failed for {row['entity_id']}/{row['config_area']}: {exc}", file=sys.stderr)
             diff_json = "[]"
             summary = "diff unavailable"
         events.append({
