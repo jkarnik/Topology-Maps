@@ -20,6 +20,8 @@ from server.config_collector.store import (
     get_blob_by_hash, get_change_events,
     create_sweep_run, get_active_sweep_run,
     get_observations_in_window,
+    create_template, list_templates, get_template_areas,
+    delete_template, get_coverage,
 )
 from server.config_collector.diff_engine import compute_diff
 from server.meraki_client import MerakiClient
@@ -492,6 +494,233 @@ async def get_entity_timeline(
         # Return newest-first
         entries.reverse()
         return {"entity_type": entity_type, "entity_id": entity_id, "entries": entries}
+    finally:
+        conn.close()
+
+
+# ── Phase 6: Templates ────────────────────────────────────────────────────────
+
+class PromoteTemplateRequest(BaseModel):
+    org_id: str
+    name: str
+    network_id: str
+
+
+@router.get("/templates")
+async def list_templates_route(org_id: str) -> list[dict]:
+    conn = get_connection()
+    try:
+        return list_templates(conn, org_id=org_id)
+    finally:
+        conn.close()
+
+
+@router.post("/templates")
+async def create_template_route(req: PromoteTemplateRequest) -> dict:
+    conn = get_connection()
+    try:
+        name_row = conn.execute(
+            """SELECT name_hint FROM config_observations
+               WHERE org_id=? AND entity_type='network' AND entity_id=?
+               AND name_hint IS NOT NULL ORDER BY observed_at DESC LIMIT 1""",
+            (req.org_id, req.network_id),
+        ).fetchone()
+        network_name = name_row["name_hint"] if name_row else None
+        return create_template(conn, org_id=req.org_id, name=req.name,
+                               network_id=req.network_id, network_name=network_name)
+    finally:
+        conn.close()
+
+
+@router.delete("/templates/{template_id}")
+async def delete_template_route(template_id: int) -> dict:
+    conn = get_connection()
+    try:
+        delete_template(conn, template_id=template_id)
+        return {"deleted": template_id}
+    finally:
+        conn.close()
+
+
+# ── Phase 6: Network Comparison ───────────────────────────────────────────────
+
+@router.get("/compare/networks")
+async def compare_networks(
+    org_id: str,
+    network_a: str,
+    network_b: str,
+) -> dict:
+    conn = get_connection()
+    try:
+        rows_a = conn.execute(
+            """SELECT config_area, sub_key, hash, name_hint FROM config_observations
+               WHERE org_id=? AND entity_type='network' AND entity_id=?
+               GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
+            (org_id, network_a),
+        ).fetchall()
+        rows_b = conn.execute(
+            """SELECT config_area, sub_key, hash, name_hint FROM config_observations
+               WHERE org_id=? AND entity_type='network' AND entity_id=?
+               GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
+            (org_id, network_b),
+        ).fetchall()
+
+        name_a = rows_a[0]["name_hint"] if rows_a else network_a
+        name_b = rows_b[0]["name_hint"] if rows_b else network_b
+
+        map_a = {(r["config_area"], r["sub_key"]): r for r in rows_a}
+        map_b = {(r["config_area"], r["sub_key"]): r for r in rows_b}
+        all_keys = set(map_a) | set(map_b)
+
+        areas = []
+        total_changes = 0
+        differing_areas = 0
+
+        for key in sorted(all_keys):
+            config_area, sub_key = key
+            in_a = key in map_a
+            in_b = key in map_b
+
+            if in_a and not in_b:
+                areas.append({"config_area": config_area, "sub_key": sub_key,
+                               "status": "only_in_a", "diff": None})
+                differing_areas += 1
+                continue
+            if in_b and not in_a:
+                areas.append({"config_area": config_area, "sub_key": sub_key,
+                               "status": "only_in_b", "diff": None})
+                differing_areas += 1
+                continue
+
+            blob_row_a = get_blob_by_hash(conn, map_a[key]["hash"])
+            blob_row_b = get_blob_by_hash(conn, map_b[key]["hash"])
+            blob_a = json.loads(blob_row_a["payload"]) if blob_row_a else {}
+            blob_b = json.loads(blob_row_b["payload"]) if blob_row_b else {}
+            diff = compute_diff(blob_a, blob_b)
+            change_count = len(diff.changes)
+            total_changes += change_count
+            status = "differs" if change_count > 0 else "identical"
+            if change_count > 0:
+                differing_areas += 1
+            areas.append({
+                "config_area": config_area,
+                "sub_key": sub_key,
+                "status": status,
+                "diff": dataclasses.asdict(diff),
+            })
+
+        areas.sort(key=lambda a: (0 if a["status"] != "identical" else 1, a["config_area"]))
+
+        return {
+            "network_a": {"id": network_a, "name": name_a},
+            "network_b": {"id": network_b, "name": name_b},
+            "areas": areas,
+            "total_areas": len(areas),
+            "differing_areas": differing_areas,
+            "total_changes": total_changes,
+        }
+    finally:
+        conn.close()
+
+
+# ── Phase 6: Coverage ─────────────────────────────────────────────────────────
+
+@router.get("/coverage")
+async def get_coverage_route(org_id: str) -> dict:
+    conn = get_connection()
+    try:
+        return {"areas": get_coverage(conn, org_id=org_id)}
+    finally:
+        conn.close()
+
+
+# ── Phase 6: Template Scoring ─────────────────────────────────────────────────
+
+@router.get("/templates/{template_id}/scores")
+async def get_template_scores(template_id: int, org_id: str) -> dict:
+    conn = get_connection()
+    try:
+        tmpl_row = conn.execute(
+            "SELECT * FROM config_templates WHERE id=?", (template_id,)
+        ).fetchone()
+        if not tmpl_row:
+            raise HTTPException(status_code=404, detail="Template not found")
+
+        template_areas = get_template_areas(conn, template_id=template_id)
+        area_count = len(template_areas)
+
+        networks = conn.execute(
+            """SELECT DISTINCT entity_id, MAX(name_hint) as name_hint
+               FROM config_observations
+               WHERE org_id=? AND entity_type='network'
+               GROUP BY entity_id""",
+            (org_id,),
+        ).fetchall()
+
+        scores = []
+        for net in networks:
+            network_id = net["entity_id"]
+            network_name = net["name_hint"] or network_id
+
+            net_obs = conn.execute(
+                """SELECT config_area, sub_key, hash FROM config_observations
+                   WHERE org_id=? AND entity_type='network' AND entity_id=?
+                   GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
+                (org_id, network_id),
+            ).fetchall()
+            net_map = {(r["config_area"], r["sub_key"]): r["hash"] for r in net_obs}
+
+            total_fields = 0
+            total_changes = 0
+            missing_areas = []
+            area_scores = []
+
+            for ta in template_areas:
+                key = (ta["config_area"], ta["sub_key"])
+                if key not in net_map:
+                    missing_areas.append(ta["config_area"])
+                    area_scores.append({"config_area": ta["config_area"], "score_pct": 0, "change_count": 0})
+                    continue
+
+                tmpl_blob_row = get_blob_by_hash(conn, ta["blob_hash"])
+                net_blob_row = get_blob_by_hash(conn, net_map[key])
+                tmpl_blob = json.loads(tmpl_blob_row["payload"]) if tmpl_blob_row else {}
+                net_blob = json.loads(net_blob_row["payload"]) if net_blob_row else {}
+
+                diff = compute_diff(tmpl_blob, net_blob)
+                n_changes = len(diff.changes)
+                n_fields = diff.unchanged_count + n_changes
+                total_fields += n_fields
+                total_changes += n_changes
+
+                area_score = 100 if n_fields == 0 else round((n_fields - n_changes) / n_fields * 100)
+                area_scores.append({
+                    "config_area": ta["config_area"],
+                    "score_pct": area_score,
+                    "change_count": n_changes,
+                })
+
+            score_pct = 100 if total_fields == 0 else round((total_fields - total_changes) / total_fields * 100)
+            scores.append({
+                "network_id": network_id,
+                "network_name": network_name,
+                "score_pct": score_pct,
+                "change_count": total_changes,
+                "total_fields": total_fields,
+                "missing_areas": missing_areas,
+                "area_scores": area_scores,
+            })
+
+        scores.sort(key=lambda s: s["score_pct"])
+
+        return {
+            "template": {
+                "id": template_id,
+                "name": tmpl_row["name"],
+                "area_count": area_count,
+            },
+            "scores": scores,
+        }
     finally:
         conn.close()
 
