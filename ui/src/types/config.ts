@@ -139,3 +139,70 @@ export interface EntityTimelineResponse {
   entity_id: string
   entries: TimelineEntry[]
 }
+
+// ── Phase 6: Multi-Site Comparison ───────────────────────────────────────────
+
+export interface NetworkCompareArea {
+  config_area: string
+  sub_key: string | null
+  status: 'differs' | 'identical' | 'only_in_a' | 'only_in_b'
+  diff: DiffResult | null
+}
+
+export interface NetworkCompareResponse {
+  network_a: { id: string; name: string | null }
+  network_b: { id: string; name: string | null }
+  areas: NetworkCompareArea[]
+  total_areas: number
+  differing_areas: number
+  total_changes: number
+}
+
+export interface CoverageArea {
+  config_area: string
+  network_count: number
+  network_total: number
+  missing_networks: { id: string; name: string | null }[]
+  device_breakdown: { id: string; name: string | null }[]
+}
+
+export interface CoverageResponse {
+  areas: CoverageArea[]
+}
+
+export interface TemplateAreaRef {
+  config_area: string
+  sub_key: string | null
+  blob_hash: string
+}
+
+export interface ConfigTemplate {
+  id: number
+  org_id: string
+  name: string
+  source_network_id: string
+  source_network_name: string | null
+  created_at: string
+  areas: TemplateAreaRef[]
+}
+
+export interface TemplateAreaScore {
+  config_area: string
+  score_pct: number
+  change_count: number
+}
+
+export interface NetworkTemplateScore {
+  network_id: string
+  network_name: string
+  score_pct: number
+  change_count: number
+  total_fields: number
+  missing_areas: string[]
+  area_scores: TemplateAreaScore[]
+}
+
+export interface TemplateScoresResponse {
+  template: { id: number; name: string; area_count: number }
+  scores: NetworkTemplateScore[]
+}
