@@ -47,7 +47,7 @@ NR Events API
     ▼ NerdGraph / NRQL  (queried by Nerdpack)
 NR One App (Nerdpack)
     ├── Standalone launcher app  (left nav)
-    └── Entity detail tab  (on EXT-SWITCH / EXT-FIREWALL / EXT-ACCESS_POINT pages)
+    └── Entity detail tab  (on EXT-MERAKI_ORGANIZATION / EXT-SITE / EXT-SWITCH / EXT-FIREWALL / EXT-ACCESS_POINT pages)
 ```
 
 **Key principle:** The Nerdpack has no dependency on the FastAPI server. It reads everything from NR via NerdGraph. The server's only role in this integration is as the source that `config_ingest.py` reads from.
@@ -180,14 +180,14 @@ Three tabs, mirroring the existing ConfigBrowser:
 |---|---|
 | **Overview** | Org selector → tree (org / network / device). Click any node to see its current config areas and the latest snapshot JSON for each. |
 | **History** | Time-range selector. Shows a diff between the current config and a chosen past point, with a tree on the left highlighting which entities changed. |
-| **Compare** | Pick two networks from the same org. Shows side-by-side config for each area, with differences highlighted. |
+| **Compare** | Pick two networks from the same org. Three sub-views: (1) side-by-side config diff per area, (2) coverage map showing what % of config areas have been observed/baselined per network, (3) deferred: templates (golden config promotion and scoring). |
 
 ### 7.2 Entity Detail Tab (config-entity-tab nerdlet)
 
 Appears as a **"Config"** tab on all five entity types: `EXT-MERAKI_ORGANIZATION`, `EXT-SITE`, `EXT-SWITCH`, `EXT-FIREWALL`, and `EXT-ACCESS_POINT`.
 
 Sections:
-1. **Config status bar** — last synced timestamp, whether any area has drifted since baseline
+1. **Config status bar** — timestamp of last ingest run (polled from latest NR event — no live WebSocket connection). Whether any area has drifted since baseline.
 2. **Config areas list** — one row per config area; green if unchanged, amber if changed recently. Org and site entities show more config areas (org-wide policies, network settings) than individual devices.
 3. **Recent changes** — last 10 `MerakiConfigChange` events for this entity, with expandable diff view per change
 
@@ -213,8 +213,47 @@ nr1 nerdpack:subscribe --channel STABLE
 
 ---
 
-## 9. Open Questions / Future Work
+## 9. Alert Condition Recipe
 
-- **Ingest scheduling:** For the POC, manual runs are fine. Long-term, hook `config_ingest.py` into the server's sweep completion event so NR is always current within minutes of a sweep.
-- **Alerts recipe:** Document a standard NRQL alert condition for config drift as a follow-on. The data model supports it from day one.
-- **Templates view:** The existing ConfigBrowser has a "Templates" tab (promote a config as a golden template, score networks against it). This is deferred — not in the Nerdpack POC scope.
+The following NRQL alert conditions can be created in NR once config events are flowing. Set these up in NR One → Alerts → Create alert condition → NRQL.
+
+```sql
+-- Condition 1: Any config change detected (fires within ~15 min of a drift event)
+SELECT count(*) FROM MerakiConfigChange
+WHERE tags.source = 'topology-maps-app'
+SINCE 1 hour ago
+
+-- Condition 2: Config change on a specific site (replace network_id value)
+SELECT count(*) FROM MerakiConfigChange
+WHERE network_id = 'N_123456789'
+SINCE 1 hour ago
+
+-- Condition 3: High-frequency drift — more than 5 changes in 1 hour (noisy device)
+SELECT count(*) FROM MerakiConfigChange
+WHERE tags.source = 'topology-maps-app'
+SINCE 1 hour ago
+HAVING count(*) > 5
+```
+
+Recommended threshold for all conditions: `count > 0` triggers a warning-level incident.
+
+---
+
+## 10. Known UX Differences vs Local App
+
+| Feature | Local App | Nerdpack |
+|---|---|---|
+| Trigger a baseline sweep | ✅ "Start Baseline" button | ✗ Not available — use the local app or call `POST /api/config/baseline/{org_id}` directly |
+| Trigger an anti-drift sweep | ✅ "Start Sweep" button | ✗ Not available — same workaround |
+| Live sweep progress bar | ✅ Real-time via WebSocket | ✗ No live connection — status updates on next NR poll (~30s) |
+| Templates view | ✅ Full promote + scoring | ✗ Deferred — not in POC scope |
+
+**Impact:** For the POC, sweeps are triggered manually from the local app or Lightsail deployment. The Nerdpack is a read-only view of whatever the server has already collected — it surfaces the data in NR context but does not replace the local app's operator functions.
+
+---
+
+## 11. Future Work
+
+- **Ingest scheduling:** Hook `config_ingest.py` into the server's sweep completion event so NR is always current within minutes of a sweep.
+- **Sweep triggering from Nerdpack:** Add a "Request Sweep" button that calls the FastAPI server — requires the Nerdpack to know the server URL (env var). This is the one exception to the no-server-dependency rule and is deferred post-POC.
+- **Templates view:** Promote a config as a golden template and score networks against it. Deferred.
