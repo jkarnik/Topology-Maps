@@ -103,7 +103,7 @@ export function TemplatesView({ orgId, tree }: Props) {
   const { templates, loading, promote, remove } = useTemplates(orgId)
   const [selected, setSelected] = useState<ConfigTemplate | null>(null)
   const [showPromote, setShowPromote] = useState(false)
-  const { data: scoresData, loading: scoresLoading } = useTemplateScores(selected?.id ?? null, orgId)
+  const { data: scoresData, loading: scoresLoading, error: scoresError } = useTemplateScores(selected?.id ?? null, orgId)
 
   const handlePromote = async (name: string, networkId: string) => {
     await promote(name, networkId)
@@ -165,14 +165,20 @@ export function TemplatesView({ orgId, tree }: Props) {
           <p className="text-xs opacity-30 p-4">Select a template to see network scores.</p>
         ) : scoresLoading ? (
           <p className="text-xs opacity-40 p-4">Scoring networks…</p>
+        ) : scoresError ? (
+          <p className="text-xs text-red-400 p-4">{scoresError}</p>
         ) : scoresData ? (
           <div>
             <p className="text-xs opacity-50 mb-3">
               {scoresData.template.name} · {scoresData.scores.length} networks · {scoresData.template.area_count} template areas
             </p>
-            {scoresData.scores.map(score => (
-              <NetworkScoreRow key={score.network_id} score={score} />
-            ))}
+            {scoresData.scores.length === 0 ? (
+              <p className="text-xs opacity-40 p-4 text-center">No networks collected yet — run a baseline first.</p>
+            ) : (
+              scoresData.scores.map(score => (
+                <NetworkScoreRow key={score.network_id} score={score} />
+              ))
+            )}
           </div>
         ) : null}
       </div>

@@ -105,9 +105,15 @@ export function CompareNetworksView({ orgId, tree }: Props) {
               <p className="text-xs opacity-50 mb-2">
                 {result.differing_areas} area{result.differing_areas !== 1 ? 's' : ''} differ · {result.total_changes} field{result.total_changes !== 1 ? 's' : ''} changed
               </p>
-              {result.areas.map((area, i) => (
-                <AreaRow key={i} area={area} nameA={nameA} nameB={nameB} />
-              ))}
+              {result.areas
+                .filter(area =>
+                  area.status === 'only_in_a' ||
+                  area.status === 'only_in_b' ||
+                  (area.diff?.changes.length ?? 0) > 0
+                )
+                .map((area, i) => (
+                  <AreaRow key={i} area={area} nameA={nameA} nameB={nameB} />
+                ))}
             </>
           )}
         </div>

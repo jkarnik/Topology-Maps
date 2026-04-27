@@ -162,8 +162,10 @@ def compute_diff(blob_a: dict | list, blob_b: dict | list) -> DiffResult:
     if is_array:
         _merged = {**blob_a, **blob_b}
         area_name = next((k for k in _merged if _is_row_list(_merged[k])), next(iter(blob_b or blob_a), ""))
-        rows_a = blob_a.get(area_name, [])
-        rows_b = blob_b.get(area_name, [])
+        rows_a_raw = blob_a.get(area_name, [])
+        rows_b_raw = blob_b.get(area_name, [])
+        rows_a = rows_a_raw if isinstance(rows_a_raw, list) else []
+        rows_b = rows_b_raw if isinstance(rows_b_raw, list) else []
         changes, unchanged = _array_diff(area_name, rows_a, rows_b)
         return DiffResult(shape="array", changes=changes, unchanged_count=unchanged)
     changes, unchanged = _object_diff(blob_a, blob_b)
