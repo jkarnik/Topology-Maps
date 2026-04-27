@@ -364,3 +364,82 @@ def get_observations_in_window(
     cursor = conn.execute(sql, {"org_id": org_id, "from_ts": from_ts, "to_ts": to_ts})
     cols = [d[0] for d in cursor.description]
     return [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+
+# ── Phase 6: Templates ────────────────────────────────────────────────────────
+
+def create_template(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    name: str,
+    network_id: str,
+    network_name: Optional[str],
+) -> dict:
+    """Promote a network snapshot to a template. Returns the full template dict."""
+    now = _now_iso()
+    cursor = conn.execute(
+        """INSERT INTO config_templates (org_id, name, source_network_id, source_network_name, created_at)
+           VALUES (?, ?, ?, ?, ?)""",
+        (org_id, name, network_id, network_name, now),
+    )
+    template_id = cursor.lastrowid
+
+    rows = conn.execute(
+        """SELECT config_area, sub_key, hash
+           FROM config_observations
+           WHERE org_id=? AND entity_type='network' AND entity_id=?
+           GROUP BY config_area, sub_key
+           HAVING MAX(observed_at)""",
+        (org_id, network_id),
+    ).fetchall()
+
+    areas = []
+    for row in rows:
+        conn.execute(
+            """INSERT INTO config_template_areas (template_id, config_area, sub_key, blob_hash)
+               VALUES (?, ?, ?, ?)""",
+            (template_id, row["config_area"], row["sub_key"], row["hash"]),
+        )
+        areas.append({"config_area": row["config_area"], "sub_key": row["sub_key"], "blob_hash": row["hash"]})
+
+    conn.commit()
+    return {
+        "id": template_id,
+        "org_id": org_id,
+        "name": name,
+        "source_network_id": network_id,
+        "source_network_name": network_name,
+        "created_at": now,
+        "areas": areas,
+    }
+
+
+def list_templates(conn: sqlite3.Connection, *, org_id: str) -> list[dict]:
+    rows = conn.execute(
+        "SELECT * FROM config_templates WHERE org_id=? ORDER BY created_at DESC",
+        (org_id,),
+    ).fetchall()
+    templates = []
+    for row in rows:
+        areas = conn.execute(
+            "SELECT config_area, sub_key, blob_hash FROM config_template_areas WHERE template_id=?",
+            (row["id"],),
+        ).fetchall()
+        t = dict(row)
+        t["areas"] = [dict(a) for a in areas]
+        templates.append(t)
+    return templates
+
+
+def get_template_areas(conn: sqlite3.Connection, *, template_id: int) -> list[dict]:
+    rows = conn.execute(
+        "SELECT * FROM config_template_areas WHERE template_id=?",
+        (template_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def delete_template(conn: sqlite3.Connection, *, template_id: int) -> None:
+    conn.execute("DELETE FROM config_templates WHERE id=?", (template_id,))
+    conn.commit()
