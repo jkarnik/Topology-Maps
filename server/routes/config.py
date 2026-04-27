@@ -565,12 +565,19 @@ async def compare_networks(
             (org_id, network_b),
         ).fetchall()
 
+        logger.info(
+            "compare_networks org=%s a=%s(%d rows) b=%s(%d rows)",
+            org_id, network_a, len(rows_a), network_b, len(rows_b),
+        )
+
         name_a = rows_a[0]["name_hint"] if rows_a else network_a
         name_b = rows_b[0]["name_hint"] if rows_b else network_b
 
         map_a = {(r["config_area"], r["sub_key"]): r for r in rows_a}
         map_b = {(r["config_area"], r["sub_key"]): r for r in rows_b}
         all_keys = set(map_a) | set(map_b)
+
+        logger.info("compare_networks all_keys(%d): %s", len(all_keys), sorted(all_keys, key=lambda k: (k[0], "" if k[1] is None else k[1])))
 
         areas = []
         total_changes = 0
@@ -592,24 +599,43 @@ async def compare_networks(
                 differing_areas += 1
                 continue
 
+            logger.info("compare_networks diffing config_area=%s sub_key=%s", config_area, sub_key)
             blob_row_a = get_blob_by_hash(conn, map_a[key]["hash"])
             blob_row_b = get_blob_by_hash(conn, map_b[key]["hash"])
+            logger.info(
+                "  blob_a hash=%s found=%s  blob_b hash=%s found=%s",
+                map_a[key]["hash"][:12], blob_row_a is not None,
+                map_b[key]["hash"][:12], blob_row_b is not None,
+            )
             blob_a = json.loads(blob_row_a["payload"]) if blob_row_a else {}
             blob_b = json.loads(blob_row_b["payload"]) if blob_row_b else {}
-            diff = compute_diff(blob_a, blob_b)
+            logger.info("  blob_a type=%s blob_b type=%s", type(blob_a).__name__, type(blob_b).__name__)
+            try:
+                diff = compute_diff(blob_a, blob_b)
+                logger.info("  diff OK: %d changes", len(diff.changes))
+            except Exception as diff_exc:
+                logger.exception("  compute_diff FAILED for config_area=%s sub_key=%s: %s", config_area, sub_key, diff_exc)
+                logger.info("  blob_a preview: %s", str(blob_a)[:200])
+                logger.info("  blob_b preview: %s", str(blob_b)[:200])
+                raise
             change_count = len(diff.changes)
             total_changes += change_count
             status = "differs" if change_count > 0 else "identical"
             if change_count > 0:
                 differing_areas += 1
+            try:
+                diff_dict = dataclasses.asdict(diff)
+            except Exception as serial_exc:
+                logger.exception("  dataclasses.asdict FAILED for config_area=%s sub_key=%s: %s", config_area, sub_key, serial_exc)
+                raise
             areas.append({
                 "config_area": config_area,
                 "sub_key": sub_key,
                 "status": status,
-                "diff": dataclasses.asdict(diff),
+                "diff": diff_dict,
             })
 
-        areas.sort(key=lambda a: (0 if a["status"] != "identical" else 1, a["config_area"]))
+        areas.sort(key=lambda a: (0 if a["status"] != "identical" else 1, a["config_area"] or ""))
 
         return {
             "network_a": {"id": network_a, "name": name_a},
@@ -619,6 +645,9 @@ async def compare_networks(
             "differing_areas": differing_areas,
             "total_changes": total_changes,
         }
+    except Exception as exc:
+        logger.exception("compare_networks FAILED org=%s a=%s b=%s: %s", org_id, network_a, network_b, exc)
+        raise
     finally:
         conn.close()
 
