@@ -40,3 +40,6 @@ Thumbs.db
 # Build logs
 output.txt
 .superpowers/
+
+# Git worktrees
+.worktrees/
