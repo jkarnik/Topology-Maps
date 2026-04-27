@@ -13,6 +13,8 @@ from config_data_source import load_config_db
 import config_data_source as _cds
 from config_ingest import build_snapshot_events
 from config_ingest import build_change_events, _compute_change_summary, read_marker, write_marker, parse_since
+from config_ingest import post_events_batch, chunked
+import httpx
 import json
 
 
@@ -214,3 +216,80 @@ def test_parse_since_zero_raises():
     import pytest
     with pytest.raises(ValueError, match="must be > 0"):
         parse_since("0h")
+
+
+def test_post_events_batch_success(monkeypatch):
+    posted = []
+
+    class FakeResp:
+        status_code = 200
+        text = '{"success":true}'
+
+    def mock_post(url, *, headers, json, timeout):
+        posted.append(json)
+        return FakeResp()
+
+    monkeypatch.setattr(httpx, "post", mock_post)
+    result = post_events_batch(
+        "https://insights.example.com/events",
+        {"Api-Key": "x"},
+        [{"eventType": "Foo", "val": 1}, {"eventType": "Foo", "val": 2}],
+    )
+    assert result is True
+    assert len(posted) == 1
+    assert len(posted[0]) == 2
+
+
+def test_post_events_batch_failure(monkeypatch):
+    class FakeResp:
+        status_code = 403
+        text = "Forbidden"
+
+    monkeypatch.setattr(httpx, "post", lambda *a, **kw: FakeResp())
+    result = post_events_batch("https://x.com/e", {}, [{"eventType": "Foo"}])
+    assert result is False
+
+
+def test_chunked():
+    batches = list(chunked(list(range(10)), 3))
+    assert batches == [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+
+
+def test_main_pushes_snapshot_and_change_events(test_db, tmp_path, monkeypatch):
+    """main() posts both event types and writes the marker file."""
+    import config_ingest as ci
+
+    # Seed DB with one observation (snapshot only — no prior obs so no change event)
+    test_db.execute("INSERT INTO config_blobs VALUES (?,?,?,?)",
+                    ("h1", '{"mode":"access"}', 14, "2026-01-01T00:00:00"))
+    test_db.execute(
+        "INSERT INTO config_observations "
+        "(org_id, entity_type, entity_id, config_area, sub_key, hash, "
+        "observed_at, source_event, sweep_run_id, name_hint) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?)",
+        ("org1", "device", "Q2XX", "switch_ports", None,
+         "h1", "2026-01-01T00:00:00", "baseline", 1, "Main Switch"),
+    )
+    test_db.commit()
+
+    posted_events = []
+
+    class FakeResp:
+        status_code = 200
+        text = "{}"
+
+    def mock_post(url, *, headers, json, timeout):
+        posted_events.extend(json)
+        return FakeResp()
+
+    monkeypatch.setattr(httpx, "post", mock_post)
+    monkeypatch.setattr(ci, "load_config_db", lambda: test_db)
+    monkeypatch.setenv("NR_LICENSE_KEY", "fake")
+    monkeypatch.setenv("NR_ACCOUNT_ID", "12345")
+
+    marker = tmp_path / ".last_config_ingest"
+    result = ci.main(since_override=None, marker_path=marker)
+
+    assert result == 0
+    assert any(e["eventType"] == "MerakiConfigSnapshot" for e in posted_events)
+    assert marker.exists()

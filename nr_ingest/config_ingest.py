@@ -7,6 +7,7 @@ Usage:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -23,6 +24,7 @@ _PROJECT_ROOT = _DIR.parent
 sys.path.insert(0, str(_PROJECT_ROOT / "server"))
 
 from config_collector.diff_engine import compute_diff  # noqa: E402
+from config_data_source import load_config_db  # noqa: E402
 
 _ENV_FILE = _PROJECT_ROOT / ".env"
 if _ENV_FILE.exists():
@@ -184,3 +186,70 @@ def parse_since(since_str: Optional[str]) -> Optional[str]:
     delta = timedelta(hours=value) if unit == "h" else timedelta(minutes=value)
     cutoff = datetime.now(timezone.utc) - delta
     return cutoff.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def chunked(lst: list, size: int):
+    """Yield successive size-length chunks from lst."""
+    for i in range(0, len(lst), size):
+        yield lst[i : i + size]
+
+
+def post_events_batch(url: str, headers: dict, events: list[dict]) -> bool:
+    """POST events to NR Events API. Returns True on success, False on failure."""
+    resp = httpx.post(url, headers=headers, json=events, timeout=30.0)
+    if resp.status_code != 200:
+        print(f"  FAILED {resp.status_code}: {resp.text}", file=sys.stderr)
+        return False
+    return True
+
+
+def main(
+    since_override: Optional[str] = None,
+    marker_path: Path = MARKER_FILE,
+) -> int:
+    """Main entry point. Returns exit code (0 = success, 1 = failure)."""
+    license_key = os.environ["NR_LICENSE_KEY"]
+    account_id = os.environ["NR_ACCOUNT_ID"]
+    url = NR_EVENT_API.format(account_id=account_id)
+    headers = {"Api-Key": license_key, "Content-Type": "application/json"}
+
+    conn = load_config_db()
+
+    since_ts = since_override if since_override is not None else read_marker(marker_path=marker_path)
+
+    snapshot_events = build_snapshot_events(conn)
+    change_events = build_change_events(conn, since_ts=since_ts)
+    all_events = snapshot_events + change_events
+
+    print(f"Snapshot events:  {len(snapshot_events)}")
+    print(f"Change events:    {len(change_events)}")
+    print(f"Total to push:    {len(all_events)}")
+
+    if not all_events:
+        print("Nothing to push.")
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        write_marker(now, marker_path=marker_path)
+        return 0
+
+    total_sent = 0
+    for batch_num, batch in enumerate(chunked(all_events, 500), start=1):
+        print(f"Batch {batch_num}: posting {len(batch)} events...")
+        if not post_events_batch(url, headers, batch):
+            print("Aborting — batch failed.", file=sys.stderr)
+            return 1
+        total_sent += len(batch)
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    write_marker(now, marker_path=marker_path)
+    print(f"\nAll {total_sent} events accepted. Marker updated: {now}")
+    return 0
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Push Meraki config events to New Relic")
+    parser.add_argument("--since", metavar="DURATION",
+                        help="Override since-timestamp, e.g. '2h' or '30m'")
+    args = parser.parse_args()
+
+    since = parse_since(args.since) if args.since else None
+    sys.exit(main(since_override=since))
