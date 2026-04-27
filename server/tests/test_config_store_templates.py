@@ -77,3 +77,22 @@ def test_get_template_areas(conn):
 
 def test_delete_nonexistent_template_is_noop(conn):
     store.delete_template(conn, template_id=9999)
+
+
+def test_get_coverage(conn):
+    h = _seed_blob(conn)
+    _seed_observation(conn, "org1", "net1", "wireless_ssids", h)
+    _seed_observation(conn, "org1", "net2", "wireless_ssids", h)
+    _seed_observation(conn, "org1", "net1", "appliance_vlans", h)
+
+    coverage = store.get_coverage(conn, org_id="org1")
+    areas = {a["config_area"]: a for a in coverage}
+
+    assert areas["wireless_ssids"]["network_count"] == 2
+    assert areas["wireless_ssids"]["network_total"] == 2
+    assert areas["wireless_ssids"]["missing_networks"] == []
+
+    assert areas["appliance_vlans"]["network_count"] == 1
+    assert areas["appliance_vlans"]["network_total"] == 2
+    assert len(areas["appliance_vlans"]["missing_networks"]) == 1
+    assert areas["appliance_vlans"]["missing_networks"][0]["id"] == "net2"

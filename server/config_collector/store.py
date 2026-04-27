@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json as _json
 import sqlite3
+from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -443,3 +444,56 @@ def get_template_areas(conn: sqlite3.Connection, *, template_id: int) -> list[di
 def delete_template(conn: sqlite3.Connection, *, template_id: int) -> None:
     conn.execute("DELETE FROM config_templates WHERE id=?", (template_id,))
     conn.commit()
+
+
+def get_coverage(conn: sqlite3.Connection, *, org_id: str) -> list[dict]:
+    """Return per-config-area coverage counts for all networks in an org."""
+    all_nets = conn.execute(
+        """SELECT DISTINCT entity_id, MAX(name_hint) as name_hint
+           FROM config_observations
+           WHERE org_id=? AND entity_type='network'
+           GROUP BY entity_id""",
+        (org_id,),
+    ).fetchall()
+    all_net_ids = {r["entity_id"] for r in all_nets}
+    net_name_map = {r["entity_id"]: r["name_hint"] for r in all_nets}
+    network_total = len(all_net_ids)
+
+    area_rows = conn.execute(
+        """SELECT config_area, entity_id
+           FROM config_observations
+           WHERE org_id=? AND entity_type='network'
+           GROUP BY config_area, entity_id""",
+        (org_id,),
+    ).fetchall()
+
+    area_nets: dict[str, set] = defaultdict(set)
+    for r in area_rows:
+        area_nets[r["config_area"]].add(r["entity_id"])
+
+    device_rows = conn.execute(
+        """SELECT config_area, entity_id, MAX(name_hint) as name_hint
+           FROM config_observations
+           WHERE org_id=? AND entity_type='device'
+           GROUP BY config_area, entity_id""",
+        (org_id,),
+    ).fetchall()
+
+    area_devices: dict[str, list] = defaultdict(list)
+    for r in device_rows:
+        area_devices[r["config_area"]].append({"id": r["entity_id"], "name": r["name_hint"]})
+
+    results = []
+    for area, present_nets in sorted(area_nets.items()):
+        missing = [
+            {"id": nid, "name": net_name_map.get(nid)}
+            for nid in sorted(all_net_ids - present_nets)
+        ]
+        results.append({
+            "config_area": area,
+            "network_count": len(present_nets),
+            "network_total": network_total,
+            "missing_networks": missing,
+            "device_breakdown": area_devices.get(area, []),
+        })
+    return results
