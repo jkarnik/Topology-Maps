@@ -20,7 +20,7 @@ Surface Meraki config management inside New Relic so that config state, history,
 - A `config_ingest.py` script that pushes config data from SQLite to NR as custom events
 - A Nerdpack (NR One App) with two surfaces:
   - **Standalone app** — full config browser accessible from the NR left nav
-  - **Entity detail tab** — a "Config" tab on every switch, firewall, and AP entity page
+  - **Entity detail tab** — a "Config" tab on every org, site, switch, firewall, and AP entity page
 - NRQL-based alerting on config drift — the data model supports it from day one; a ready-to-use alert condition recipe is included in this spec
 
 ### Out of scope
@@ -162,7 +162,7 @@ nerdpack/
         CompareView.js            — side-by-side network comparison
     config-entity-tab/            — "Config" tab on device entity pages
       index.js
-      nr1.json                    — declares entityTypes: EXT-SWITCH, EXT-FIREWALL, EXT-ACCESS_POINT
+      nr1.json                    — declares entityTypes: EXT-MERAKI_ORGANIZATION, EXT-SITE, EXT-SWITCH, EXT-FIREWALL, EXT-ACCESS_POINT
       components/
         ConfigSummary.js          — list of config areas + drift status
         RecentChanges.js          — last N MerakiConfigChange events for this entity
@@ -184,11 +184,11 @@ Three tabs, mirroring the existing ConfigBrowser:
 
 ### 7.2 Entity Detail Tab (config-entity-tab nerdlet)
 
-Appears as a **"Config"** tab on every `EXT-SWITCH`, `EXT-FIREWALL`, and `EXT-ACCESS_POINT` entity page.
+Appears as a **"Config"** tab on all five entity types: `EXT-MERAKI_ORGANIZATION`, `EXT-SITE`, `EXT-SWITCH`, `EXT-FIREWALL`, and `EXT-ACCESS_POINT`.
 
 Sections:
 1. **Config status bar** — last synced timestamp, whether any area has drifted since baseline
-2. **Config areas list** — one row per config area; green if unchanged, amber if changed recently
+2. **Config areas list** — one row per config area; green if unchanged, amber if changed recently. Org and site entities show more config areas (org-wide policies, network settings) than individual devices.
 3. **Recent changes** — last 10 `MerakiConfigChange` events for this entity, with expandable diff view per change
 
 ---
