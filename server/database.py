@@ -136,6 +136,26 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             error_summary TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS config_templates (
+            id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+            org_id               TEXT NOT NULL,
+            name                 TEXT NOT NULL,
+            source_network_id    TEXT NOT NULL,
+            source_network_name  TEXT,
+            created_at           TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS config_template_areas (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            template_id  INTEGER NOT NULL REFERENCES config_templates(id) ON DELETE CASCADE,
+            config_area  TEXT NOT NULL,
+            sub_key      TEXT,
+            blob_hash    TEXT NOT NULL REFERENCES config_blobs(hash)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_template_areas_template
+            ON config_template_areas(template_id);
+
         CREATE INDEX IF NOT EXISTS idx_obs_entity_latest
             ON config_observations(org_id, entity_type, entity_id, config_area, sub_key, observed_at DESC);
         CREATE INDEX IF NOT EXISTS idx_obs_area_time
