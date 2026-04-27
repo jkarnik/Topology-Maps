@@ -1,5 +1,11 @@
-# nr_ingest/config_data_source.py
+"""Load the Meraki config history from the project's topology SQLite DB.
+
+Prefers the live container DB (topologymaps-server-1:/app/data/topology.db) via
+docker cp so ingest always sees the latest config observations.  Falls back to
+the local data/topology.db if Docker is unavailable.
+"""
 from __future__ import annotations
+import os
 import sqlite3
 import subprocess
 import tempfile
@@ -12,7 +18,10 @@ _CONTAINER_DB = "/app/data/topology.db"
 
 
 def _resolve_topology_db_path() -> Path:
-    tmp = Path(tempfile.mktemp(suffix=".db"))
+    """Return the path to a readable topology.db, preferring the container's copy."""
+    tmp_fd, tmp_str = tempfile.mkstemp(suffix=".db")
+    os.close(tmp_fd)
+    tmp = Path(tmp_str)
     try:
         result = subprocess.run(
             ["docker", "cp", f"{_CONTAINER}:{_CONTAINER_DB}", str(tmp)],
@@ -28,6 +37,7 @@ def _resolve_topology_db_path() -> Path:
 
 
 def load_config_db() -> sqlite3.Connection:
+    """Open and return a connection to the topology config DB."""
     path = _resolve_topology_db_path()
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
