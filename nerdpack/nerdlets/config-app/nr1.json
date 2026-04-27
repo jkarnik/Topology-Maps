@@ -1,0 +1,6 @@
+{
+  "schemaType": "NERDLET",
+  "id": "config-app",
+  "displayName": "Config Browser",
+  "description": "Browse Meraki configuration snapshots, change history, and network comparison"
+}
