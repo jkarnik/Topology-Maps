@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
 import { NrqlQuery, Spinner } from 'nr1';
 
+function highlightJson(raw) {
+  let pretty = raw;
+  try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch (_) {}
+  return pretty
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+      match => {
+        if (/^"/.test(match)) {
+          return /:$/.test(match)
+            ? `<span style="color:#9cdcfe">${match}</span>`
+            : `<span style="color:#ce9178">${match}</span>`;
+        }
+        if (/true|false/.test(match)) return `<span style="color:#569cd6">${match}</span>`;
+        if (/null/.test(match))       return `<span style="color:#f44747">${match}</span>`;
+        return `<span style="color:#b5cea8">${match}</span>`;
+      }
+    );
+}
+
 export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
   const [selectedArea, setSelectedArea] = useState(null);
 
@@ -86,16 +106,16 @@ function ConfigJson({ accountId, entityId, configArea }) {
       {({ data, loading }) => {
         if (loading) return <Spinner />;
         const raw = data?.[0]?.data?.[0]?.['config_json'] || data?.[0]?.data?.[0]?.['latest.config_json'] || '{}';
-        let pretty = raw;
-        try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch (_) {}
         return (
-          <pre style={{
-            background: 'rgba(128,128,128,0.08)', padding: '12px',
-            borderRadius: '4px', overflow: 'auto', maxHeight: '400px',
-            marginTop: '12px', fontSize: '12px', border: '1px solid rgba(128,128,128,0.15)',
-          }}>
-            {pretty}
-          </pre>
+          <pre
+            style={{
+              background: 'rgba(128,128,128,0.08)', padding: '12px',
+              borderRadius: '4px', overflow: 'auto', maxHeight: '400px',
+              margin: '0', fontSize: '12px', border: '1px solid rgba(128,128,128,0.15)',
+              fontFamily: 'monospace', lineHeight: '1.6',
+            }}
+            dangerouslySetInnerHTML={{ __html: highlightJson(raw) }}
+          />
         );
       }}
     </NrqlQuery>
