@@ -18,4 +18,6 @@ jobs:
             cd ~/topology-maps
             git pull origin master
             export MERAKI_API_KEY=${{ secrets.MERAKI_API_KEY }}
+            export NR_LICENSE_KEY=${{ secrets.NR_LICENSE_KEY }}
+            export NR_ACCOUNT_ID=${{ vars.NR_ACCOUNT_ID }}
             docker compose up -d --build
