@@ -11,12 +11,12 @@ function highlightJson(raw) {
       match => {
         if (/^"/.test(match)) {
           return /:$/.test(match)
-            ? `<span style="color:#9cdcfe">${match}</span>`
-            : `<span style="color:#ce9178">${match}</span>`;
+            ? `<span class="json-key">${match}</span>`
+            : `<span class="json-str">${match}</span>`;
         }
-        if (/true|false/.test(match)) return `<span style="color:#569cd6">${match}</span>`;
-        if (/null/.test(match))       return `<span style="color:#f44747">${match}</span>`;
-        return `<span style="color:#b5cea8">${match}</span>`;
+        if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+        if (/null/.test(match))       return `<span class="json-null">${match}</span>`;
+        return `<span class="json-num">${match}</span>`;
       }
     );
 }
@@ -37,6 +37,20 @@ export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
 
   return (
     <div>
+      <style>{`
+        .json-key  { color: #0066cc; }
+        .json-str  { color: #a31515; }
+        .json-num  { color: #098658; }
+        .json-bool { color: #0000ff; }
+        .json-null { color: #dd0000; }
+        @media (prefers-color-scheme: dark) {
+          .json-key  { color: #9cdcfe; }
+          .json-str  { color: #ce9178; }
+          .json-num  { color: #b5cea8; }
+          .json-bool { color: #569cd6; }
+          .json-null { color: #f44747; }
+        }
+      `}</style>
       <h3 style={{ marginBottom: '12px', fontSize: '14px' }}>
         {entityType}: {entityId}
       </h3>
