@@ -4,6 +4,7 @@ Prefers the live container DB (topologymaps-server-1:/app/data/app.db) via
 docker cp so ingest always sees the latest snapshot.  Falls back to the local
 data/app.db if Docker is unavailable.
 """
+import os
 import subprocess
 import sys
 import tempfile
@@ -21,7 +22,13 @@ import db  # noqa: E402
 
 def _resolve_db_path() -> Path:
     """Return the path to a readable app.db, preferring the container's copy."""
-    tmp = Path(tempfile.mktemp(suffix=".db"))
+    if Path("/.dockerenv").exists():
+        print(f"Running inside container — using local DB at {_LOCAL_DB}")
+        return _LOCAL_DB
+
+    fd, tmp_str = tempfile.mkstemp(suffix=".db")
+    os.close(fd)
+    tmp = Path(tmp_str)
     try:
         result = subprocess.run(
             ["docker", "cp", f"{_CONTAINER}:{_CONTAINER_DB}", str(tmp)],
@@ -30,8 +37,9 @@ def _resolve_db_path() -> Path:
         if result.returncode == 0 and tmp.exists():
             print(f"Using DB copied from container {_CONTAINER}:{_CONTAINER_DB}")
             return tmp
+        tmp.unlink(missing_ok=True)
     except Exception:
-        pass
+        tmp.unlink(missing_ok=True)
     print(f"Container unavailable — using local DB at {_LOCAL_DB}")
     return _LOCAL_DB
 
