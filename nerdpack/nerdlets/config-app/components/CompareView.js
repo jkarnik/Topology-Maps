@@ -24,7 +24,7 @@ function NetworkSelector({ accountId, orgId, label, value, onChange }) {
 export default function CompareView({ accountId, orgId }) {
   const [netA, setNetA] = useState(null);
   const [netB, setNetB] = useState(null);
-  if (!orgId) return <p style={{ color: '#8e9aad' }}>Select an org to compare networks.</p>;
+  if (!orgId) return <p style={{ opacity: 0.6 }}>Select an org to compare networks.</p>;
   return (
     <div>
       <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
@@ -34,7 +34,7 @@ export default function CompareView({ accountId, orgId }) {
       {netA && netB && netA !== netB ? (
         <SideBySideDiff accountId={accountId} netA={netA} netB={netB} />
       ) : (
-        <p style={{ color: '#8e9aad' }}>Select two different networks to compare.</p>
+        <p style={{ opacity: 0.6 }}>Select two different networks to compare.</p>
       )}
     </div>
   );
@@ -50,8 +50,8 @@ function SideBySideDiff({ accountId, netA, netB }) {
           {({ data: dB, loading: lB }) => {
             if (lA || lB) return <Spinner />;
             const mapA = {}, mapB = {};
-            (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
-            (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
+            (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
+            (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
             const allAreas = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])].sort();
             const diffAreas = allAreas.filter((a) => mapA[a] !== mapB[a]);
             if (!diffAreas.length) return <p style={{ color: '#27ae60' }}>Networks are identical across all observed config areas.</p>;
@@ -65,9 +65,9 @@ function SideBySideDiff({ accountId, netA, netB }) {
                       <div style={{ display: 'flex', gap: '16px' }}>
                         {[{id: netA, json: mapA[area]}, {id: netB, json: mapB[area]}].map(({id, json}) => (
                           <div key={id} style={{ flex: 1 }}>
-                            <p style={{ color: '#8e9aad', fontSize: '12px' }}>{id}</p>
-                            <pre style={{ background: '#0d1117', color: '#e0e0e0', padding: '8px', fontSize: '11px',
-                                          borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
+                            <p style={{ opacity: 0.6, fontSize: '12px' }}>{id}</p>
+                            <pre style={{ background: 'rgba(128,128,128,0.08)', border: '1px solid rgba(128,128,128,0.15)',
+                                          padding: '8px', fontSize: '11px', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
                               {fmt(json)}
                             </pre>
                           </div>

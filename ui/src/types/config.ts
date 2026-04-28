@@ -56,6 +56,7 @@ export interface ConfigTreeNetwork {
   name: string | null;
   config_areas: string[];
   devices: { serial: string; name: string | null }[];
+  ssids: { id: string; name: string | null }[];
 }
 
 export interface ConfigTree {

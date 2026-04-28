@@ -5,6 +5,7 @@ export type TreeSelection =
   | { level: 'org'; orgId: string }
   | { level: 'network'; networkId: string }
   | { level: 'device'; entityType: string; entityId: string }
+  | { level: 'ssid'; entityType: 'ssid'; entityId: string }
 
 interface Props {
   orgId: string
@@ -57,6 +58,7 @@ export function ConfigTree({
 }: Props) {
   const [orgOpen, setOrgOpen] = useState(true)
   const [openNetworks, setOpenNetworks] = useState<Set<string>>(new Set())
+  const [openSsids, setOpenSsids] = useState<Set<string>>(new Set())
 
   if (loading) {
     return <div style={{ padding: '14px', fontSize: '12px', color: 'var(--text-muted)', ...MONO }}>Loading…</div>
@@ -71,6 +73,7 @@ export function ConfigTree({
     if (sel.level === 'org') return true
     if (sel.level === 'network' && selected.level === 'network') return sel.networkId === selected.networkId
     if (sel.level === 'device' && selected.level === 'device') return sel.entityId === selected.entityId
+    if (sel.level === 'ssid' && selected.level === 'ssid') return sel.entityId === selected.entityId
     return false
   }
 
@@ -111,6 +114,14 @@ export function ConfigTree({
     setOpenNetworks(prev => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSsids = (netId: string) => {
+    setOpenSsids(prev => {
+      const next = new Set(prev)
+      if (next.has(netId)) next.delete(netId); else next.add(netId)
       return next
     })
   }
@@ -190,6 +201,37 @@ export function ConfigTree({
                             {dev.name ?? dev.serial}
                           </span>
                           {devCount !== null && devCount > 0 && <span style={badgeStyle}>{devCount}</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* SSIDs (children of network, collapsed by default) */}
+                {open && net.ssids && net.ssids.length > 0 && (
+                  <div style={{ paddingLeft: '18px' }}>
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: '2px', cursor: 'pointer', padding: '3px 0' }}
+                      onClick={() => toggleSsids(net.id)}
+                    >
+                      <span style={caretStyle}>{openSsids.has(net.id) ? '▾' : '▸'}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', ...MONO }}>
+                        SSIDs ({net.ssids.length})
+                      </span>
+                    </div>
+                    {openSsids.has(net.id) && net.ssids.map(ssid => {
+                      const ssidSel: TreeSelection = { level: 'ssid', entityType: 'ssid', entityId: ssid.id }
+                      const ssidNum = ssid.id.split(':')[1]
+                      return (
+                        <div
+                          key={ssid.id}
+                          style={{ ...rowStyle(ssidSel), paddingLeft: '24px' }}
+                          onClick={() => onSelect(ssidSel)}
+                          {...hover(ssidSel)}
+                        >
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {ssid.name ?? `SSID ${ssidNum}`}
+                          </span>
                         </div>
                       )
                     })}

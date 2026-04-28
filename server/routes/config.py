@@ -277,6 +277,23 @@ async def get_tree(org_id: str) -> dict:
             except Exception as exc:
                 logger.warning("Tree: could not fetch device inventory: %s", exc)
 
+        # SSIDs: entity_id format is "{network_id}:{ssid_number}"
+        ssid_rows = conn.execute(
+            """SELECT entity_id, MAX(name_hint) AS name_hint
+               FROM config_observations
+               WHERE org_id=? AND entity_type='ssid'
+               GROUP BY entity_id""",
+            (org_id,),
+        ).fetchall()
+        ssids_for_network: dict[str, list[dict]] = {}
+        for sr in ssid_rows:
+            sid = sr["entity_id"]
+            nid = sid.split(":")[0] if ":" in sid else None
+            if nid:
+                ssids_for_network.setdefault(nid, []).append(
+                    {"id": sid, "name": sr["name_hint"]}
+                )
+
         # Per-network payload: own config areas + the devices that belong to it
         networks: list[dict] = []
         for nr in net_rows:
@@ -296,6 +313,7 @@ async def get_tree(org_id: str) -> dict:
                 "name": nr["name_hint"],
                 "config_areas": net_areas,
                 "devices": devices_in_net,
+                "ssids": ssids_for_network.get(nid, []),
             })
 
         return {"org": {"id": org_id, "config_areas": org_areas}, "networks": networks}

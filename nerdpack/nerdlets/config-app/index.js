@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 import { Tabs, TabsItem, PlatformStateContext } from 'nr1';
+
+class Catch extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(e) { return { error: e }; }
+  render() {
+    if (this.state.error) return <pre style={{ color: 'red', padding: 8, fontSize: 11 }}>{this.props.label}: {String(this.state.error)}</pre>;
+    return this.props.children;
+  }
+}
 import OrgSelector from './components/OrgSelector';
 import ConfigTree from './components/ConfigTree';
 import ConfigAreaViewer from './components/ConfigAreaViewer';
@@ -17,31 +26,41 @@ export default function ConfigApp() {
         const accountId = platformState.accountId;
         return (
           <div style={{ padding: '16px' }}>
-            <OrgSelector accountId={accountId} selectedOrgId={selectedOrgId} onOrgChange={setSelectedOrgId} />
+            <Catch label="OrgSelector">
+              <OrgSelector accountId={accountId} selectedOrgId={selectedOrgId} onOrgChange={setSelectedOrgId} />
+            </Catch>
             <Tabs defaultValue="overview" style={{ marginTop: '16px' }}>
               <TabsItem value="overview" label="Overview">
                 <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
                   <div style={{ width: '280px', flexShrink: 0 }}>
-                    <ConfigTree
-                      accountId={accountId}
-                      orgId={selectedOrgId}
-                      selectedEntityId={selectedEntityId}
-                      onEntitySelect={(entityId, entityType) => {
-                        setSelectedEntityId(entityId);
-                        setSelectedEntityType(entityType);
-                      }}
-                    />
+                    <Catch label="ConfigTree">
+                      <ConfigTree
+                        accountId={accountId}
+                        orgId={selectedOrgId}
+                        selectedEntityId={selectedEntityId}
+                        onEntitySelect={(entityId, entityType) => {
+                          setSelectedEntityId(entityId);
+                          setSelectedEntityType(entityType);
+                        }}
+                      />
+                    </Catch>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <ConfigAreaViewer accountId={accountId} entityId={selectedEntityId} entityType={selectedEntityType} />
+                    <Catch label="ConfigAreaViewer">
+                      <ConfigAreaViewer accountId={accountId} entityId={selectedEntityId} entityType={selectedEntityType} />
+                    </Catch>
                   </div>
                 </div>
               </TabsItem>
               <TabsItem value="history" label="History">
-                <ChangeHistory accountId={accountId} orgId={selectedOrgId} entityId={selectedEntityId} />
+                <Catch label="ChangeHistory">
+                  <ChangeHistory accountId={accountId} orgId={selectedOrgId} entityId={selectedEntityId} />
+                </Catch>
               </TabsItem>
               <TabsItem value="compare" label="Compare">
-                <CompareView accountId={accountId} orgId={selectedOrgId} />
+                <Catch label="CompareView">
+                  <CompareView accountId={accountId} orgId={selectedOrgId} />
+                </Catch>
               </TabsItem>
             </Tabs>
           </div>

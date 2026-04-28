@@ -21,7 +21,7 @@ function Change({ change }) {
       <span style={{ marginRight: '6px' }}>{style.prefix}</span>
       <span>{change.type}:</span>
       <span style={{ marginLeft: '6px', fontWeight: 'bold' }}>{label}</span>
-      <span style={{ color: '#bbb' }}>{detail}</span>
+      <span style={{ opacity: 0.7 }}>{detail}</span>
     </div>
   );
 }
@@ -32,9 +32,10 @@ export default function DiffViewer({ diffJson }) {
   try { changes = JSON.parse(diffJson); } catch (_) {
     return <span style={{ color: '#e74c3c' }}>Invalid diff JSON</span>;
   }
-  if (!changes.length) return <span style={{ color: '#888' }}>No changes recorded.</span>;
+  if (!changes.length) return <span style={{ opacity: 0.6 }}>No changes recorded.</span>;
   return (
-    <div style={{ background: '#0d1117', padding: '12px', borderRadius: '4px', maxHeight: '300px', overflow: 'auto' }}>
+    <div style={{ background: 'rgba(128,128,128,0.08)', border: '1px solid rgba(128,128,128,0.15)',
+                  padding: '12px', borderRadius: '4px', maxHeight: '300px', overflow: 'auto' }}>
       {changes.map((c, i) => <Change key={i} change={c} />)}
     </div>
   );

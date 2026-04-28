@@ -4,7 +4,7 @@ import DiffViewer from './DiffViewer';
 
 export default function ChangeHistory({ accountId, orgId, entityId }) {
   const [expandedDiff, setExpandedDiff] = useState(null);
-  if (!accountId || !orgId) return <p style={{ color: '#8e9aad' }}>Select an org to view change history.</p>;
+  if (!accountId || !orgId) return <p style={{ opacity: 0.6 }}>Select an org to view change history.</p>;
 
   const entityFilter = entityId ? `AND entity_id = '${entityId}'` : '';
   const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at, diff_json
@@ -16,9 +16,9 @@ export default function ChangeHistory({ accountId, orgId, entityId }) {
       <NrqlQuery accountIds={[accountId]} query={query}>
         {({ data, loading, error }) => {
           if (loading) return <Spinner />;
-          if (error) return <span style={{ color: '#e74c3c' }}>Failed to load change history.</span>;
+          if (error) return <span style={{ color: '#c0392b' }}>Failed to load change history.</span>;
           const rows = data?.[0]?.data || [];
-          if (!rows.length) return <p style={{ color: '#8e9aad' }}>No config changes found.</p>;
+          if (!rows.length) return <p style={{ opacity: 0.6 }}>No config changes found.</p>;
           return (
             <Table items={rows}>
               <TableHeader>
@@ -50,12 +50,13 @@ export default function ChangeHistory({ accountId, orgId, entityId }) {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)',
                       zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
              onClick={() => setExpandedDiff(null)}>
-          <div style={{ background: '#1a1a2e', padding: '24px', borderRadius: '8px', minWidth: '500px',
-                        maxWidth: '80vw', maxHeight: '80vh', overflow: 'auto' }}
+          <div style={{ background: 'var(--color-background, #1e2132)', padding: '24px', borderRadius: '8px',
+                        minWidth: '500px', maxWidth: '80vw', maxHeight: '80vh', overflow: 'auto',
+                        border: '1px solid rgba(128,128,128,0.2)' }}
                onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
               <strong>Config Diff</strong>
-              <span style={{ cursor: 'pointer', color: '#8e9aad' }} onClick={() => setExpandedDiff(null)}>✕</span>
+              <span style={{ cursor: 'pointer', opacity: 0.6 }} onClick={() => setExpandedDiff(null)}>✕</span>
             </div>
             <DiffViewer diffJson={expandedDiff} />
           </div>

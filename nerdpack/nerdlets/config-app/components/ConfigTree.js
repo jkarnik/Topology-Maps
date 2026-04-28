@@ -7,7 +7,7 @@ function TreeNode({ label, children, defaultOpen = false }) {
     <div>
       <div
         onClick={() => setOpen(o => !o)}
-        style={{ cursor: 'pointer', padding: '4px 0', fontWeight: 'bold', color: '#8e9aad', userSelect: 'none', fontSize: '13px' }}
+        style={{ cursor: 'pointer', padding: '4px 0', fontWeight: 'bold', opacity: 0.7, userSelect: 'none', fontSize: '13px' }}
       >
         {open ? '▾' : '▸'} {label}
       </div>
@@ -23,8 +23,8 @@ function EntityItem({ entity, selectedEntityId, onEntitySelect, entityType }) {
       onClick={() => onEntitySelect(entity.id, entityType)}
       style={{
         padding: '3px 0 3px 2px', cursor: 'pointer', fontSize: '13px',
-        color: selected ? '#0095f7' : '#e0e0e0',
-        background: selected ? 'rgba(0,149,247,0.1)' : undefined,
+        color: selected ? '#0078bf' : 'inherit',
+        background: selected ? 'rgba(0,120,191,0.12)' : undefined,
         borderRadius: '3px',
       }}
     >
@@ -35,7 +35,7 @@ function EntityItem({ entity, selectedEntityId, onEntitySelect, entityType }) {
 
 export default function ConfigTree({ accountId, orgId, selectedEntityId, onEntitySelect }) {
   if (!accountId || !orgId) {
-    return <p style={{ color: '#8e9aad' }}>Select an org to browse config.</p>;
+    return <p style={{ opacity: 0.6 }}>Select an org to browse config.</p>;
   }
   return (
     <NrqlQuery
@@ -47,49 +47,70 @@ export default function ConfigTree({ accountId, orgId, selectedEntityId, onEntit
     >
       {({ data, loading, error }) => {
         if (loading) return <Spinner />;
-        if (error) return <p style={{ color: 'red' }}>Failed to load: {error.message}</p>;
+        if (error) return <p style={{ color: '#c0392b' }}>Failed to load: {error.message}</p>;
 
-        // Build: networks{id: {name, devices:[], ssids:[]}}
-        const networks = {};
-        const orgs = [];
-
-        (data || []).forEach((series) => {
-          const facets = (series.metadata.groups || []).filter(g => g.type === 'facet');
-          const entityType = facets[0]?.value;
-          const entityId   = facets[1]?.value;
-          const networkId  = series.data?.[0]?.['latest.network_id'] || '';
+        // CHART format with 2 SELECT items produces 2 series per facet combination.
+        // Merge by entity_type:entity_id so each entity ends up with one record.
+        const entityMap = {};
+        (data || []).forEach(s => {
+          const facetGroups = (s.metadata?.groups || []).filter(g => g.type === 'facet');
+          const entityType = facetGroups[0]?.value;
+          const entityId = facetGroups[1]?.value;
           if (!entityType || !entityId) return;
-          const name = series.data?.[0]?.['latest.entity_name'] || series.data?.[0]?.name || entityId;
+          const key = `${entityType}:${entityId}`;
+          if (!entityMap[key]) entityMap[key] = { entityType, entityId };
+          Object.assign(entityMap[key], s.data?.[0] || {});
+        });
 
-          if (entityType === 'network') {
-            if (!networks[entityId]) networks[entityId] = { id: entityId, name, devices: [], ssids: [] };
-            else { networks[entityId].name = name; networks[entityId].id = entityId; }
+        const networks = {};
+        let orgEntity = null;
+
+        Object.values(entityMap).forEach(entry => {
+          const { entityType, entityId } = entry;
+          const name = entry['entity_name'] || '';
+          const networkId = entry['network_id'] || '';
+
+          if (entityType === 'org') {
+            orgEntity = { id: entityId, name: name || entityId };
+          } else if (entityType === 'network') {
+            if (!networks[entityId]) networks[entityId] = { id: entityId, name: name || entityId, devices: [], ssids: [] };
+            else { networks[entityId].name = name || networks[entityId].name; }
           } else if (entityType === 'device') {
-            if (networkId && !networks[networkId]) networks[networkId] = { id: networkId, name: networkId, devices: [], ssids: [] };
-            const bucket = networkId ? networks[networkId] : (networks['__unknown'] = networks['__unknown'] || { id: '', name: 'Unknown Network', devices: [], ssids: [] });
-            bucket.devices.push({ id: entityId, name });
+            const netId = networkId || '__unknown';
+            if (!networks[netId]) networks[netId] = { id: netId, name: netId === '__unknown' ? 'Unknown Network' : netId, devices: [], ssids: [] };
+            networks[netId].devices.push({ id: entityId, name: name || entityId });
           } else if (entityType === 'ssid') {
             const netId = entityId.split(':')[0];
+            const ssidNum = entityId.split(':')[1];
             if (!networks[netId]) networks[netId] = { id: netId, name: netId, devices: [], ssids: [] };
-            networks[netId].ssids.push({ id: entityId, name });
-          } else if (entityType === 'org') {
-            orgs.push({ id: entityId, name });
+            networks[netId].ssids.push({ id: entityId, name: name || `SSID ${ssidNum}` });
           }
         });
 
+        const networkList = Object.values(networks).filter(n => n.id !== '__unknown');
+        const unknown = networks['__unknown'];
+
         return (
           <div style={{ fontFamily: 'monospace' }}>
-            {Object.values(networks).map(net => (
-              <TreeNode key={net.id} label={`${net.name || net.id}`} defaultOpen={Object.keys(networks).length === 1}>
+            {orgEntity && (
+              <EntityItem
+                entity={{ id: orgEntity.id, name: `Org: ${orgEntity.name}` }}
+                entityType="org"
+                selectedEntityId={selectedEntityId}
+                onEntitySelect={onEntitySelect}
+              />
+            )}
+            {networkList.map(net => (
+              <TreeNode key={net.id} label={net.name || net.id} defaultOpen={networkList.length === 1}>
                 {net.devices.length > 0 && (
-                  <TreeNode label={`Devices (${net.devices.length})`} defaultOpen>
+                  <TreeNode label={`Devices (${net.devices.length})`} defaultOpen={net.devices.length <= 10}>
                     {net.devices.map(e => (
                       <EntityItem key={e.id} entity={e} entityType="device" selectedEntityId={selectedEntityId} onEntitySelect={onEntitySelect} />
                     ))}
                   </TreeNode>
                 )}
                 {net.ssids.length > 0 && (
-                  <TreeNode label={`SSIDs (${net.ssids.length})`} defaultOpen>
+                  <TreeNode label={`SSIDs (${net.ssids.length})`}>
                     {net.ssids.map(e => (
                       <EntityItem key={e.id} entity={e} entityType="ssid" selectedEntityId={selectedEntityId} onEntitySelect={onEntitySelect} />
                     ))}
@@ -97,6 +118,13 @@ export default function ConfigTree({ accountId, orgId, selectedEntityId, onEntit
                 )}
               </TreeNode>
             ))}
+            {unknown && (
+              <TreeNode label={`Unknown Network (${unknown.devices.length})`}>
+                {unknown.devices.map(e => (
+                  <EntityItem key={e.id} entity={e} entityType="device" selectedEntityId={selectedEntityId} onEntitySelect={onEntitySelect} />
+                ))}
+              </TreeNode>
+            )}
           </div>
         );
       }}
