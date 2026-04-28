@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NrqlQuery, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, Modal, ModalHeader, ModalBody } from 'nr1';
+import { NrqlQuery, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
 import DiffViewer from './DiffViewer';
 
 export default function ChangeHistory({ accountId, orgId, entityId }) {
@@ -47,10 +47,19 @@ export default function ChangeHistory({ accountId, orgId, entityId }) {
         }}
       </NrqlQuery>
       {expandedDiff && (
-        <Modal onClose={() => setExpandedDiff(null)}>
-          <ModalHeader title="Config Diff" />
-          <ModalBody><DiffViewer diffJson={expandedDiff} /></ModalBody>
-        </Modal>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)',
+                      zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+             onClick={() => setExpandedDiff(null)}>
+          <div style={{ background: '#1a1a2e', padding: '24px', borderRadius: '8px', minWidth: '500px',
+                        maxWidth: '80vw', maxHeight: '80vh', overflow: 'auto' }}
+               onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <strong>Config Diff</strong>
+              <span style={{ cursor: 'pointer', color: '#8e9aad' }} onClick={() => setExpandedDiff(null)}>✕</span>
+            </div>
+            <DiffViewer diffJson={expandedDiff} />
+          </div>
+        </div>
       )}
     </>
   );

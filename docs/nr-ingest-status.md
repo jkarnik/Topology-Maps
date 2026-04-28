@@ -36,9 +36,7 @@ clients, VLANs, and ports are queryable as entities, and per-site topology is vi
 
 | Script | Purpose |
 |---|---|
-| `nr_ingest/phase1_one_switch.py` | Single switch smoke test |
-| `nr_ingest/phase1_one_of_each.py` | One entity of each type — validation run |
-| `nr_ingest/phase2_all_devices.py` | Full ingest: all 1,422 events across all entity types |
+| `nr_ingest/push_all_devices.py` | Full ingest: all 1,422 events across all entity types |
 | `nr_ingest/create_workloads.py` | Creates one NR Workload per network (run once) |
 | `nr_ingest/create_relationships.py` | Creates user-defined entity relationships (run after full ingest) |
 | `nr_ingest/data_source.py` | Loads snapshot from container DB via `docker cp`; falls back to local `data/app.db` |
@@ -96,7 +94,7 @@ user-defined relationships between EXT-* entities? Relationships are the first r
 
 ### 3. Re-sync Strategy
 
-Currently ingest is manual (run `phase2_all_devices.py` by hand).
+Currently ingest is manual (run `push_all_devices.py` by hand).
 Options for keeping NR in sync with the live Meraki state:
 
 - **Scheduled script** — cron job or cloud function running phase2 on a schedule (e.g. every 15 min)

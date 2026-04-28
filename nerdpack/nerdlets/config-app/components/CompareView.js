@@ -4,11 +4,12 @@ import { NrqlQuery, Spinner, Select, SelectItem } from 'nr1';
 function NetworkSelector({ accountId, orgId, label, value, onChange }) {
   return (
     <NrqlQuery accountIds={[accountId]}
-      query={`SELECT uniques(entity_id, 100) FROM MerakiConfigSnapshot
-              WHERE org_id = '${orgId}' AND entity_type = 'network' SINCE 30 days ago`}>
+      query={`SELECT count(*) FROM MerakiConfigSnapshot
+              WHERE org_id = '${orgId}' AND entity_type = 'network'
+              FACET entity_id SINCE 30 days ago LIMIT 100`}>
       {({ data, loading }) => {
         if (loading) return <Spinner />;
-        const ids = data?.[0]?.data?.[0]?.['uniques.entity_id'] || [];
+        const ids = (data || []).map(s => s.metadata?.groups?.find(g => g.type === 'facet')?.value).filter(Boolean);
         return (
           <Select label={label} value={value} onChange={(_, v) => onChange(v)}>
             <SelectItem value={null}>— Select network —</SelectItem>
@@ -49,8 +50,8 @@ function SideBySideDiff({ accountId, netA, netB }) {
           {({ data: dB, loading: lB }) => {
             if (lA || lB) return <Spinner />;
             const mapA = {}, mapB = {};
-            (dA || []).forEach((s) => { mapA[s.metadata.groups[0].value] = s.data?.[0]?.json; });
-            (dB || []).forEach((s) => { mapB[s.metadata.groups[0].value] = s.data?.[0]?.json; });
+            (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
+            (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
             const allAreas = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])].sort();
             const diffAreas = allAreas.filter((a) => mapA[a] !== mapB[a]);
             if (!diffAreas.length) return <p style={{ color: '#27ae60' }}>Networks are identical across all observed config areas.</p>;

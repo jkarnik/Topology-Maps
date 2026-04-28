@@ -51,10 +51,8 @@ WebSocket channels: `/ws/topology` (live topology), `/ws/config` (config sweep e
 Scripts run outside Docker against the live SQLite DB:
 
 1. `data_source.py` — copies DB from container (`topologymaps-server-1`) via `docker cp`; falls back to `data/app.db`
-2. `phase1_one_switch.py` — push one switch entity to NR (smoke test)
-3. `phase1_one_of_each.py` — one entity per device type
-4. `phase2_all_devices.py` — full topology push
-5. `create_relationships.py` / `create_workloads.py` — NR relationship + workload setup
+2. `push_all_devices.py` — full topology push
+3. `create_relationships.py` / `create_workloads.py` — NR relationship + workload setup
 
 Credentials read from `.env` at project root: `NR_API_KEY`, `NR_ACCOUNT_ID`.
 

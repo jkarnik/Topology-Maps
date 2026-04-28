@@ -18,10 +18,10 @@ export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
           if (loading) return <Spinner />;
           if (error || !data?.length) return <span>No config data found.</span>;
           const areas = (data || []).map((s) => ({
-            area: s.metadata.groups[0].value,
-            hash: s.data?.[0]?.hash || '',
-            ts: s.data?.[0]?.ts || '',
-          }));
+            area: (s.metadata.groups || []).find(g => g.type === 'facet')?.value || '',
+            hash: s.data?.[0]?.['latest.config_hash'] || s.data?.[0]?.hash || '',
+            ts: s.data?.[0]?.['latest.observed_at'] || s.data?.[0]?.ts || '',
+          })).filter(a => a.area);
           return (
             <>
               <Table items={areas}>

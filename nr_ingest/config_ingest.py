@@ -38,13 +38,58 @@ NR_EVENT_API = "https://insights-collector.newrelic.com/v1/accounts/{account_id}
 MARKER_FILE = _DIR / "data" / ".last_config_ingest"
 
 
+def _build_entity_meta(conn: sqlite3.Connection) -> dict[str, dict]:
+    """Return {entity_id: {network_id, name}} from metadata blobs for devices and networks."""
+    sql = """
+        SELECT o.entity_type, o.entity_id, b.payload
+        FROM config_observations o
+        JOIN config_blobs b ON b.hash = o.hash
+        WHERE o.config_area IN ('device_metadata', 'network_metadata')
+          AND o.id = (
+            SELECT id FROM config_observations i
+            WHERE i.entity_type = o.entity_type AND i.config_area = o.config_area
+              AND i.entity_id = o.entity_id
+            ORDER BY i.observed_at DESC, i.id DESC LIMIT 1
+          )
+    """
+    result: dict[str, dict] = {}
+    for row in conn.execute(sql).fetchall():
+        try:
+            payload = json.loads(row["payload"])
+            entry = result.setdefault(row["entity_id"], {})
+            if payload.get("name"):
+                entry["name"] = payload["name"]
+            if row["entity_type"] == "device" and payload.get("networkId"):
+                entry["network_id"] = payload["networkId"]
+        except Exception:
+            pass
+    return result
+
+
+def _derive_network_id(entity_type: str, entity_id: str, entity_meta: dict) -> str:
+    if entity_type == "network":
+        return entity_id
+    if entity_type == "ssid":
+        return entity_id.split(":")[0]
+    if entity_type == "device":
+        return entity_meta.get(entity_id, {}).get("network_id", "")
+    return ""
+
+
+def _derive_name(entity_id: str, name_hint: Optional[str], entity_meta: dict) -> str:
+    if name_hint:
+        return name_hint
+    return entity_meta.get(entity_id, {}).get("name", "")
+
+
 def build_snapshot_events(conn: sqlite3.Connection) -> list[dict]:
     """Return one MerakiConfigSnapshot event per (entity, config_area), latest only."""
+    entity_meta = _build_entity_meta(conn)
     sql = """
         SELECT
             o.org_id, o.entity_type, o.entity_id, o.config_area, o.sub_key,
             o.hash AS config_hash, o.observed_at, o.sweep_run_id,
-            COALESCE(o.name_hint, '') AS entity_name,
+            o.name_hint,
             b.payload AS config_json
         FROM config_observations o
         JOIN config_blobs b ON b.hash = o.hash
@@ -62,13 +107,13 @@ def build_snapshot_events(conn: sqlite3.Connection) -> list[dict]:
             "eventType": "MerakiConfigSnapshot",
             "entity_type": row["entity_type"],
             "entity_id": row["entity_id"],
-            "entity_name": row["entity_name"],
+            "entity_name": _derive_name(row["entity_id"], row["name_hint"], entity_meta),
             "config_area": row["config_area"],
             "sub_key": row["sub_key"] or "",
             "config_hash": row["config_hash"],
-            "config_json": row["config_json"],
+            "config_json": row["config_json"][:4000],
             "org_id": row["org_id"],
-            "network_id": "",
+            "network_id": _derive_network_id(row["entity_type"], row["entity_id"], entity_meta),
             "sweep_run_id": row["sweep_run_id"] or 0,
             "tags.source": "topology-maps-app",
         }
@@ -101,7 +146,7 @@ def _serialize_diff(diff_result) -> str:
     return json.dumps([dataclasses.asdict(c) for c in diff_result.changes])
 
 
-def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str]) -> list[dict]:
+def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entity_meta: Optional[dict] = None) -> list[dict]:
     """Return MerakiConfigChange events for hash changes detected after since_ts."""
     sql = """
         SELECT
@@ -131,6 +176,8 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str]) -> li
         ORDER BY a.observed_at
     """
     rows = conn.execute(sql, (since_ts, since_ts)).fetchall()
+    if entity_meta is None:
+        entity_meta = _build_entity_meta(conn)
     events = []
     for row in rows:
         try:
@@ -150,11 +197,11 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str]) -> li
             "sub_key": row["sub_key"] or "",
             "from_hash": row["from_hash"],
             "to_hash": row["to_hash"],
-            "diff_json": diff_json,
+            "diff_json": diff_json[:4000],
             "change_summary": summary,
             "detected_at": row["detected_at"],
             "org_id": row["org_id"],
-            "network_id": "",
+            "network_id": _derive_network_id(row["entity_type"], row["entity_id"], entity_meta),
             "tags.source": "topology-maps-app",
         })
     return events
@@ -221,8 +268,9 @@ def main(
 
     since_ts = since_override if since_override is not None else read_marker(marker_path=marker_path)
 
+    entity_meta = _build_entity_meta(conn)
     snapshot_events = build_snapshot_events(conn)
-    change_events = build_change_events(conn, since_ts=since_ts)
+    change_events = build_change_events(conn, since_ts=since_ts, entity_meta=entity_meta)
     all_events = snapshot_events + change_events
 
     print(f"Snapshot events:  {len(snapshot_events)}")
@@ -236,7 +284,7 @@ def main(
         return 0
 
     total_sent = 0
-    for batch_num, batch in enumerate(chunked(all_events, 500), start=1):
+    for batch_num, batch in enumerate(chunked(all_events, 50), start=1):
         print(f"Batch {batch_num}: posting {len(batch)} events...")
         if not post_events_batch(url, headers, batch):
             print("Aborting — batch failed.", file=sys.stderr)

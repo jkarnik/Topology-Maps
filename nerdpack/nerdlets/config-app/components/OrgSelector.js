@@ -6,11 +6,13 @@ export default function OrgSelector({ accountId, selectedOrgId, onOrgChange }) {
   return (
     <NrqlQuery
       accountIds={[accountId]}
-      query="SELECT uniques(org_id, 100) FROM MerakiConfigSnapshot SINCE 30 days ago"
+      query="SELECT count(*) FROM MerakiConfigSnapshot FACET org_id SINCE 30 days ago LIMIT 100"
     >
-      {({ data, loading }) => {
+      {({ data, loading, error }) => {
         if (loading) return <Spinner />;
-        const orgIds = data?.[0]?.data?.[0]?.['uniques.org_id'] || [];
+        if (error) return <p style={{color:'red'}}>Query error: {error.message}</p>;
+        const orgIds = (data || []).map(s => s.metadata?.groups?.find(g => g.type === 'facet')?.value).filter(Boolean);
+        if (orgIds.length === 0) return <p style={{color:'orange'}}>No orgs found (accountId: {accountId})</p>;
         return (
           <Select value={selectedOrgId} onChange={(_, value) => onOrgChange(value)} label="Organization">
             <SelectItem value={null}>— Select org —</SelectItem>

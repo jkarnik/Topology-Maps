@@ -528,15 +528,15 @@ git commit -m "feat(ui): thread orgId through topology hook state and save paylo
 ### Task 4: NR ingest — read `orgId` from `load_snapshot()` instead of `.env`
 
 **Files:**
-- Modify: `nr_ingest/phase2_all_devices.py`
+- Modify: `nr_ingest/push_all_devices.py`
 
 **What this task delivers:** The Phase 2 ingest script reads `org_id` from the DB snapshot (populated by Task 2) rather than requiring a `MERAKI_ORG_ID` env var. No change to `data_source.py` — `load_snapshot()` already returns `orgId` after Task 2.
 
 ---
 
-- [ ] **Step 1: Update `phase2_all_devices.py` to include the org entity event**
+- [ ] **Step 1: Update `push_all_devices.py` to include the org entity event**
 
-Find the `main()` function in `nr_ingest/phase2_all_devices.py`. Add org event construction before the `all_events` assembly:
+Find the `main()` function in `nr_ingest/push_all_devices.py`. Add org event construction before the `all_events` assembly:
 
 ```python
 def build_org_event(org_id: str, org_name: str) -> dict:
@@ -585,7 +585,7 @@ Also update the success verification message to reflect the org entity:
 
 ```bash
 cd /Users/jkarnik/Code/Topology\ Maps/nr_ingest
-python phase2_all_devices.py 2>&1 | head -20
+python push_all_devices.py 2>&1 | head -20
 ```
 
 Expected output starts with:
@@ -601,6 +601,6 @@ If `orgId not in snapshot` warning appears: run a topology refresh in the UI, sa
 - [ ] **Step 3: Commit**
 
 ```bash
-git add nr_ingest/phase2_all_devices.py
+git add nr_ingest/push_all_devices.py
 git commit -m "feat(nr-ingest): add org entity event, read orgId from DB snapshot"
 ```

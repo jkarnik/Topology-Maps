@@ -384,9 +384,8 @@ Standalone scripts, run manually outside Docker. They read from the same SQLite 
 
 ```
 data_source.py       → copies DB from container via `docker cp`, falls back to data/app.db
-phase1_one_switch.py → smoke test: push one switch entity
-phase1_one_of_each.py → one entity per device type (org, network, MX, MS, MR, client, VLAN, port)
-phase2_all_devices.py → full push of all devices across all entity types
+push_all_devices.py  → full push of all devices across all entity types
+config_ingest.py     → push Meraki config snapshots and change events to NR
 create_relationships.py → create NR relationships (e.g. switch CONTAINS port, network CONTAINS device)
 create_workloads.py  → create NR workloads (one per Meraki network/site)
 ```

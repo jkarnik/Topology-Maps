@@ -3,5 +3,5 @@
   "id": "config-launcher",
   "displayName": "Meraki Config",
   "description": "Browse Meraki configuration snapshots and change history",
-  "rootNerdletId": "topology-maps-config.config-app"
+  "rootNerdletId": "b579e606-6ef2-4922-a770-707fdd3e8cee.config-app"
 }

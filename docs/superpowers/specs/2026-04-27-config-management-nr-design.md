@@ -116,7 +116,7 @@ SINCE 30 days ago LIMIT 100
 
 ## 5. Ingest Pipeline — `nr_ingest/config_ingest.py`
 
-A new script following the same pattern as `nr_ingest/phase2_all_devices.py`.
+A new script following the same pattern as `nr_ingest/push_all_devices.py`.
 
 **What it does:**
 1. Loads the SQLite DB via `data_source.py` (container copy preferred, local fallback)
