@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { NrqlQuery, Spinner } from 'nr1';
 
-function TreeNode({ label, children, defaultOpen = false }) {
+function TreeNode({ label, children, defaultOpen = false, onSelect, selected }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div>
       <div
-        onClick={() => setOpen(o => !o)}
-        style={{ cursor: 'pointer', padding: '4px 0', fontWeight: 'bold', opacity: 0.7, userSelect: 'none', fontSize: '13px' }}
+        onClick={() => { setOpen(o => !o); if (onSelect) onSelect(); }}
+        style={{
+          cursor: 'pointer', padding: '4px 0', fontWeight: 'bold', userSelect: 'none', fontSize: '13px',
+          color: selected ? '#0078bf' : undefined,
+          background: selected ? 'rgba(0,120,191,0.12)' : undefined,
+          borderRadius: selected ? '3px' : undefined,
+          opacity: 0.7,
+        }}
       >
         {open ? '▾' : '▸'} {label}
       </div>
@@ -101,7 +107,13 @@ export default function ConfigTree({ accountId, orgId, selectedEntityId, onEntit
               />
             )}
             {networkList.map(net => (
-              <TreeNode key={net.id} label={net.name || net.id} defaultOpen={networkList.length === 1}>
+              <TreeNode
+                key={net.id}
+                label={net.name || net.id}
+                defaultOpen={networkList.length === 1}
+                onSelect={() => onEntitySelect(net.id, 'network')}
+                selected={selectedEntityId === net.id}
+              >
                 {net.devices.length > 0 && (
                   <TreeNode label={`Devices (${net.devices.length})`} defaultOpen={net.devices.length <= 10}>
                     {net.devices.map(e => (
