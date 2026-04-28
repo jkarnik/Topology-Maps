@@ -116,6 +116,8 @@ def test_build_change_events_detects_hash_diff(test_db):
     assert isinstance(diff, list)
     assert len(diff) > 0
     assert ev["change_summary"] != ""
+    assert ev["from_payload"] == '[{"portId":"1","enabled":true}]'
+    assert ev["to_payload"] == '[{"portId":"1","enabled":false}]'
 
 
 def test_build_change_events_no_previous_obs_excluded(test_db):
