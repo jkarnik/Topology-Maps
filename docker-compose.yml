@@ -59,6 +59,21 @@ services:
     networks:
       - topology-net
 
+  nr_ingest:
+    build:
+      context: .
+      dockerfile: nr_ingest/Dockerfile
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - NR_LICENSE_KEY=${NR_LICENSE_KEY}
+      - NR_ACCOUNT_ID=${NR_ACCOUNT_ID}
+    volumes:
+      - topology-data:/app/data
+    networks:
+      - topology-net
+
 networks:
   topology-net:
     driver: bridge
