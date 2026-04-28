@@ -22,7 +22,15 @@ function highlightJson(raw) {
 }
 
 export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
-  const [selectedArea, setSelectedArea] = useState(null);
+  const [openAreas, setOpenAreas] = useState(new Set());
+
+  function toggleArea(area) {
+    setOpenAreas(prev => {
+      const next = new Set(prev);
+      next.has(area) ? next.delete(area) : next.add(area);
+      return next;
+    });
+  }
 
   if (!entityId) return <p style={{ opacity: 0.6 }}>Select an entity to view its config.</p>;
   if (!accountId) return <p style={{ opacity: 0.6 }}>No account.</p>;
@@ -57,37 +65,46 @@ export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
           if (!areas.length) return <p style={{ opacity: 0.6 }}>No config areas found.</p>;
 
           return (
-            <>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(128,128,128,0.2)', textAlign: 'left', opacity: 0.6 }}>
-                    <th style={{ padding: '6px 8px', fontWeight: 'normal' }}>Config Area</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 'normal' }}>Hash</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 'normal' }}>Last Observed</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {areas.map(({ area, hash, ts }) => (
-                    <tr
-                      key={area}
-                      onClick={() => setSelectedArea(selectedArea === area ? null : area)}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {areas.map(({ area, hash, ts }) => {
+                const isOpen = openAreas.has(area);
+                return (
+                  <div
+                    key={area}
+                    style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '6px', overflow: 'hidden' }}
+                  >
+                    <div
+                      onClick={() => toggleArea(area)}
                       style={{
-                        borderBottom: '1px solid rgba(128,128,128,0.1)', cursor: 'pointer',
-                        background: area === selectedArea ? 'rgba(0,120,191,0.12)' : undefined,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '10px 14px', cursor: 'pointer', userSelect: 'none',
+                        fontFamily: 'monospace', fontSize: '13px',
+                        background: isOpen ? 'rgba(0,120,191,0.12)' : 'rgba(128,128,128,0.05)',
+                        color: isOpen ? '#0078bf' : 'inherit',
+                        borderBottom: isOpen ? '1px solid rgba(128,128,128,0.15)' : undefined,
                       }}
                     >
-                      <td style={{ padding: '6px 8px', color: area === selectedArea ? '#0078bf' : 'inherit' }}>{area}</td>
-                      <td style={{ padding: '6px 8px', fontFamily: 'monospace', opacity: 0.6 }}>{hash.slice(0, 12)}</td>
-                      <td style={{ padding: '6px 8px', opacity: 0.6 }}>{ts}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {selectedArea && (
-                <ConfigJson accountId={accountId} entityId={entityId} configArea={selectedArea} />
-              )}
-            </>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{
+                          fontSize: '12px', opacity: isOpen ? 1 : 0.4,
+                          color: isOpen ? '#0078bf' : 'inherit',
+                          display: 'inline-block',
+                          transform: isOpen ? 'rotate(90deg)' : undefined,
+                          transition: 'transform 0.15s',
+                        }}>▶</span>
+                        <span style={{ fontWeight: 'bold' }}>{area}</span>
+                        <span style={{ opacity: 0.5, fontSize: '11px' }}>{hash.slice(0, 8)} · {ts}</span>
+                      </div>
+                    </div>
+                    {isOpen && (
+                      <div style={{ padding: '12px 14px', background: 'rgba(128,128,128,0.04)' }}>
+                        <ConfigJson accountId={accountId} entityId={entityId} configArea={area} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           );
         }}
       </NrqlQuery>
