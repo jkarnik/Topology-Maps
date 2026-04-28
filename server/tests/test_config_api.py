@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -19,6 +20,12 @@ def app(monkeypatch):
 
         from fastapi import FastAPI
         from server.routes import config as config_routes
+
+        # Prevent real Meraki API calls regardless of env vars loaded by other modules.
+        unconfigured_client = MagicMock()
+        unconfigured_client.is_configured = False
+        monkeypatch.setattr(config_routes, "_get_meraki_client", lambda: unconfigured_client)
+
         app = FastAPI()
         app.include_router(config_routes.router)
         yield app
