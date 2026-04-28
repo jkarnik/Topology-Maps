@@ -277,7 +277,7 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entit
             "org_id": row["org_id"],
             "network_id": _derive_network_id(row["entity_type"], row["entity_id"], entity_meta),
             "from_payload": (row["from_payload"] or "")[:4000],
-            "to_payload": row["to_payload"][:4000],
+            "to_payload": (row["to_payload"] or "")[:4000],
             "tags.source": "topology-maps-app",
         })
     return events
