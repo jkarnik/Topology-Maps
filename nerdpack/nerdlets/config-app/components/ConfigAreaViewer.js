@@ -93,7 +93,7 @@ export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
                           transition: 'transform 0.15s',
                         }}>▶</span>
                         <span style={{ fontWeight: 'bold' }}>{area}</span>
-                        <span style={{ opacity: 0.5, fontSize: '11px' }}>{hash.slice(0, 8)} · {ts}</span>
+                        <span style={{ opacity: 0.5, fontSize: '11px' }}>{hash.slice(0, 8)} · {ts ? new Date(ts).toLocaleString() : ''}</span>
                       </div>
                     </div>
                     {isOpen && (
@@ -120,8 +120,9 @@ function ConfigJson({ accountId, entityId, configArea }) {
               WHERE entity_id = '${entityId}' AND config_area = '${configArea}'
               SINCE 30 days ago`}
     >
-      {({ data, loading }) => {
+      {({ data, loading, error }) => {
         if (loading) return <Spinner />;
+        if (error) return <p style={{ color: '#c0392b', fontSize: '12px', margin: 0 }}>Query failed: {String(error.message || error)}</p>;
         const raw = data?.[0]?.data?.[0]?.['config_json'] || data?.[0]?.data?.[0]?.['latest.config_json'] || '{}';
         return (
           <pre
