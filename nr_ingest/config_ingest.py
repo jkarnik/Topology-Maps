@@ -35,7 +35,81 @@ if _ENV_FILE.exists():
             os.environ.setdefault(_k.strip(), _v.strip())
 
 NR_EVENT_API = "https://insights-collector.newrelic.com/v1/accounts/{account_id}/events"
+NR_GRAPHQL_API = "https://api.newrelic.com/graphql"
 MARKER_FILE = _DIR / "data" / ".last_config_ingest"
+
+
+def query_nr_last_push(account_id: str, user_api_key: str) -> Optional[str]:
+    """Query NR for the ingest timestamp of the most recent MerakiConfigSnapshot.
+
+    Returns an ISO UTC string if found, None on any failure or if no snapshots exist.
+    """
+    nrql = "SELECT max(timestamp) FROM MerakiConfigSnapshot SINCE 7 days ago"
+    body = {
+        "query": (
+            "{ actor { account(id: %s) { nrql(query: \"%s\") { results } } } }"
+            % (account_id, nrql)
+        )
+    }
+    try:
+        resp = httpx.post(
+            NR_GRAPHQL_API,
+            headers={"Api-Key": user_api_key, "Content-Type": "application/json"},
+            json=body,
+            timeout=15.0,
+        )
+        if resp.status_code != 200:
+            return None
+        results = resp.json()["data"]["actor"]["account"]["nrql"]["results"]
+        if not results:
+            return None
+        max_ts_ms = results[0].get("max.timestamp")
+        if not max_ts_ms:
+            return None
+        dt = datetime.fromtimestamp(max_ts_ms / 1000, tz=timezone.utc)
+        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    except Exception:
+        return None
+
+
+def query_nr_snapshot_hashes(account_id: str, user_api_key: str) -> dict[tuple[str, str], str]:
+    """Return {(entity_id, config_area): config_hash} for all snapshots currently in NR.
+
+    Returns empty dict on any failure — caller treats all snapshots as new.
+    """
+    nrql = "SELECT latest(config_hash) FROM MerakiConfigSnapshot FACET entity_id, config_area LIMIT MAX SINCE 30 days ago"
+    body = {
+        "query": (
+            "{ actor { account(id: %s) { nrql(query: \"%s\") { results } } } }"
+            % (account_id, nrql)
+        )
+    }
+    try:
+        resp = httpx.post(
+            NR_GRAPHQL_API,
+            headers={"Api-Key": user_api_key, "Content-Type": "application/json"},
+            json=body,
+            timeout=15.0,
+        )
+        if resp.status_code != 200:
+            return {}
+        results = resp.json()["data"]["actor"]["account"]["nrql"]["results"]
+        return {
+            (row["facet"][0], row["facet"][1]): row["latest.config_hash"]
+            for row in results
+        }
+    except Exception:
+        return {}
+
+
+def filter_new_snapshots(
+    events: list[dict], nr_hashes: dict[tuple[str, str], str]
+) -> list[dict]:
+    """Return only snapshot events whose hash differs from (or is absent in) NR."""
+    return [
+        ev for ev in events
+        if nr_hashes.get((ev["entity_id"], ev["config_area"])) != ev["config_hash"]
+    ]
 
 
 def _build_entity_meta(conn: sqlite3.Connection) -> dict[str, dict]:
@@ -266,10 +340,29 @@ def main(
 
     conn = load_config_db()
 
-    since_ts = since_override if since_override is not None else read_marker(marker_path=marker_path)
+    if since_override is not None:
+        since_ts = since_override
+        print(f"Using --since override: {since_ts}")
+    else:
+        user_api_key = os.environ.get("NR_USER_API_KEY")
+        nr_ts = query_nr_last_push(account_id, user_api_key) if user_api_key else None
+        if nr_ts is not None:
+            since_ts = nr_ts
+            print(f"Using NR last-push timestamp: {since_ts}")
+        else:
+            since_ts = read_marker(marker_path=marker_path)
+            if since_ts:
+                print(f"Using local marker timestamp: {since_ts}")
+            else:
+                print("No prior push found — pushing all changes.")
 
     entity_meta = _build_entity_meta(conn)
     snapshot_events = build_snapshot_events(conn)
+
+    user_api_key = os.environ.get("NR_USER_API_KEY")
+    nr_hashes = query_nr_snapshot_hashes(account_id, user_api_key) if user_api_key else {}
+    snapshot_events = filter_new_snapshots(snapshot_events, nr_hashes)
+
     change_events = build_change_events(conn, since_ts=since_ts, entity_meta=entity_meta)
     all_events = snapshot_events + change_events
 
