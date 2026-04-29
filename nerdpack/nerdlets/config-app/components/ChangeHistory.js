@@ -107,17 +107,25 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
                   entities.push({ entityType, entityId, entityName: entityName || entityId, networkId, count });
                 });
                 if (!entities.length) return <p style={{ opacity: 0.5, fontSize: '12px' }}>No changes in range.</p>;
+                const orgEntities = [];
                 const networks = {};
                 entities.forEach(e => {
+                  if (e.entityType === 'org') { orgEntities.push(e); return; }
                   const netId = e.entityType === 'network' ? e.entityId
                     : e.entityType === 'ssid' ? e.entityId.split(':')[0]
                     : e.networkId || '__unknown';
                   if (!networks[netId]) networks[netId] = { id: netId, name: netNames[netId] || netId, items: [] };
                   if (e.entityType !== 'network') networks[netId].items.push(e);
                 });
+                const visibleNetworks = Object.values(networks).filter(n => n.items.length > 0);
                 return (
                   <div style={{ fontFamily: 'monospace' }}>
-                    {Object.values(networks).map(net => (
+                    {orgEntities.map(e => (
+                      <HistoryEntityItem key={e.entityId} entity={e}
+                        selected={selectedId === e.entityId}
+                        onSelect={() => onSelect(e.entityId, e.entityName)} />
+                    ))}
+                    {visibleNetworks.map(net => (
                       <HistoryTreeNode key={net.id} label={net.name} defaultOpen>
                         {net.items.map(e => (
                           <HistoryEntityItem key={e.entityId} entity={e}
@@ -152,8 +160,9 @@ function parseSummaryBadges(summary) {
 }
 
 function safeParse(str) {
-  try { return JSON.stringify(JSON.parse(str || '{}'), null, 2).split('\n'); }
-  catch (_) { return (str || '').split('\n'); }
+  if (!str) return null;
+  try { return JSON.stringify(JSON.parse(str), null, 2).split('\n'); }
+  catch (_) { return str.split('\n'); }
 }
 
 function syntaxHighlight(line) {
@@ -177,17 +186,22 @@ function syntaxHighlight(line) {
 }
 
 function JsonPane({ label, jsonStr, otherJsonStr, side }) {
+  const sharedBorderStyle = { flex: 1, overflow: 'auto', maxHeight: '300px', borderRight: side === 'from' ? '1px solid rgba(128,128,128,0.15)' : 'none' };
+  const labelEl = <div style={{ fontSize: '11px', opacity: 0.5, padding: '4px 8px', borderBottom: '1px solid rgba(128,128,128,0.1)', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>;
   const lines = safeParse(jsonStr);
-  const otherLines = safeParse(otherJsonStr);
+  if (!lines) {
+    return (
+      <div style={sharedBorderStyle}>
+        {labelEl}
+        <p style={{ opacity: 0.4, fontSize: '11px', padding: '8px', fontStyle: 'italic' }}>No payload — re-run config_ingest.py to capture before/after for new changes.</p>
+      </div>
+    );
+  }
+  const otherLines = safeParse(otherJsonStr) || [];
   const otherSet = new Set(otherLines.map(l => l.trim()).filter(Boolean));
   return (
-    <div style={{
-      flex: 1, overflow: 'auto', maxHeight: '300px',
-      borderRight: side === 'from' ? '1px solid rgba(128,128,128,0.15)' : 'none',
-    }}>
-      <div style={{ fontSize: '11px', opacity: 0.5, padding: '4px 8px', borderBottom: '1px solid rgba(128,128,128,0.1)', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {label}
-      </div>
+    <div style={sharedBorderStyle}>
+      {labelEl}
       <pre style={{ margin: 0, padding: '8px', fontSize: '11px', fontFamily: 'monospace', lineHeight: '1.6' }}>
         {lines.map((line, i) => {
           const trimmed = line.trim();
@@ -206,10 +220,11 @@ function JsonPane({ label, jsonStr, otherJsonStr, side }) {
   );
 }
 
-function DiffTile({ row }) {
+function DiffTile({ row, showEntity }) {
   const [expanded, setExpanded] = useState(false);
   const badges = parseSummaryBadges(row.change_summary);
   const dt = row.detected_at ? new Date(row.detected_at).toISOString().slice(0, 10) : '';
+  const entityLabel = row.entity_name || row.entity_id || '';
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
       <div onClick={() => setExpanded(e => !e)} style={{
@@ -217,7 +232,10 @@ function DiffTile({ row }) {
         cursor: 'pointer', background: 'rgba(128,128,128,0.05)',
       }}>
         <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{expanded ? '▼' : '▶'}</span>
-        <span style={{ fontFamily: 'monospace', fontSize: '13px', flex: 1 }}>{row.config_area}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: '13px', flex: 1 }}>
+          {row.config_area}
+          {showEntity && entityLabel && <span style={{ opacity: 0.5, fontWeight: 'normal', marginLeft: '6px', fontSize: '11px' }}>{entityLabel}</span>}
+        </span>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {badges.map((b, i) => (
             <span key={i} style={{
@@ -242,7 +260,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
   const fromISO = fromDate.toISOString().slice(0, 10);
   const toISO = toDate.toISOString().slice(0, 10);
   const entityFilter = selectedEntityId ? `AND entity_id = '${nrqlEsc(selectedEntityId)}'` : '';
-  const query = `SELECT config_area, change_summary, detected_at, diff_json, from_payload, to_payload
+  const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at, diff_json, from_payload, to_payload
                  FROM MerakiConfigChange
                  WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
                  SINCE '${fromISO}' UNTIL '${toISO}'
@@ -266,7 +284,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
               </div>
               {!rows.length
                 ? <p style={{ opacity: 0.6 }}>No changes found for this selection.</p>
-                : <div>{rows.map((row, i) => <DiffTile key={`${row.config_area}-${row.detected_at}-${i}`} row={row} />)}</div>
+                : <div>{rows.map((row, i) => <DiffTile key={`${row.config_area}-${row.detected_at}-${i}`} row={row} showEntity={!selectedEntityId} />)}</div>
               }
             </>
           );
