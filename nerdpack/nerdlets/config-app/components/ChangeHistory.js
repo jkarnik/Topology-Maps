@@ -1,67 +1,74 @@
 import React, { useState } from 'react';
-import { NrqlQuery, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
-import DiffViewer from './DiffViewer';
+import { NrqlQuery, Spinner } from 'nr1';
 
-export default function ChangeHistory({ accountId, orgId, entityId }) {
-  const [expandedDiff, setExpandedDiff] = useState(null);
+function daysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function DateRangePanel({ fromDate, toDate, onRangeChange }) {
+  function setShortcut(days) {
+    const to = new Date();
+    to.setHours(23, 59, 59, 999);
+    const from = daysAgo(days);
+    onRangeChange(from, to);
+  }
+  function toInputVal(d) { return d.toISOString().slice(0, 10); }
+  const activeDays = Math.round((toDate - fromDate) / 86400000);
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date Range</div>
+      <div style={{ marginBottom: '6px', fontSize: '12px' }}>
+        <label style={{ display: 'block', opacity: 0.6, marginBottom: '2px' }}>From</label>
+        <input type="date" value={toInputVal(fromDate)} max={toInputVal(toDate)}
+          onChange={e => onRangeChange(new Date(e.target.value + 'T00:00:00'), toDate)}
+          style={{ width: '100%', fontSize: '12px', padding: '2px 4px', background: 'transparent', border: '1px solid rgba(128,128,128,0.3)', borderRadius: '3px', color: 'inherit' }} />
+      </div>
+      <div style={{ marginBottom: '8px', fontSize: '12px' }}>
+        <label style={{ display: 'block', opacity: 0.6, marginBottom: '2px' }}>To</label>
+        <input type="date" value={toInputVal(toDate)} min={toInputVal(fromDate)}
+          onChange={e => onRangeChange(fromDate, new Date(e.target.value + 'T23:59:59'))}
+          style={{ width: '100%', fontSize: '12px', padding: '2px 4px', background: 'transparent', border: '1px solid rgba(128,128,128,0.3)', borderRadius: '3px', color: 'inherit' }} />
+      </div>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {[7, 30, 90].map(d => (
+          <button key={d} onClick={() => setShortcut(d)} style={{
+            flex: 1, fontSize: '11px', padding: '3px 0', cursor: 'pointer',
+            background: activeDays === d ? 'rgba(0,120,191,0.15)' : 'transparent',
+            border: `1px solid ${activeDays === d ? '#0078bf' : 'rgba(128,128,128,0.3)'}`,
+            borderRadius: '3px', color: activeDays === d ? '#0078bf' : 'inherit',
+          }}>{d}d</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function ChangeHistory({ accountId, orgId }) {
+  const [fromDate, setFromDate] = useState(daysAgo(30));
+  const [toDate, setToDate] = useState(() => { const d = new Date(); d.setHours(23,59,59,999); return d; });
+  const [selectedEntityId, setSelectedEntityId] = useState(null);
+  const [selectedEntityName, setSelectedEntityName] = useState(null);
+
   if (!accountId || !orgId) return <p style={{ opacity: 0.6 }}>Select an org to view change history.</p>;
 
-  const entityFilter = entityId ? `AND entity_id = '${entityId}'` : '';
-  const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at, diff_json
-                 FROM MerakiConfigChange WHERE org_id = '${orgId}' ${entityFilter}
-                 SINCE 30 days ago ORDER BY detected_at DESC LIMIT 100`;
+  function handleSelect(entityId, entityName) {
+    if (selectedEntityId === entityId) { setSelectedEntityId(null); setSelectedEntityName(null); }
+    else { setSelectedEntityId(entityId); setSelectedEntityName(entityName); }
+  }
 
   return (
-    <>
-      <NrqlQuery accountIds={[accountId]} query={query}>
-        {({ data, loading, error }) => {
-          if (loading) return <Spinner />;
-          if (error) return <span style={{ color: '#c0392b' }}>Failed to load change history.</span>;
-          const rows = data?.[0]?.data || [];
-          if (!rows.length) return <p style={{ opacity: 0.6 }}>No config changes found.</p>;
-          return (
-            <Table items={rows}>
-              <TableHeader>
-                <TableHeaderCell>Entity</TableHeaderCell>
-                <TableHeaderCell>Config Area</TableHeaderCell>
-                <TableHeaderCell>Summary</TableHeaderCell>
-                <TableHeaderCell>Detected At</TableHeaderCell>
-                <TableHeaderCell>Diff</TableHeaderCell>
-              </TableHeader>
-              {({ item }) => (
-                <TableRow>
-                  <TableRowCell>{item.entity_name || item.entity_id}</TableRowCell>
-                  <TableRowCell>{item.config_area}</TableRowCell>
-                  <TableRowCell>{item.change_summary}</TableRowCell>
-                  <TableRowCell>{item.detected_at}</TableRowCell>
-                  <TableRowCell>
-                    <span style={{ color: '#0078bf', cursor: 'pointer', textDecoration: 'underline' }}
-                          onClick={() => setExpandedDiff(item.diff_json)}>
-                      View diff
-                    </span>
-                  </TableRowCell>
-                </TableRow>
-              )}
-            </Table>
-          );
-        }}
-      </NrqlQuery>
-      {expandedDiff && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)',
-                      zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-             onClick={() => setExpandedDiff(null)}>
-          <div style={{ background: 'var(--color-background, #1e2132)', padding: '24px', borderRadius: '8px',
-                        minWidth: '500px', maxWidth: '80vw', maxHeight: '80vh', overflow: 'auto',
-                        border: '1px solid rgba(128,128,128,0.2)' }}
-               onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <strong>Config Diff</strong>
-              <span style={{ cursor: 'pointer', opacity: 0.6 }} onClick={() => setExpandedDiff(null)}>✕</span>
-            </div>
-            <DiffViewer diffJson={expandedDiff} />
-          </div>
-        </div>
-      )}
-    </>
+    <div style={{ display: 'flex', height: '100%', gap: 0 }}>
+      <div style={{ width: '220px', minWidth: '220px', borderRight: '1px solid rgba(128,128,128,0.2)', paddingRight: '12px', overflowY: 'auto' }}>
+        <DateRangePanel fromDate={fromDate} toDate={toDate}
+          onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
+        <div style={{ fontSize: '11px', opacity: 0.4 }}>Entity tree coming soon…</div>
+      </div>
+      <div style={{ flex: 1, paddingLeft: '16px', overflowY: 'auto' }}>
+        <div style={{ opacity: 0.4, fontSize: '13px' }}>Diff tiles coming soon…</div>
+      </div>
+    </div>
   );
 }
