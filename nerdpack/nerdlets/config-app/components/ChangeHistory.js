@@ -151,6 +151,11 @@ function parseSummaryBadges(summary) {
   });
 }
 
+function safeParse(str) {
+  try { return JSON.stringify(JSON.parse(str || '{}'), null, 2).split('\n'); }
+  catch (_) { return (str || '').split('\n'); }
+}
+
 function syntaxHighlight(line) {
   const tokenRegex = /("(?:[^"\\]|\\.)*":?|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}[\],:])/g;
   const result = [];
@@ -172,14 +177,8 @@ function syntaxHighlight(line) {
 }
 
 function JsonPane({ label, jsonStr, otherJsonStr, side }) {
-  let lines = [], otherLines = [];
-  try {
-    lines = JSON.stringify(JSON.parse(jsonStr || '{}'), null, 2).split('\n');
-    otherLines = JSON.stringify(JSON.parse(otherJsonStr || '{}'), null, 2).split('\n');
-  } catch (_) {
-    lines = (jsonStr || '').split('\n');
-    otherLines = (otherJsonStr || '').split('\n');
-  }
+  const lines = safeParse(jsonStr);
+  const otherLines = safeParse(otherJsonStr);
   const otherSet = new Set(otherLines.map(l => l.trim()).filter(Boolean));
   return (
     <div style={{
