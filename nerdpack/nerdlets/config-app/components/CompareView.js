@@ -52,7 +52,7 @@ function CoverageTab({ accountId, orgId }) {
         const rows = Object.entries(matrix).map(([entityId, areaMap]) => {
           const observed = areas.filter(a => areaMap[a] != null).length;
           const pct = areas.length ? Math.round((observed / areas.length) * 100) : 0;
-          return { entityId, areaMap, observed, pct };
+          return { entityId, areaMap, pct };
         }).sort((a, b) => b.pct - a.pct);
 
         if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
@@ -80,7 +80,7 @@ function CoverageTab({ accountId, orgId }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ entityId, areaMap, observed, pct }) => (
+                {rows.map(({ entityId, areaMap, pct }) => (
                   <tr key={entityId}>
                     <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{entityId}</td>
                     <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
