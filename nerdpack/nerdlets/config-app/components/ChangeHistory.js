@@ -111,7 +111,7 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
                     : e.entityType === 'ssid' ? e.entityId.split(':')[0]
                     : e.networkId || '__unknown';
                   if (!networks[netId]) networks[netId] = { id: netId, name: netNames[netId] || netId, items: [] };
-                  networks[netId].items.push(e);
+                  if (e.entityType !== 'network') networks[netId].items.push(e);
                 });
                 return (
                   <div style={{ fontFamily: 'monospace' }}>
