@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import { NrqlQuery, Spinner, Select, SelectItem } from 'nr1';
 
+function cellColor(ts, now, STALE_MS) {
+  if (ts == null) return 'rgba(128,128,128,0.12)';
+  return (now - ts) > STALE_MS ? '#e67e22' : '#27ae60';
+}
+
+function pctColor(pct) {
+  if (pct >= 80) return '#27ae60';
+  if (pct >= 50) return '#e67e22';
+  return '#e74c3c';
+}
+
+function scoreColor(pct) {
+  if (pct >= 80) return { bg: 'rgba(39,174,96,0.06)', border: 'rgba(39,174,96,0.2)', text: '#27ae60' };
+  if (pct >= 50) return { bg: 'rgba(230,126,34,0.06)', border: 'rgba(230,126,34,0.2)', text: '#e67e22' };
+  return { bg: 'rgba(231,76,60,0.06)', border: 'rgba(231,76,60,0.2)', text: '#e74c3c' };
+}
+
 function NetworkSelector({ accountId, orgId, label, value, onChange }) {
   return (
     <NrqlQuery accountIds={[accountId]}
@@ -57,16 +74,6 @@ function CoverageTab({ accountId, orgId }) {
 
         if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
 
-        function cellColor(ts) {
-          if (ts == null) return 'rgba(128,128,128,0.12)';
-          return (now - ts) > STALE_MS ? '#e67e22' : '#27ae60';
-        }
-        function pctColor(pct) {
-          if (pct >= 80) return '#27ae60';
-          if (pct >= 50) return '#e67e22';
-          return '#e74c3c';
-        }
-
         return (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ borderCollapse: 'collapse', fontSize: '12px', width: '100%' }}>
@@ -86,7 +93,7 @@ function CoverageTab({ accountId, orgId }) {
                     <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
                     {areas.map(a => (
                       <td key={a} style={{ padding: '3px' }}>
-                        <div style={{ background: cellColor(areaMap[a]), borderRadius: '3px', width: '20px', height: '14px', margin: '0 auto' }} />
+                        <div style={{ background: cellColor(areaMap[a], now, STALE_MS), borderRadius: '3px', width: '20px', height: '14px', margin: '0 auto' }} />
                       </td>
                     ))}
                   </tr>
@@ -135,7 +142,7 @@ function TemplatesTab({ accountId, orgId }) {
         <p style={{ opacity: 0.6 }}>Select a network above and click "Set as Template" to score all other networks against it.</p>
       )}
 
-      {templateNet && query && (
+      {templateNet && (
         <NrqlQuery accountIds={[accountId]} query={query}>
           {({ data, loading, error }) => {
             if (loading) return <Spinner />;
@@ -158,12 +165,6 @@ function TemplatesTab({ accountId, orgId }) {
 
             if (!templateAreaKeys.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for the selected template network.</p>;
 
-            function scoreColor(pct) {
-              if (pct >= 80) return { bg: 'rgba(39,174,96,0.06)', border: 'rgba(39,174,96,0.2)', text: '#27ae60' };
-              if (pct >= 50) return { bg: 'rgba(230,126,34,0.06)', border: 'rgba(230,126,34,0.2)', text: '#e67e22' };
-              return { bg: 'rgba(231,76,60,0.06)', border: 'rgba(231,76,60,0.2)', text: '#e74c3c' };
-            }
-
             const scored = Object.entries(snapshots)
               .filter(([id]) => id !== templateNet)
               .map(([entityId, areaMap]) => {
@@ -172,6 +173,8 @@ function TemplatesTab({ accountId, orgId }) {
                 return { entityId, areaMap, matched: new Set(matched), pct };
               })
               .sort((a, b) => b.pct - a.pct);
+
+            if (!scored.length) return <p style={{ opacity: 0.6 }}>No other networks to score against this template.</p>;
 
             return (
               <div>
