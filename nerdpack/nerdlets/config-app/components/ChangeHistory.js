@@ -8,6 +8,8 @@ function daysAgo(n) {
   return d;
 }
 
+function nrqlEsc(val) { return String(val || '').replace(/'/g, "\\'"); }
+
 function DateRangePanel({ fromDate, toDate, onRangeChange, activeShortcut, onShortcut }) {
   function setShortcut(days) {
     const to = new Date();
@@ -78,7 +80,7 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
     <div>
       <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Changed Entities</div>
       <NrqlQuery accountIds={[accountId]}
-        query={`SELECT latest(entity_name) FROM MerakiConfigSnapshot WHERE entity_type = 'network' AND org_id = '${orgId}' FACET entity_id SINCE 30 days ago LIMIT MAX`}>
+        query={`SELECT latest(entity_name) FROM MerakiConfigSnapshot WHERE entity_type = 'network' AND org_id = '${nrqlEsc(orgId)}' FACET entity_id SINCE 30 days ago LIMIT MAX`}>
         {({ data: netData }) => {
           const netNames = {};
           (netData || []).forEach(s => {
@@ -89,7 +91,7 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
           });
           return (
             <NrqlQuery accountIds={[accountId]}
-              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${orgId}' FACET entity_type, entity_id, entity_name, network_id SINCE '${fromISO}' UNTIL '${toISO}' LIMIT MAX`}>
+              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${nrqlEsc(orgId)}' FACET entity_type, entity_id, entity_name, network_id SINCE '${fromISO}' UNTIL '${toISO}' LIMIT MAX`}>
               {({ data, loading, error }) => {
                 if (loading) return <Spinner />;
                 if (error) return <p style={{ color: '#c0392b', fontSize: '12px' }}>Failed to load.</p>;
@@ -152,7 +154,7 @@ function parseSummaryBadges(summary) {
 function DiffTile({ row }) {
   const [expanded, setExpanded] = useState(false);
   const badges = parseSummaryBadges(row.change_summary);
-  const dt = row.detected_at ? String(row.detected_at).slice(0, 10) : '';
+  const dt = row.detected_at ? new Date(row.detected_at).toISOString().slice(0, 10) : '';
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
       <div onClick={() => setExpanded(e => !e)} style={{
@@ -183,10 +185,10 @@ function DiffTile({ row }) {
 function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fromDate, toDate }) {
   const fromISO = fromDate.toISOString().slice(0, 10);
   const toISO = toDate.toISOString().slice(0, 10);
-  const entityFilter = selectedEntityId ? `AND entity_id = '${selectedEntityId}'` : '';
+  const entityFilter = selectedEntityId ? `AND entity_id = '${nrqlEsc(selectedEntityId)}'` : '';
   const query = `SELECT config_area, change_summary, detected_at, diff_json, from_payload, to_payload
                  FROM MerakiConfigChange
-                 WHERE org_id = '${orgId}' ${entityFilter}
+                 WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
                  SINCE '${fromISO}' UNTIL '${toISO}'
                  ORDER BY detected_at DESC LIMIT 100`;
   const headerLabel = selectedEntityName || 'All entities';
@@ -208,7 +210,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
               </div>
               {!rows.length
                 ? <p style={{ opacity: 0.6 }}>No changes found for this selection.</p>
-                : <div>{rows.map((row, i) => <DiffTile key={i} row={row} />)}</div>
+                : <div>{rows.map((row, i) => <DiffTile key={`${row.config_area}-${row.detected_at}-${i}`} row={row} />)}</div>
               }
             </>
           );
