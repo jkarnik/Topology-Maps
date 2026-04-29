@@ -246,11 +246,17 @@ function JsonPane({ label, jsonStr, otherJsonStr, side }) {
   );
 }
 
-function DiffTile({ row, showEntity }) {
+function DiffTile({ row, showEntity, accountId, orgId }) {
   const [expanded, setExpanded] = useState(false);
   const badges = parseSummaryBadges(row.change_summary);
   const dt = row.detected_at ? new Date(row.detected_at).toISOString().slice(0, 10) : '';
   const entityLabel = row.entity_name || row.entity_id || '';
+  const payloadQuery = expanded
+    ? `SELECT from_payload, to_payload FROM MerakiConfigChange
+       WHERE org_id = '${nrqlEsc(orgId)}' AND entity_id = '${nrqlEsc(row.entity_id)}'
+       AND config_area = '${nrqlEsc(row.config_area)}' AND detected_at = '${nrqlEsc(row.detected_at)}'
+       AND from_payload != '' SINCE 30 days ago LIMIT 1`
+    : null;
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
       <div onClick={() => setExpanded(e => !e)} style={{
@@ -273,10 +279,18 @@ function DiffTile({ row, showEntity }) {
         <span style={{ fontSize: '11px', opacity: 0.5, marginLeft: '8px', whiteSpace: 'nowrap' }}>{dt}</span>
       </div>
       {expanded && (
-        <div style={{ display: 'flex', borderTop: '1px solid rgba(128,128,128,0.15)' }}>
-          <JsonPane label="Before" jsonStr={row.from_payload} otherJsonStr={row.to_payload} side="from" />
-          <JsonPane label="After" jsonStr={row.to_payload} otherJsonStr={row.from_payload} side="to" />
-        </div>
+        <NrqlQuery accountIds={[accountId]} query={payloadQuery}>
+          {({ data, loading }) => {
+            if (loading) return <div style={{ padding: '12px' }}><Spinner /></div>;
+            const payload = data?.[0]?.data?.[0] || {};
+            return (
+              <div style={{ display: 'flex', borderTop: '1px solid rgba(128,128,128,0.15)' }}>
+                <JsonPane label="Before" jsonStr={payload.from_payload} otherJsonStr={payload.to_payload} side="from" />
+                <JsonPane label="After" jsonStr={payload.to_payload} otherJsonStr={payload.from_payload} side="to" />
+              </div>
+            );
+          }}
+        </NrqlQuery>
       )}
     </div>
   );
@@ -286,10 +300,8 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
   const fromISO = fromDate.toISOString().slice(0, 10);
   const toISO = toDate.toISOString().slice(0, 10);
   const entityFilter = selectedEntityId ? `AND entity_id = '${nrqlEsc(selectedEntityId)}'` : '';
-  // Raw event query; JS dedup below keeps the best version per (entity_id, config_area, detected_at).
-  // LIMIT 300 handles up to 100 unique changes × up to 3 re-push copies.
-  const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at,
-                        diff_json, from_payload, to_payload
+  // Lightweight query — payloads loaded lazily per tile on expand to avoid NR1 response size limits.
+  const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at
                  FROM MerakiConfigChange
                  WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
                  SINCE '${fromISO}' UNTIL '${toISO}'
@@ -301,12 +313,12 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
         {({ data, loading, error }) => {
           if (loading) return <Spinner />;
           if (error) return <span style={{ color: '#c0392b' }}>Failed to load changes.</span>;
-          // Deduplicate by (entity_id, config_area, detected_at): prefer version with from_payload.
+          // Deduplicate by (entity_id, config_area, detected_at): prefer version with entity_name populated.
           const seen = new Map();
           (data?.[0]?.data || []).forEach(row => {
             const key = `${row.entity_id}||${row.config_area}||${row.detected_at}`;
             const prev = seen.get(key);
-            if (!prev || (row.from_payload && !prev.from_payload)) seen.set(key, row);
+            if (!prev || (row.entity_name && !prev.entity_name)) seen.set(key, row);
           });
           const rows = [...seen.values()]
             .filter(r => parseSummaryBadges(r.change_summary).length > 0)
@@ -322,7 +334,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
               </div>
               {!rows.length
                 ? <p style={{ opacity: 0.6 }}>No changes found for this selection.</p>
-                : <div>{rows.map((row, i) => <DiffTile key={`${row.config_area}-${row.detected_at}-${i}`} row={row} showEntity={!selectedEntityId} />)}</div>
+                : <div>{rows.map((row, i) => <DiffTile key={`${row.config_area}-${row.detected_at}-${i}`} row={row} showEntity={!selectedEntityId} accountId={accountId} orgId={orgId} />)}</div>
               }
             </>
           );
