@@ -163,13 +163,13 @@ function syntaxHighlight(line) {
   while ((m = tokenRegex.exec(line)) !== null) {
     if (m.index > last) result.push(<span key={`p${last}`}>{line.slice(last, m.index)}</span>);
     const t = m[0];
-    let color;
-    if (t.endsWith(':') && t.startsWith('"')) color = '#7fb3d3';
-    else if (t.startsWith('"')) color = '#a8c97e';
-    else if (/^-?\d/.test(t)) color = '#f7ca88';
-    else if (t === 'true' || t === 'false' || t === 'null') color = '#c8a2c8';
-    else color = 'rgba(200,200,200,0.6)';
-    result.push(<span key={m.index} style={{ color }}>{t}</span>);
+    let cls;
+    if (t.endsWith(':') && t.startsWith('"')) cls = 'json-key';
+    else if (t.startsWith('"')) cls = 'json-str';
+    else if (/^-?\d/.test(t)) cls = 'json-num';
+    else if (t === 'true' || t === 'false') cls = 'json-bool';
+    else if (t === 'null') cls = 'json-null';
+    result.push(<span key={m.index} className={cls}>{t}</span>);
     last = m.index + t.length;
   }
   if (last < line.length) result.push(<span key={`e${last}`}>{line.slice(last)}</span>);
@@ -292,6 +292,20 @@ export default function ChangeHistory({ accountId, orgId }) {
 
   return (
     <div style={{ display: 'flex', height: '100%', gap: 0 }}>
+      <style>{`
+        .json-key  { color: #0066cc; }
+        .json-str  { color: #a31515; }
+        .json-num  { color: #098658; }
+        .json-bool { color: #0000ff; }
+        .json-null { color: #dd0000; }
+        @media (prefers-color-scheme: dark) {
+          .json-key  { color: #9cdcfe; }
+          .json-str  { color: #ce9178; }
+          .json-num  { color: #b5cea8; }
+          .json-bool { color: #569cd6; }
+          .json-null { color: #f44747; }
+        }
+      `}</style>
       <div style={{ width: '220px', minWidth: '220px', borderRight: '1px solid rgba(128,128,128,0.2)', paddingRight: '12px', overflowY: 'auto' }}>
         <DateRangePanel fromDate={fromDate} toDate={toDate}
           onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }}
