@@ -21,16 +21,23 @@ function scoreColor(pct) {
 function NetworkSelector({ accountId, orgId, label, value, onChange }) {
   return (
     <NrqlQuery accountIds={[accountId]}
-      query={`SELECT count(*) FROM MerakiConfigSnapshot
+      query={`SELECT latest(entity_name) FROM MerakiConfigSnapshot
               WHERE org_id = '${orgId}' AND entity_type = 'network'
               FACET entity_id SINCE 30 days ago LIMIT 100`}>
       {({ data, loading }) => {
         if (loading) return <Spinner />;
-        const ids = (data || []).map(s => s.metadata?.groups?.find(g => g.type === 'facet')?.value).filter(Boolean);
+        const networks = (data || []).map(s => {
+          const id = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
+          const name = s.data?.[0]?.['entity_name'] ?? s.data?.[0]?.['latest.entity_name'] ?? id;
+          return id ? { id, name: name || id } : null;
+        }).filter(Boolean);
         return (
-          <Select label={label} value={value} onChange={(_, v) => onChange(v)}>
+          <Select label={label} value={value} onChange={(_, v) => {
+            const net = networks.find(n => n.id === v);
+            onChange(v, net?.name || v);
+          }}>
             <SelectItem value={null}>— Select network —</SelectItem>
-            {ids.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+            {networks.map(({ id, name }) => <SelectItem key={id} value={id}>{name}</SelectItem>)}
           </Select>
         );
       }}
@@ -219,7 +226,9 @@ function TemplatesTab({ accountId, orgId }) {
 
 export default function CompareView({ accountId, orgId }) {
   const [netA, setNetA] = useState(null);
+  const [netAName, setNetAName] = useState(null);
   const [netB, setNetB] = useState(null);
+  const [netBName, setNetBName] = useState(null);
   const [subTab, setSubTab] = useState('networks');
 
   const pillStyle = (key) => ({
@@ -244,12 +253,12 @@ export default function CompareView({ accountId, orgId }) {
 
       {subTab === 'networks' && (
         <div>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
-            <NetworkSelector accountId={accountId} orgId={orgId} label="Network A" value={netA} onChange={setNetA} />
-            <NetworkSelector accountId={accountId} orgId={orgId} label="Network B" value={netB} onChange={setNetB} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '16px' }}>
+            <NetworkSelector accountId={accountId} orgId={orgId} label="Network A" value={netA} onChange={(id, name) => { setNetA(id); setNetAName(name); }} />
+            <NetworkSelector accountId={accountId} orgId={orgId} label="Network B" value={netB} onChange={(id, name) => { setNetB(id); setNetBName(name); }} />
           </div>
           {netA && netB && netA !== netB
-            ? <SideBySideDiff accountId={accountId} netA={netA} netB={netB} />
+            ? <CompareDiffView accountId={accountId} netA={netA} netB={netB} nameA={netAName} nameB={netBName} />
             : <p style={{ opacity: 0.6 }}>Select two different networks to compare.</p>
           }
         </div>
@@ -266,47 +275,156 @@ export default function CompareView({ accountId, orgId }) {
   );
 }
 
-function SideBySideDiff({ accountId, netA, netB }) {
+function safeParse(str) {
+  if (!str) return null;
+  try { return JSON.stringify(JSON.parse(str), null, 2).split('\n'); }
+  catch (_) { return str.split('\n'); }
+}
+
+function syntaxHighlight(line) {
+  const tokenRegex = /("(?:[^"\\]|\\.)*":?|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}[\],:])/g;
+  const result = [];
+  let last = 0, m;
+  while ((m = tokenRegex.exec(line)) !== null) {
+    if (m.index > last) result.push(<span key={`p${last}`}>{line.slice(last, m.index)}</span>);
+    const t = m[0];
+    let cls;
+    if (t.endsWith(':') && t.startsWith('"')) cls = 'json-key';
+    else if (t.startsWith('"')) cls = 'json-str';
+    else if (/^-?\d/.test(t)) cls = 'json-num';
+    else if (t === 'true' || t === 'false') cls = 'json-bool';
+    else if (t === 'null') cls = 'json-null';
+    result.push(<span key={m.index} className={cls}>{t}</span>);
+    last = m.index + t.length;
+  }
+  if (last < line.length) result.push(<span key={`e${last}`}>{line.slice(last)}</span>);
+  return result;
+}
+
+function CompareJsonPane({ label, jsonStr, otherJsonStr, side }) {
+  const borderStyle = { flex: 1, overflow: 'auto', maxHeight: '400px', borderRight: side === 'left' ? '1px solid rgba(128,128,128,0.15)' : 'none' };
+  const labelEl = <div style={{ fontSize: '11px', opacity: 0.5, padding: '4px 8px', borderBottom: '1px solid rgba(128,128,128,0.1)', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>;
+  const lines = safeParse(jsonStr);
+  if (!lines) {
+    return (
+      <div style={borderStyle}>
+        {labelEl}
+        <p style={{ opacity: 0.4, fontSize: '11px', padding: '8px', fontStyle: 'italic' }}>(not observed)</p>
+      </div>
+    );
+  }
+  const otherLines = safeParse(otherJsonStr) || [];
+  const otherSet = new Set(otherLines.map(l => l.trim()).filter(Boolean));
+  return (
+    <div style={borderStyle}>
+      {labelEl}
+      <pre style={{ margin: 0, padding: '8px', fontSize: '11px', fontFamily: 'monospace', lineHeight: '1.6' }}>
+        {lines.map((line, i) => {
+          const trimmed = line.trim();
+          const changed = trimmed && !otherSet.has(trimmed);
+          const bg = changed
+            ? (side === 'left' ? 'rgba(231,76,60,0.15)' : 'rgba(39,174,96,0.15)')
+            : 'transparent';
+          return (
+            <div key={i} style={{ background: bg, paddingLeft: '2px' }}>
+              {syntaxHighlight(line)}
+            </div>
+          );
+        })}
+      </pre>
+    </div>
+  );
+}
+
+function computeCompareBadges(jsonA, jsonB) {
+  const linesA = new Set((safeParse(jsonA) || []).map(l => l.trim()).filter(Boolean));
+  const linesB = new Set((safeParse(jsonB) || []).map(l => l.trim()).filter(Boolean));
+  const added = [...linesB].filter(l => !linesA.has(l)).length;
+  const removed = [...linesA].filter(l => !linesB.has(l)).length;
+  const badges = [];
+  if (added) badges.push({ text: `+ ${added} added`, color: '#27ae60' });
+  if (removed) badges.push({ text: `− ${removed} removed`, color: '#e74c3c' });
+  return badges;
+}
+
+function CompareTile({ area, jsonA, jsonB, labelA, labelB }) {
+  const [expanded, setExpanded] = useState(false);
+  const badges = computeCompareBadges(jsonA, jsonB);
+  return (
+    <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
+      <div onClick={() => setExpanded(e => !e)} style={{
+        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
+        cursor: 'pointer', background: 'rgba(128,128,128,0.05)',
+      }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{expanded ? '▼' : '▶'}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: '13px', flex: 1 }}>{area}</span>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          {badges.map((b, i) => (
+            <span key={i} style={{
+              fontSize: '11px', padding: '2px 6px', borderRadius: '10px',
+              background: `${b.color}22`, color: b.color, fontWeight: 500,
+            }}>{b.text}</span>
+          ))}
+        </div>
+      </div>
+      {expanded && (
+        <div style={{ display: 'flex', borderTop: '1px solid rgba(128,128,128,0.15)' }}>
+          <CompareJsonPane label={labelA} jsonStr={jsonA} otherJsonStr={jsonB} side="left" />
+          <CompareJsonPane label={labelB} jsonStr={jsonB} otherJsonStr={jsonA} side="right" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CompareDiffView({ accountId, netA, netB, nameA, nameB }) {
   const q = (id) => `SELECT latest(config_json) AS json FROM MerakiConfigSnapshot
                      WHERE entity_id = '${id}' FACET config_area SINCE 30 days ago LIMIT MAX`;
   return (
-    <NrqlQuery accountIds={[accountId]} query={q(netA)}>
-      {({ data: dA, loading: lA }) => (
-        <NrqlQuery accountIds={[accountId]} query={q(netB)}>
-          {({ data: dB, loading: lB }) => {
-            if (lA || lB) return <Spinner />;
-            const mapA = {}, mapB = {};
-            (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
-            (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
-            const allAreas = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])].sort();
-            const diffAreas = allAreas.filter((a) => mapA[a] !== mapB[a]);
-            if (!diffAreas.length) return <p style={{ color: '#27ae60' }}>Networks are identical across all observed config areas.</p>;
-            return (
-              <div>
-                {diffAreas.map((area) => {
-                  const fmt = (raw) => { try { return JSON.stringify(JSON.parse(raw), null, 2); } catch(_) { return raw || '(not observed)'; }};
-                  return (
-                    <div key={area} style={{ marginBottom: '16px' }}>
-                      <h4 style={{ marginBottom: '4px' }}>{area}</h4>
-                      <div style={{ display: 'flex', gap: '16px' }}>
-                        {[{id: netA, json: mapA[area]}, {id: netB, json: mapB[area]}].map(({id, json}) => (
-                          <div key={id} style={{ flex: 1 }}>
-                            <p style={{ opacity: 0.6, fontSize: '12px' }}>{id}</p>
-                            <pre style={{ background: 'rgba(128,128,128,0.08)', border: '1px solid rgba(128,128,128,0.15)',
-                                          padding: '8px', fontSize: '11px', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
-                              {fmt(json)}
-                            </pre>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          }}
-        </NrqlQuery>
-      )}
-    </NrqlQuery>
+    <>
+      <style>{`
+        .json-key  { color: #0066cc; }
+        .json-str  { color: #a31515; }
+        .json-num  { color: #098658; }
+        .json-bool { color: #0000ff; }
+        .json-null { color: #dd0000; }
+        @media (prefers-color-scheme: dark) {
+          .json-key  { color: #9cdcfe; }
+          .json-str  { color: #ce9178; }
+          .json-num  { color: #b5cea8; }
+          .json-bool { color: #569cd6; }
+          .json-null { color: #f44747; }
+        }
+      `}</style>
+      <NrqlQuery accountIds={[accountId]} query={q(netA)}>
+        {({ data: dA, loading: lA }) => (
+          <NrqlQuery accountIds={[accountId]} query={q(netB)}>
+            {({ data: dB, loading: lB }) => {
+              if (lA || lB) return <Spinner />;
+              const mapA = {}, mapB = {};
+              (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
+              (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
+              const allAreas = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])].sort();
+              const diffAreas = allAreas.filter((a) => mapA[a] !== mapB[a]);
+              if (!diffAreas.length) return <p style={{ color: '#27ae60' }}>Networks are identical across all observed config areas.</p>;
+              const labelA = nameA || netA;
+              const labelB = nameB || netB;
+              return (
+                <div>
+                  <div style={{ marginBottom: '12px', fontSize: '12px', opacity: 0.6 }}>
+                    {diffAreas.length} config area{diffAreas.length !== 1 ? 's' : ''} differ · click a tile to expand
+                  </div>
+                  {diffAreas.map(area => (
+                    <CompareTile key={area} area={area}
+                      jsonA={mapA[area]} jsonB={mapB[area]}
+                      labelA={labelA} labelB={labelB} />
+                  ))}
+                </div>
+              );
+            }}
+          </NrqlQuery>
+        )}
+      </NrqlQuery>
+    </>
   );
 }
