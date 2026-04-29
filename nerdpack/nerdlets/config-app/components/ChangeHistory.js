@@ -48,12 +48,21 @@ function DateRangePanel({ fromDate, toDate, onRangeChange, activeShortcut, onSho
   );
 }
 
-function HistoryTreeNode({ label, children, defaultOpen = false }) {
+function HistoryTreeNode({ label, children, defaultOpen = false, onSelect, selected }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div>
-      <div onClick={() => setOpen(o => !o)} style={{ cursor: 'pointer', padding: '3px 0', fontWeight: 'bold', userSelect: 'none', fontSize: '12px', opacity: 0.7 }}>
-        {open ? '▾' : '▸'} {label}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 0', fontSize: '12px', userSelect: 'none' }}>
+        <span onClick={() => setOpen(o => !o)} style={{ cursor: 'pointer', opacity: 0.7, fontWeight: 'bold' }}>
+          {open ? '▾' : '▸'}
+        </span>
+        <span onClick={onSelect ? onSelect : () => setOpen(o => !o)} style={{
+          cursor: 'pointer', fontWeight: 'bold',
+          color: selected ? '#0078bf' : 'inherit',
+          opacity: selected ? 1 : 0.7,
+        }}>
+          {onSelect ? (selected ? '● ' : '○ ') : ''}{label}
+        </span>
       </div>
       {open && <div style={{ paddingLeft: '12px' }}>{children}</div>}
     </div>
@@ -113,10 +122,15 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
                   const netId = e.entityType === 'network' ? e.entityId
                     : e.entityType === 'ssid' ? e.entityId.split(':')[0]
                     : e.networkId || '__unknown';
-                  if (!networks[netId]) networks[netId] = { id: netId, name: netNames[netId] || netId, items: [] };
-                  networks[netId].items.push(e);
+                  const netName = netNames[netId] || netId;
+                  if (!networks[netId]) networks[netId] = { id: netId, name: netName, networkEntity: null, items: [] };
+                  if (e.entityType === 'network') {
+                    networks[netId].networkEntity = { ...e, entityName: netName };
+                  } else {
+                    networks[netId].items.push(e);
+                  }
                 });
-                const visibleNetworks = Object.values(networks).filter(n => n.items.length > 0);
+                const visibleNetworks = Object.values(networks).filter(n => n.items.length > 0 || n.networkEntity);
                 const orgCount = entities.filter(e => e.entityType === 'org').reduce((s, e) => s + e.count, 0);
                 return (
                   <div style={{ fontFamily: 'monospace' }}>
@@ -124,15 +138,27 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
                       entity={{ entityId: orgId, entityName: 'Organization', count: orgCount }}
                       selected={selectedId === orgId}
                       onSelect={() => onSelect(orgId, 'Organization')} />
-                    {visibleNetworks.map(net => (
-                      <HistoryTreeNode key={net.id} label={net.name} defaultOpen>
-                        {net.items.map(e => (
-                          <HistoryEntityItem key={e.entityId} entity={e}
-                            selected={selectedId === e.entityId}
-                            onSelect={() => onSelect(e.entityId, e.entityName)} />
-                        ))}
-                      </HistoryTreeNode>
-                    ))}
+                    {visibleNetworks.map(net => {
+                      const ne = net.networkEntity;
+                      if (net.items.length === 0 && ne) {
+                        return (
+                          <HistoryEntityItem key={net.id} entity={ne}
+                            selected={selectedId === ne.entityId}
+                            onSelect={() => onSelect(ne.entityId, net.name)} />
+                        );
+                      }
+                      return (
+                        <HistoryTreeNode key={net.id} label={net.name} defaultOpen
+                          onSelect={ne ? () => onSelect(ne.entityId, net.name) : undefined}
+                          selected={ne ? selectedId === ne.entityId : false}>
+                          {net.items.map(e => (
+                            <HistoryEntityItem key={e.entityId} entity={e}
+                              selected={selectedId === e.entityId}
+                              onSelect={() => onSelect(e.entityId, e.entityName)} />
+                          ))}
+                        </HistoryTreeNode>
+                      );
+                    })}
                   </div>
                 );
               }}

@@ -225,7 +225,7 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entit
     sql = """
         SELECT
             a.org_id, a.entity_type, a.entity_id, a.config_area, a.sub_key,
-            COALESCE(a.name_hint, '') AS entity_name,
+            COALESCE(a.name_hint, '') AS name_hint,
             a.hash AS to_hash, a.observed_at AS detected_at,
             prev.hash AS from_hash,
             b_new.payload AS to_payload, b_old.payload AS from_payload
@@ -266,7 +266,7 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entit
             "eventType": "MerakiConfigChange",
             "entity_type": row["entity_type"],
             "entity_id": row["entity_id"],
-            "entity_name": row["entity_name"],
+            "entity_name": _derive_name(row["entity_id"], row["name_hint"] or None, entity_meta),
             "config_area": row["config_area"],
             "sub_key": row["sub_key"] or "",
             "from_hash": row["from_hash"],
