@@ -151,6 +151,62 @@ function parseSummaryBadges(summary) {
   });
 }
 
+function syntaxHighlight(line) {
+  const tokenRegex = /("(?:[^"\\]|\\.)*":?|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}[\],:])/g;
+  const result = [];
+  let last = 0, m;
+  while ((m = tokenRegex.exec(line)) !== null) {
+    if (m.index > last) result.push(<span key={`p${last}`}>{line.slice(last, m.index)}</span>);
+    const t = m[0];
+    let color;
+    if (t.endsWith(':') && t.startsWith('"')) color = '#7fb3d3';
+    else if (t.startsWith('"')) color = '#a8c97e';
+    else if (/^-?\d/.test(t)) color = '#f7ca88';
+    else if (t === 'true' || t === 'false' || t === 'null') color = '#c8a2c8';
+    else color = 'rgba(200,200,200,0.6)';
+    result.push(<span key={m.index} style={{ color }}>{t}</span>);
+    last = m.index + t.length;
+  }
+  if (last < line.length) result.push(<span key={`e${last}`}>{line.slice(last)}</span>);
+  return result;
+}
+
+function JsonPane({ label, jsonStr, otherJsonStr, side }) {
+  let lines = [], otherLines = [];
+  try {
+    lines = JSON.stringify(JSON.parse(jsonStr || '{}'), null, 2).split('\n');
+    otherLines = JSON.stringify(JSON.parse(otherJsonStr || '{}'), null, 2).split('\n');
+  } catch (_) {
+    lines = (jsonStr || '').split('\n');
+    otherLines = (otherJsonStr || '').split('\n');
+  }
+  const otherSet = new Set(otherLines.map(l => l.trim()).filter(Boolean));
+  return (
+    <div style={{
+      flex: 1, overflow: 'auto', maxHeight: '300px',
+      borderRight: side === 'from' ? '1px solid rgba(128,128,128,0.15)' : 'none',
+    }}>
+      <div style={{ fontSize: '11px', opacity: 0.5, padding: '4px 8px', borderBottom: '1px solid rgba(128,128,128,0.1)', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {label}
+      </div>
+      <pre style={{ margin: 0, padding: '8px', fontSize: '11px', fontFamily: 'monospace', lineHeight: '1.6' }}>
+        {lines.map((line, i) => {
+          const trimmed = line.trim();
+          const changed = trimmed && !otherSet.has(trimmed);
+          const bg = changed
+            ? (side === 'from' ? 'rgba(231,76,60,0.15)' : 'rgba(39,174,96,0.15)')
+            : 'transparent';
+          return (
+            <div key={i} style={{ background: bg, paddingLeft: '2px' }}>
+              {syntaxHighlight(line)}
+            </div>
+          );
+        })}
+      </pre>
+    </div>
+  );
+}
+
 function DiffTile({ row }) {
   const [expanded, setExpanded] = useState(false);
   const badges = parseSummaryBadges(row.change_summary);
@@ -174,8 +230,9 @@ function DiffTile({ row }) {
         <span style={{ fontSize: '11px', opacity: 0.5, marginLeft: '8px', whiteSpace: 'nowrap' }}>{dt}</span>
       </div>
       {expanded && (
-        <div style={{ padding: '12px', borderTop: '1px solid rgba(128,128,128,0.15)', opacity: 0.5, fontSize: '12px' }}>
-          Diff view coming in next task…
+        <div style={{ display: 'flex', borderTop: '1px solid rgba(128,128,128,0.15)' }}>
+          <JsonPane label="Before" jsonStr={row.from_payload} otherJsonStr={row.to_payload} side="from" />
+          <JsonPane label="After" jsonStr={row.to_payload} otherJsonStr={row.from_payload} side="to" />
         </div>
       )}
     </div>
