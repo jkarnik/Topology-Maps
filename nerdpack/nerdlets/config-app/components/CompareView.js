@@ -181,7 +181,7 @@ function TemplatesTab({ accountId, orgId }) {
                   <span style={{ opacity: 0.5 }}> · {templateAreaKeys.length} config areas</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {scored.map(({ entityId, areaMap, matched, pct }) => {
+                  {scored.map(({ entityId, matched, pct }) => {
                     const c = scoreColor(pct);
                     return (
                       <div key={entityId} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: '6px', padding: '10px 14px' }}>
