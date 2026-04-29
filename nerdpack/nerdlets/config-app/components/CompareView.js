@@ -204,8 +204,8 @@ function NetworkSelector({ accountId, orgId, label, value, onChange }) {
 }
 
 function CoverageTab({ accountId, orgId }) {
-  const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}'
+  const query = `SELECT latest(timestamp), latest(entity_name) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}' AND entity_type = 'network'
                  FACET entity_id, config_area
                  SINCE 30 days ago LIMIT MAX`;
   return (
@@ -218,6 +218,7 @@ function CoverageTab({ accountId, orgId }) {
         const STALE_MS = 7 * 24 * 60 * 60 * 1000;
 
         const matrix = {};
+        const nameMap = {};
         const allAreas = new Set();
         (data || []).forEach(s => {
           const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
@@ -225,8 +226,10 @@ function CoverageTab({ accountId, orgId }) {
           const area = fg[1]?.value;
           if (!entityId || !area) return;
           const ts = s.data?.[0]?.['latest.timestamp'] ?? s.data?.[0]?.['timestamp'] ?? null;
+          const name = s.data?.[0]?.['latest.entity_name'] ?? s.data?.[0]?.['entity_name'] ?? null;
           if (!matrix[entityId]) matrix[entityId] = {};
           matrix[entityId][area] = ts ? Number(ts) : null;
+          if (name && !nameMap[entityId]) nameMap[entityId] = name;
           allAreas.add(area);
         });
 
@@ -234,7 +237,7 @@ function CoverageTab({ accountId, orgId }) {
         const rows = Object.entries(matrix).map(([entityId, areaMap]) => {
           const observed = areas.filter(a => areaMap[a] != null).length;
           const pct = areas.length ? Math.round((observed / areas.length) * 100) : 0;
-          return { entityId, areaMap, pct };
+          return { entityId, name: nameMap[entityId] || entityId, areaMap, pct };
         }).sort((a, b) => b.pct - a.pct);
 
         if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
@@ -252,9 +255,9 @@ function CoverageTab({ accountId, orgId }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ entityId, areaMap, pct }) => (
+                {rows.map(({ entityId, name, areaMap, pct }) => (
                   <tr key={entityId}>
-                    <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{entityId}</td>
+                    <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{name}</td>
                     <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
                     {areas.map(a => (
                       <td key={a} style={{ padding: '3px' }}>
@@ -279,11 +282,13 @@ function CoverageTab({ accountId, orgId }) {
 
 function TemplatesTab({ accountId, orgId }) {
   const [selectedNet, setSelectedNet] = useState(null);
+  const [selectedNetName, setSelectedNetName] = useState(null);
   const [templateNet, setTemplateNet] = useState(null);
+  const [templateNetName, setTemplateNetName] = useState(null);
 
   const query = templateNet
-    ? `SELECT latest(config_json) FROM MerakiConfigSnapshot
-       WHERE org_id = '${orgId}'
+    ? `SELECT latest(config_json), latest(entity_name) FROM MerakiConfigSnapshot
+       WHERE org_id = '${orgId}' AND entity_type = 'network'
        FACET entity_id, config_area
        SINCE 30 days ago LIMIT MAX`
     : null;
@@ -293,10 +298,10 @@ function TemplatesTab({ accountId, orgId }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', padding: '12px', background: 'rgba(0,120,191,0.07)', border: '1px solid rgba(0,120,191,0.2)', borderRadius: '6px' }}>
         <span style={{ fontSize: '12px', opacity: 0.6, whiteSpace: 'nowrap' }}>Golden template:</span>
         <div style={{ flex: 1 }}>
-          <NetworkSelector accountId={accountId} orgId={orgId} label="" value={selectedNet} onChange={setSelectedNet} />
+          <NetworkSelector accountId={accountId} orgId={orgId} label="" value={selectedNet} onChange={(id, name) => { setSelectedNet(id); setSelectedNetName(name); }} />
         </div>
         <button
-          onClick={() => setTemplateNet(selectedNet)}
+          onClick={() => { setTemplateNet(selectedNet); setTemplateNetName(selectedNetName); }}
           disabled={!selectedNet}
           style={{ padding: '6px 14px', background: selectedNet ? 'rgba(0,120,191,0.2)' : 'rgba(128,128,128,0.1)', border: `1px solid ${selectedNet ? '#0078bf' : 'rgba(128,128,128,0.3)'}`, borderRadius: '4px', color: selectedNet ? '#0078bf' : 'inherit', fontSize: '12px', cursor: selectedNet ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
           Set as Template
@@ -314,14 +319,17 @@ function TemplatesTab({ accountId, orgId }) {
             if (error) return <p style={{ color: '#c0392b' }}>Failed to load snapshot data.</p>;
 
             const snapshots = {};
+            const nameMap = {};
             (data || []).forEach(s => {
               const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
               const entityId = fg[0]?.value;
               const area = fg[1]?.value;
               if (!entityId || !area) return;
               const json = s.data?.[0]?.['latest.config_json'] ?? s.data?.[0]?.['config_json'] ?? s.data?.[0]?.json ?? null;
+              const name = s.data?.[0]?.['latest.entity_name'] ?? s.data?.[0]?.['entity_name'] ?? null;
               if (!snapshots[entityId]) snapshots[entityId] = {};
               snapshots[entityId][area] = json;
+              if (name && !nameMap[entityId]) nameMap[entityId] = name;
             });
 
             const templateAreas = snapshots[templateNet] || {};
@@ -344,7 +352,7 @@ function TemplatesTab({ accountId, orgId }) {
               <div>
                 <div style={{ marginBottom: '14px', fontSize: '12px' }}>
                   <span style={{ opacity: 0.5 }}>Scoring against: </span>
-                  <span style={{ color: '#0078bf', fontWeight: 'bold' }}>{templateNet}</span>
+                  <span style={{ color: '#0078bf', fontWeight: 'bold' }}>{templateNetName || templateNet}</span>
                   <span style={{ opacity: 0.5 }}> · {templateAreaKeys.length} config areas</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -353,7 +361,7 @@ function TemplatesTab({ accountId, orgId }) {
                     return (
                       <div key={entityId} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: '6px', padding: '10px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                          <div style={{ flex: 1, fontSize: '13px' }}>{entityId}</div>
+                          <div style={{ flex: 1, fontSize: '13px' }}>{nameMap[entityId] || entityId}</div>
                           <div style={{ fontSize: '20px', fontWeight: 'bold', color: c.text }}>{pct}%</div>
                           <div style={{ fontSize: '11px', opacity: 0.5 }}>{matched.size} / {templateAreaKeys.length} areas</div>
                         </div>
