@@ -24,17 +24,47 @@ function NetworkSelector({ accountId, orgId, label, value, onChange }) {
 export default function CompareView({ accountId, orgId }) {
   const [netA, setNetA] = useState(null);
   const [netB, setNetB] = useState(null);
+  const [subTab, setSubTab] = useState('networks');
+
   if (!orgId) return <p style={{ opacity: 0.6 }}>Select an org to compare networks.</p>;
+
+  const pillStyle = (key) => ({
+    padding: '5px 14px',
+    borderRadius: '20px',
+    border: subTab === key ? '1px solid #0078bf' : '1px solid rgba(128,128,128,0.3)',
+    background: subTab === key ? 'rgba(0,120,191,0.15)' : 'transparent',
+    color: subTab === key ? '#0078bf' : 'inherit',
+    cursor: 'pointer',
+    fontSize: '12px',
+  });
+
   return (
     <div>
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
-        <NetworkSelector accountId={accountId} orgId={orgId} label="Network A" value={netA} onChange={setNetA} />
-        <NetworkSelector accountId={accountId} orgId={orgId} label="Network B" value={netB} onChange={setNetB} />
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
+        <button style={pillStyle('networks')} onClick={() => setSubTab('networks')}>Networks</button>
+        <button style={pillStyle('coverage')} onClick={() => setSubTab('coverage')}>Coverage</button>
+        <button style={pillStyle('templates')} onClick={() => setSubTab('templates')}>Templates</button>
       </div>
-      {netA && netB && netA !== netB ? (
-        <SideBySideDiff accountId={accountId} netA={netA} netB={netB} />
-      ) : (
-        <p style={{ opacity: 0.6 }}>Select two different networks to compare.</p>
+
+      {subTab === 'networks' && (
+        <div>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
+            <NetworkSelector accountId={accountId} orgId={orgId} label="Network A" value={netA} onChange={setNetA} />
+            <NetworkSelector accountId={accountId} orgId={orgId} label="Network B" value={netB} onChange={setNetB} />
+          </div>
+          {netA && netB && netA !== netB
+            ? <SideBySideDiff accountId={accountId} netA={netA} netB={netB} />
+            : <p style={{ opacity: 0.6 }}>Select two different networks to compare.</p>
+          }
+        </div>
+      )}
+
+      {subTab === 'coverage' && (
+        <p style={{ opacity: 0.6 }}>Coverage coming soon…</p>
+      )}
+
+      {subTab === 'templates' && (
+        <p style={{ opacity: 0.6 }}>Templates coming soon…</p>
       )}
     </div>
   );
