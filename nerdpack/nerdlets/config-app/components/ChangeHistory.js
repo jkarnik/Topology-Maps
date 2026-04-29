@@ -171,7 +171,8 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
 }
 
 function parseSummaryBadges(summary) {
-  if (!summary) return [];
+  if (!summary || summary === 'no changes') return [];
+  if (summary.includes('diff unavailable')) return [{ text: 'diff unavailable', color: '#7f8c8d' }];
   const patterns = [
     [/(\d+) added/, n => `+ ${n} added`, '#27ae60'],
     [/(\d+) removed/, n => `− ${n} removed`, '#e74c3c'],
@@ -285,15 +286,14 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
   const fromISO = fromDate.toISOString().slice(0, 10);
   const toISO = toDate.toISOString().slice(0, 10);
   const entityFilter = selectedEntityId ? `AND entity_id = '${nrqlEsc(selectedEntityId)}'` : '';
-  // FACET on (entity_id, config_area, detected_at) deduplicates re-pushed events;
-  // latest() picks the most-recently-ingested version which has from_payload/to_payload.
-  const query = `SELECT latest(entity_name) as entity_name, latest(change_summary) as change_summary,
-                        latest(diff_json) as diff_json, latest(from_payload) as from_payload,
-                        latest(to_payload) as to_payload
+  // Raw event query; JS dedup below keeps the best version per (entity_id, config_area, detected_at).
+  // LIMIT 300 handles up to 100 unique changes × up to 3 re-push copies.
+  const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at,
+                        diff_json, from_payload, to_payload
                  FROM MerakiConfigChange
                  WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
                  SINCE '${fromISO}' UNTIL '${toISO}'
-                 FACET entity_id, config_area, detected_at LIMIT 100`;
+                 ORDER BY detected_at DESC LIMIT 300`;
   const headerLabel = selectedEntityName || 'All entities';
   return (
     <div>
@@ -301,20 +301,15 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
         {({ data, loading, error }) => {
           if (loading) return <Spinner />;
           if (error) return <span style={{ color: '#c0392b' }}>Failed to load changes.</span>;
-          const rows = (data || []).map(s => {
-            const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
-            const m = s.data?.[0] || {};
-            return {
-              entity_id: fg[0]?.value,
-              config_area: fg[1]?.value,
-              detected_at: fg[2]?.value,
-              entity_name: m['entity_name'],
-              change_summary: m['change_summary'],
-              diff_json: m['diff_json'],
-              from_payload: m['from_payload'],
-              to_payload: m['to_payload'],
-            };
-          }).filter(r => r.entity_id && r.config_area)
+          // Deduplicate by (entity_id, config_area, detected_at): prefer version with from_payload.
+          const seen = new Map();
+          (data?.[0]?.data || []).forEach(row => {
+            const key = `${row.entity_id}||${row.config_area}||${row.detected_at}`;
+            const prev = seen.get(key);
+            if (!prev || (row.from_payload && !prev.from_payload)) seen.set(key, row);
+          });
+          const rows = [...seen.values()]
+            .filter(r => parseSummaryBadges(r.change_summary).length > 0)
             .sort((a, b) => (b.detected_at || '').localeCompare(a.detected_at || ''));
           return (
             <>
