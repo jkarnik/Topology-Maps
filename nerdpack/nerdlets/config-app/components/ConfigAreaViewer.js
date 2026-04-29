@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NrqlQuery, Spinner } from 'nr1';
 
 function highlightJson(raw) {
@@ -21,8 +21,43 @@ function highlightJson(raw) {
     );
 }
 
+function detectDark() {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.matchMedia?.('(prefers-color-scheme: dark)').matches ||
+    document.documentElement.classList.contains('dark') ||
+    document.body?.classList.contains('dark') ||
+    document.documentElement.getAttribute('data-theme') === 'dark' ||
+    document.body?.getAttribute('data-theme') === 'dark'
+  );
+}
+
+const LIGHT_CSS = `
+  .json-key  { color: #0055b3; }
+  .json-str  { color: #a31515; }
+  .json-num  { color: #116611; }
+  .json-bool { color: #0000cc; }
+  .json-null { color: #cc0000; }
+`;
+
+const DARK_CSS = `
+  .json-key  { color: #79b8ff; }
+  .json-str  { color: #ffab70; }
+  .json-num  { color: #85e89d; }
+  .json-bool { color: #b392f0; }
+  .json-null { color: #ff7b72; }
+`;
+
 export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
   const [openAreas, setOpenAreas] = useState(new Set());
+  const [dark, setDark] = useState(detectDark);
+
+  useEffect(() => {
+    const mq = window.matchMedia?.('(prefers-color-scheme: dark)');
+    const update = () => setDark(detectDark());
+    mq?.addEventListener('change', update);
+    return () => mq?.removeEventListener('change', update);
+  }, []);
 
   function toggleArea(area) {
     setOpenAreas(prev => {
@@ -37,20 +72,7 @@ export default function ConfigAreaViewer({ accountId, entityId, entityType }) {
 
   return (
     <div>
-      <style>{`
-        .json-key  { color: #0066cc; }
-        .json-str  { color: #a31515; }
-        .json-num  { color: #098658; }
-        .json-bool { color: #0000ff; }
-        .json-null { color: #dd0000; }
-        @media (prefers-color-scheme: dark) {
-          .json-key  { color: #9cdcfe; }
-          .json-str  { color: #ce9178; }
-          .json-num  { color: #b5cea8; }
-          .json-bool { color: #569cd6; }
-          .json-null { color: #f44747; }
-        }
-      `}</style>
+      <style>{dark ? DARK_CSS : LIGHT_CSS}</style>
       <h3 style={{ marginBottom: '12px', fontSize: '14px' }}>
         {entityType}: {entityId}
       </h3>
@@ -138,16 +160,25 @@ function ConfigJson({ accountId, entityId, configArea }) {
         if (loading) return <Spinner />;
         if (error) return <p style={{ color: '#c0392b', fontSize: '12px', margin: 0 }}>Query failed: {String(error.message || error)}</p>;
         const raw = data?.[0]?.data?.[0]?.['config_json'] || data?.[0]?.data?.[0]?.['latest.config_json'] || '{}';
+        let isValidJson = true;
+        try { JSON.parse(raw); } catch (_) { isValidJson = false; }
         return (
-          <pre
-            style={{
-              background: 'rgba(128,128,128,0.08)', padding: '12px',
-              borderRadius: '4px', overflow: 'auto', maxHeight: '400px',
-              margin: '0', fontSize: '12px', border: '1px solid rgba(128,128,128,0.15)',
-              fontFamily: 'monospace', lineHeight: '1.6',
-            }}
-            dangerouslySetInnerHTML={{ __html: highlightJson(raw) }}
-          />
+          <div>
+            {!isValidJson && (
+              <p style={{ fontSize: '11px', color: '#e6a817', margin: '0 0 6px 0', opacity: 0.85 }}>
+                ⚠ Content may be truncated — New Relic limits attribute values to 4 KB
+              </p>
+            )}
+            <pre
+              style={{
+                background: 'rgba(128,128,128,0.08)', padding: '12px',
+                borderRadius: '4px', overflow: 'auto', maxHeight: '400px',
+                margin: '0', fontSize: '12px', border: '1px solid rgba(128,128,128,0.15)',
+                fontFamily: 'monospace', lineHeight: '1.6',
+              }}
+              dangerouslySetInnerHTML={{ __html: highlightJson(raw) }}
+            />
+          </div>
         );
       }}
     </NrqlQuery>
