@@ -135,6 +135,89 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
   );
 }
 
+function parseSummaryBadges(summary) {
+  if (!summary) return [];
+  const patterns = [
+    [/(\d+) added/, n => `+ ${n} added`, '#27ae60'],
+    [/(\d+) removed/, n => `− ${n} removed`, '#e74c3c'],
+    [/(\d+) changed/, n => `~ ${n} changed`, '#e67e22'],
+    [/(\d+) secret rotated/, n => `🔒 ${n} secret rotated`, '#8e44ad'],
+  ];
+  return patterns.flatMap(([re, label, color]) => {
+    const m = summary.match(re);
+    return m ? [{ text: label(m[1]), color }] : [];
+  });
+}
+
+function DiffTile({ row }) {
+  const [expanded, setExpanded] = useState(false);
+  const badges = parseSummaryBadges(row.change_summary);
+  const dt = row.detected_at ? String(row.detected_at).slice(0, 10) : '';
+  return (
+    <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
+      <div onClick={() => setExpanded(e => !e)} style={{
+        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
+        cursor: 'pointer', background: 'rgba(128,128,128,0.05)',
+      }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{expanded ? '▼' : '▶'}</span>
+        <span style={{ fontFamily: 'monospace', fontSize: '13px', flex: 1 }}>{row.config_area}</span>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+          {badges.map((b, i) => (
+            <span key={i} style={{
+              fontSize: '11px', padding: '2px 6px', borderRadius: '10px',
+              background: `${b.color}22`, color: b.color, fontWeight: 500,
+            }}>{b.text}</span>
+          ))}
+        </div>
+        <span style={{ fontSize: '11px', opacity: 0.5, marginLeft: '8px', whiteSpace: 'nowrap' }}>{dt}</span>
+      </div>
+      {expanded && (
+        <div style={{ padding: '12px', borderTop: '1px solid rgba(128,128,128,0.15)', opacity: 0.5, fontSize: '12px' }}>
+          Diff view coming in next task…
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fromDate, toDate }) {
+  const fromISO = fromDate.toISOString().slice(0, 10);
+  const toISO = toDate.toISOString().slice(0, 10);
+  const entityFilter = selectedEntityId ? `AND entity_id = '${selectedEntityId}'` : '';
+  const query = `SELECT config_area, change_summary, detected_at, diff_json, from_payload, to_payload
+                 FROM MerakiConfigChange
+                 WHERE org_id = '${orgId}' ${entityFilter}
+                 SINCE '${fromISO}' UNTIL '${toISO}'
+                 ORDER BY detected_at DESC LIMIT 100`;
+  const headerLabel = selectedEntityName || 'All entities';
+  return (
+    <div>
+      <NrqlQuery accountIds={[accountId]} query={query}>
+        {({ data, loading, error }) => {
+          if (loading) return <Spinner />;
+          if (error) return <span style={{ color: '#c0392b' }}>Failed to load changes.</span>;
+          const rows = data?.[0]?.data || [];
+          return (
+            <>
+              <div style={{ marginBottom: '12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <strong style={{ fontFamily: 'monospace' }}>{headerLabel}</strong>
+                <span style={{ opacity: 0.4 }}>·</span>
+                <span style={{ opacity: 0.6 }}>{rows.length} changes</span>
+                <span style={{ opacity: 0.4 }}>·</span>
+                <span style={{ opacity: 0.5, fontSize: '11px' }}>{fromISO} – {toISO}</span>
+              </div>
+              {!rows.length
+                ? <p style={{ opacity: 0.6 }}>No changes found for this selection.</p>
+                : <div>{rows.map((row, i) => <DiffTile key={i} row={row} />)}</div>
+              }
+            </>
+          );
+        }}
+      </NrqlQuery>
+    </div>
+  );
+}
+
 export default function ChangeHistory({ accountId, orgId }) {
   const [fromDate, setFromDate] = useState(daysAgo(30));
   const [toDate, setToDate] = useState(() => { const d = new Date(); d.setHours(23,59,59,999); return d; });
@@ -159,7 +242,9 @@ export default function ChangeHistory({ accountId, orgId }) {
           selectedId={selectedEntityId} onSelect={handleSelect} />
       </div>
       <div style={{ flex: 1, paddingLeft: '16px', overflowY: 'auto' }}>
-        <div style={{ opacity: 0.4, fontSize: '13px' }}>Diff tiles coming soon…</div>
+        <RightPanel accountId={accountId} orgId={orgId}
+          selectedEntityId={selectedEntityId} selectedEntityName={selectedEntityName}
+          fromDate={fromDate} toDate={toDate} />
       </div>
     </div>
   );
