@@ -176,6 +176,28 @@ function CompareDiffView({ accountId, netA, netB, nameA, nameB }) {
 
 // ── Sub-components ──────────────────────────────────────────────────────────
 
+// Fetches { entityId -> name } for all networks in the org and passes it to children.
+// Re-uses the same query that drives the dropdown selectors (which is known to work).
+function WithNetworkNames({ accountId, orgId, children }) {
+  const query = `SELECT latest(entity_name) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}' AND entity_type = 'network'
+                 FACET entity_id SINCE 30 days ago LIMIT 100`;
+  return (
+    <NrqlQuery accountIds={[accountId]} query={query}>
+      {({ data, loading }) => {
+        if (loading) return <Spinner />;
+        const nameMap = {};
+        (data || []).forEach(s => {
+          const id = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
+          const name = s.data?.[0]?.['entity_name'] ?? s.data?.[0]?.['latest.entity_name'] ?? null;
+          if (id) nameMap[id] = name || id;
+        });
+        return children(nameMap);
+      }}
+    </NrqlQuery>
+  );
+}
+
 function NetworkSelector({ accountId, orgId, label, value, onChange }) {
   return (
     <NrqlQuery accountIds={[accountId]}
@@ -204,79 +226,83 @@ function NetworkSelector({ accountId, orgId, label, value, onChange }) {
 }
 
 function CoverageTab({ accountId, orgId }) {
-  const query = `SELECT latest(timestamp), latest(entity_name) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}' AND entity_type = 'network'
+  const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}'
                  FACET entity_id, config_area
                  SINCE 30 days ago LIMIT MAX`;
   return (
-    <NrqlQuery accountIds={[accountId]} query={query}>
-      {({ data, loading, error }) => {
-        if (loading) return <Spinner />;
-        if (error) return <p style={{ color: '#c0392b' }}>Failed to load coverage data.</p>;
-
-        const now = Date.now();
-        const STALE_MS = 7 * 24 * 60 * 60 * 1000;
-
-        const matrix = {};
-        const nameMap = {};
-        const allAreas = new Set();
-        (data || []).forEach(s => {
-          const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
-          const entityId = fg[0]?.value;
-          const area = fg[1]?.value;
-          if (!entityId || !area) return;
-          const ts = s.data?.[0]?.['latest.timestamp'] ?? s.data?.[0]?.['timestamp'] ?? null;
-          const name = s.data?.[0]?.['latest.entity_name'] ?? s.data?.[0]?.['entity_name'] ?? null;
-          if (!matrix[entityId]) matrix[entityId] = {};
-          matrix[entityId][area] = ts ? Number(ts) : null;
-          if (name && !nameMap[entityId]) nameMap[entityId] = name;
-          allAreas.add(area);
-        });
-
-        const areas = [...allAreas].sort();
-        const rows = Object.entries(matrix).map(([entityId, areaMap]) => {
-          const observed = areas.filter(a => areaMap[a] != null).length;
-          const pct = areas.length ? Math.round((observed / areas.length) * 100) : 0;
-          return { entityId, name: nameMap[entityId] || entityId, areaMap, pct };
-        }).sort((a, b) => b.pct - a.pct);
-
-        if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
-
+    <WithNetworkNames accountId={accountId} orgId={orgId}>
+      {(nameMap) => {
+        const networkIds = new Set(Object.keys(nameMap));
         return (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: '12px', width: '100%' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '4px 8px 4px 0', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap', minWidth: '140px' }}>Network</th>
-                  <th style={{ textAlign: 'right', padding: '4px 12px 4px 4px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap' }}>Coverage</th>
-                  {areas.map(a => (
-                    <th key={a} style={{ padding: '4px 3px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', textAlign: 'center', fontSize: '11px', whiteSpace: 'nowrap' }}>{a}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(({ entityId, name, areaMap, pct }) => (
-                  <tr key={entityId}>
-                    <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{name}</td>
-                    <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
-                    {areas.map(a => (
-                      <td key={a} style={{ padding: '3px' }}>
-                        <div style={{ background: cellColor(areaMap[a], now, STALE_MS), borderRadius: '3px', width: '20px', height: '14px', margin: '0 auto' }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div style={{ display: 'flex', gap: '14px', marginTop: '10px', fontSize: '11px', opacity: 0.5 }}>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#27ae60', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />observed</span>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#e67e22', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />stale (&gt;7d)</span>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: 'rgba(128,128,128,0.12)', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />never observed</span>
-            </div>
-          </div>
+          <NrqlQuery accountIds={[accountId]} query={query}>
+            {({ data, loading, error }) => {
+              if (loading) return <Spinner />;
+              if (error) return <p style={{ color: '#c0392b' }}>Failed to load coverage data.</p>;
+
+              const now = Date.now();
+              const STALE_MS = 7 * 24 * 60 * 60 * 1000;
+
+              const matrix = {};
+              const allAreas = new Set();
+              (data || []).forEach(s => {
+                const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
+                const entityId = fg[0]?.value;
+                const area = fg[1]?.value;
+                if (!entityId || !area || !networkIds.has(entityId)) return;
+                const ts = s.data?.[0]?.['latest.timestamp'] ?? s.data?.[0]?.['timestamp'] ?? null;
+                if (!matrix[entityId]) matrix[entityId] = {};
+                matrix[entityId][area] = ts ? Number(ts) : null;
+                allAreas.add(area);
+              });
+
+              const areas = [...allAreas].sort();
+              const rows = Object.entries(matrix).map(([entityId, areaMap]) => {
+                const observed = areas.filter(a => areaMap[a] != null).length;
+                const pct = areas.length ? Math.round((observed / areas.length) * 100) : 0;
+                return { entityId, name: nameMap[entityId] || entityId, areaMap, pct };
+              }).sort((a, b) => b.pct - a.pct);
+
+              if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
+
+              return (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ borderCollapse: 'collapse', fontSize: '12px', width: '100%' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: 'left', padding: '4px 8px 4px 0', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap', minWidth: '140px' }}>Network</th>
+                        <th style={{ textAlign: 'right', padding: '4px 12px 4px 4px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap' }}>Coverage</th>
+                        {areas.map(a => (
+                          <th key={a} style={{ padding: '4px 3px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', textAlign: 'center', fontSize: '11px', whiteSpace: 'nowrap' }}>{a}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map(({ entityId, name, areaMap, pct }) => (
+                        <tr key={entityId}>
+                          <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{name}</td>
+                          <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
+                          {areas.map(a => (
+                            <td key={a} style={{ padding: '3px' }}>
+                              <div style={{ background: cellColor(areaMap[a], now, STALE_MS), borderRadius: '3px', width: '20px', height: '14px', margin: '0 auto' }} />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div style={{ display: 'flex', gap: '14px', marginTop: '10px', fontSize: '11px', opacity: 0.5 }}>
+                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#27ae60', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />observed</span>
+                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#e67e22', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />stale (&gt;7d)</span>
+                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: 'rgba(128,128,128,0.12)', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />never observed</span>
+                  </div>
+                </div>
+              );
+            }}
+          </NrqlQuery>
         );
       }}
-    </NrqlQuery>
+    </WithNetworkNames>
   );
 }
 
@@ -287,8 +313,8 @@ function TemplatesTab({ accountId, orgId }) {
   const [templateNetName, setTemplateNetName] = useState(null);
 
   const query = templateNet
-    ? `SELECT latest(config_json), latest(entity_name) FROM MerakiConfigSnapshot
-       WHERE org_id = '${orgId}' AND entity_type = 'network'
+    ? `SELECT latest(config_json) FROM MerakiConfigSnapshot
+       WHERE org_id = '${orgId}'
        FACET entity_id, config_area
        SINCE 30 days ago LIMIT MAX`
     : null;
@@ -313,77 +339,81 @@ function TemplatesTab({ accountId, orgId }) {
       )}
 
       {templateNet && (
-        <NrqlQuery accountIds={[accountId]} query={query}>
-          {({ data, loading, error }) => {
-            if (loading) return <Spinner />;
-            if (error) return <p style={{ color: '#c0392b' }}>Failed to load snapshot data.</p>;
-
-            const snapshots = {};
-            const nameMap = {};
-            (data || []).forEach(s => {
-              const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
-              const entityId = fg[0]?.value;
-              const area = fg[1]?.value;
-              if (!entityId || !area) return;
-              const json = s.data?.[0]?.['latest.config_json'] ?? s.data?.[0]?.['config_json'] ?? s.data?.[0]?.json ?? null;
-              const name = s.data?.[0]?.['latest.entity_name'] ?? s.data?.[0]?.['entity_name'] ?? null;
-              if (!snapshots[entityId]) snapshots[entityId] = {};
-              snapshots[entityId][area] = json;
-              if (name && !nameMap[entityId]) nameMap[entityId] = name;
-            });
-
-            const templateAreas = snapshots[templateNet] || {};
-            const templateAreaKeys = Object.keys(templateAreas);
-
-            if (!templateAreaKeys.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for the selected template network.</p>;
-
-            const scored = Object.entries(snapshots)
-              .filter(([id]) => id !== templateNet)
-              .map(([entityId, areaMap]) => {
-                const matched = templateAreaKeys.filter(a => areaMap[a] != null && areaMap[a] === templateAreas[a]);
-                const pct = Math.round((matched.length / templateAreaKeys.length) * 100);
-                return { entityId, areaMap, matched: new Set(matched), pct };
-              })
-              .sort((a, b) => b.pct - a.pct);
-
-            if (!scored.length) return <p style={{ opacity: 0.6 }}>No other networks to score against this template.</p>;
-
+        <WithNetworkNames accountId={accountId} orgId={orgId}>
+          {(nameMap) => {
+            const networkIds = new Set(Object.keys(nameMap));
             return (
-              <div>
-                <div style={{ marginBottom: '14px', fontSize: '12px' }}>
-                  <span style={{ opacity: 0.5 }}>Scoring against: </span>
-                  <span style={{ color: '#0078bf', fontWeight: 'bold' }}>{templateNetName || templateNet}</span>
-                  <span style={{ opacity: 0.5 }}> · {templateAreaKeys.length} config areas</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {scored.map(({ entityId, matched, pct }) => {
-                    const c = scoreColor(pct);
-                    return (
-                      <div key={entityId} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: '6px', padding: '10px 14px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                          <div style={{ flex: 1, fontSize: '13px' }}>{nameMap[entityId] || entityId}</div>
-                          <div style={{ fontSize: '20px', fontWeight: 'bold', color: c.text }}>{pct}%</div>
-                          <div style={{ fontSize: '11px', opacity: 0.5 }}>{matched.size} / {templateAreaKeys.length} areas</div>
-                        </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                          {templateAreaKeys.map(a => (
-                            <span key={a} style={{
-                              fontSize: '10px', padding: '2px 7px', borderRadius: '10px',
-                              background: matched.has(a) ? 'rgba(39,174,96,0.15)' : 'rgba(231,76,60,0.15)',
-                              color: matched.has(a) ? '#27ae60' : '#e74c3c',
-                            }}>
-                              {a} {matched.has(a) ? '✓' : '✗'}
-                            </span>
-                          ))}
-                        </div>
+              <NrqlQuery accountIds={[accountId]} query={query}>
+                {({ data, loading, error }) => {
+                  if (loading) return <Spinner />;
+                  if (error) return <p style={{ color: '#c0392b' }}>Failed to load snapshot data.</p>;
+
+                  const snapshots = {};
+                  (data || []).forEach(s => {
+                    const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
+                    const entityId = fg[0]?.value;
+                    const area = fg[1]?.value;
+                    if (!entityId || !area || !networkIds.has(entityId)) return;
+                    const json = s.data?.[0]?.['latest.config_json'] ?? s.data?.[0]?.['config_json'] ?? s.data?.[0]?.json ?? null;
+                    if (!snapshots[entityId]) snapshots[entityId] = {};
+                    snapshots[entityId][area] = json;
+                  });
+
+                  const templateAreas = snapshots[templateNet] || {};
+                  const templateAreaKeys = Object.keys(templateAreas);
+
+                  if (!templateAreaKeys.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for the selected template network.</p>;
+
+                  const scored = Object.entries(snapshots)
+                    .filter(([id]) => id !== templateNet)
+                    .map(([entityId, areaMap]) => {
+                      const matched = templateAreaKeys.filter(a => areaMap[a] != null && areaMap[a] === templateAreas[a]);
+                      const pct = Math.round((matched.length / templateAreaKeys.length) * 100);
+                      return { entityId, matched: new Set(matched), pct };
+                    })
+                    .sort((a, b) => b.pct - a.pct);
+
+                  if (!scored.length) return <p style={{ opacity: 0.6 }}>No other networks to score against this template.</p>;
+
+                  return (
+                    <div>
+                      <div style={{ marginBottom: '14px', fontSize: '12px' }}>
+                        <span style={{ opacity: 0.5 }}>Scoring against: </span>
+                        <span style={{ color: '#0078bf', fontWeight: 'bold' }}>{templateNetName || templateNet}</span>
+                        <span style={{ opacity: 0.5 }}> · {templateAreaKeys.length} config areas</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {scored.map(({ entityId, matched, pct }) => {
+                          const c = scoreColor(pct);
+                          return (
+                            <div key={entityId} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: '6px', padding: '10px 14px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                <div style={{ flex: 1, fontSize: '13px' }}>{nameMap[entityId] || entityId}</div>
+                                <div style={{ fontSize: '20px', fontWeight: 'bold', color: c.text }}>{pct}%</div>
+                                <div style={{ fontSize: '11px', opacity: 0.5 }}>{matched.size} / {templateAreaKeys.length} areas</div>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                {templateAreaKeys.map(a => (
+                                  <span key={a} style={{
+                                    fontSize: '10px', padding: '2px 7px', borderRadius: '10px',
+                                    background: matched.has(a) ? 'rgba(39,174,96,0.15)' : 'rgba(231,76,60,0.15)',
+                                    color: matched.has(a) ? '#27ae60' : '#e74c3c',
+                                  }}>
+                                    {a} {matched.has(a) ? '✓' : '✗'}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                }}
+              </NrqlQuery>
             );
           }}
-        </NrqlQuery>
+        </WithNetworkNames>
       )}
     </div>
   );
