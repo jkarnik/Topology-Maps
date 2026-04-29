@@ -3,5 +3,5 @@
   "id": "config-launcher",
   "displayName": "Meraki Config",
   "description": "Browse Meraki configuration snapshots and change history",
-  "rootNerdletId": "b579e606-6ef2-4922-a770-707fdd3e8cee.config-app"
+  "rootNerdletId": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37.config-app"
 }
