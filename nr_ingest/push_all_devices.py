@@ -172,8 +172,7 @@ def main() -> int:
     endpoints = [n for n in nodes if n["type"] == "endpoint"]
     client_events = [build_client_event(e, networks_by_id) for e in endpoints]
 
-    subnets = topology["__all__"]["l3"]["subnets"]
-    vlan_events = [build_vlan_event(s) for s in subnets]
+    vlan_events: list[dict] = []  # VLANs removed from ingest
 
     port_events = []
     for net_key, net_topo in topology.items():
