@@ -12,6 +12,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import DeviceNode from './DeviceNode';
+import SwitchStackNode from './SwitchStackNode';
 import { ConnectionEdge } from './ConnectionEdge';
 import { layoutL2Topology } from '../utils/layoutEngine';
 import type { L2Topology, Device, DrillDownState } from '../types/topology';
@@ -35,7 +36,7 @@ interface TopologyCanvasProps {
 
 /* ---------- Custom type registrations (outside component to avoid re-renders) ---------- */
 
-const nodeTypes = { deviceNode: DeviceNode };
+const nodeTypes = { deviceNode: DeviceNode, switchStackNode: SwitchStackNode };
 const edgeTypes = { connectionEdge: ConnectionEdge as AnyEdgeComponent };
 
 /* ---------- Drillable device types ---------- */
@@ -60,22 +61,19 @@ export default function TopologyCanvas({
     if (!topology) return { nodes: [], edges: [] };
     const result = layoutL2Topology(topology, drillDown.currentDeviceId, pinnedDeviceIds);
 
-    // Inject animationState into each node's data
-    if (deviceAnimations && deviceAnimations.size > 0) {
-      return {
-        ...result,
-        nodes: result.nodes.map(n => ({
-          ...n,
-          data: {
-            ...n.data,
-            animationState: deviceAnimations.get(n.id) ?? null,
-          },
-        })),
-      };
-    }
+    // Inject per-node extras: animationState for deviceNodes, onSelectMember for switchStackNodes
+    const nodes = result.nodes.map(n => {
+      if (n.type === 'switchStackNode') {
+        return { ...n, data: { ...n.data, onSelectMember: onSelectDevice } };
+      }
+      if (deviceAnimations && deviceAnimations.size > 0) {
+        return { ...n, data: { ...n.data, animationState: deviceAnimations.get(n.id) ?? null } };
+      }
+      return n;
+    });
 
-    return result;
-  }, [topology, drillDown.currentDeviceId, pinnedDeviceIds, deviceAnimations]);
+    return { ...result, nodes };
+  }, [topology, drillDown.currentDeviceId, pinnedDeviceIds, deviceAnimations, onSelectDevice]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutResult.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutResult.edges);
@@ -89,6 +87,7 @@ export default function TopologyCanvas({
   // Single click: select device for detail panel
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
+      if (node.type === 'switchStackNode') return; // SwitchStackNode handles its own interactions
       const device = (node.data as { device: Device }).device;
       onSelectDevice(device);
     },
@@ -98,6 +97,7 @@ export default function TopologyCanvas({
   // Double-click: drill into floor switches and access points
   const handleNodeDoubleClick: NodeMouseHandler = useCallback(
     (_event, node) => {
+      if (node.type === 'switchStackNode') return;
       const device = (node.data as { device: Device }).device;
       if (DRILLABLE_TYPES.has(device.type)) {
         onDrillInto(device.id, device.id);
@@ -112,7 +112,8 @@ export default function TopologyCanvas({
   }, [onSelectDevice]);
 
   // MiniMap node color by device type
-  const miniMapNodeColor = useCallback((node: { data: Record<string, unknown> }) => {
+  const miniMapNodeColor = useCallback((node: { type?: string; data: Record<string, unknown> }) => {
+    if (node.type === 'switchStackNode') return '#f5a623';
     const device = node.data.device as Device | undefined;
     if (!device) return 'var(--text-muted)';
     const colorMap: Record<string, string> = {

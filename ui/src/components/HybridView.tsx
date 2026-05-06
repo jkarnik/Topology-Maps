@@ -15,6 +15,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import DeviceNode from './DeviceNode';
+import SwitchStackNode from './SwitchStackNode';
 import type {
   L2Topology,
   L3Topology,
@@ -201,6 +202,7 @@ const VlanGroupNode: React.FC<NodeProps> = ({ data }) => {
 const nodeTypes = {
   deviceNode: DeviceNode,
   vlanGroupNode: VlanGroupNode,
+  switchStackNode: SwitchStackNode,
 };
 
 /* ================================================================
@@ -226,7 +228,7 @@ const VLAN_COLS = 3;
 function buildHybridGraph(
   l2: L2Topology,
   l3: L3Topology,
-  _onSelectDevice?: (device: Device | null) => void,
+  onSelectDevice?: (device: Device | null) => void,
   onSelectVlan?: (vlanId: number) => void,
 ): { nodes: RFNode[]; edges: RFEdge[] } {
   const nodes: RFNode[] = [];
@@ -261,6 +263,35 @@ function buildHybridGraph(
         break;
     }
   }
+
+  /* ------ Stack grouping ------ */
+  // Group floor switches by stack_name into virtual StackNodes
+  const stackGroups = new Map<string, Device[]>();
+  for (const d of floorSwitches) {
+    if (d.stack_name) {
+      if (!stackGroups.has(d.stack_name)) stackGroups.set(d.stack_name, []);
+      stackGroups.get(d.stack_name)!.push(d);
+    }
+  }
+
+  // Map each stack member device ID → its virtual stack node ID
+  const memberToVirtualId = new Map<string, string>();
+  const stackVirtualIds = new Set<string>();
+  for (const members of stackGroups.values()) {
+    const active = members.find((m) => m.stack_role === 'active') ?? members[0];
+    const virtualId = `stack-${active.id}`;
+    for (const m of members) memberToVirtualId.set(m.id, virtualId);
+    stackVirtualIds.add(virtualId);
+  }
+
+  // Resolve a device ID to its virtual stack node ID (if stacked), or itself
+  const resolveId = (id: string): string => memberToVirtualId.get(id) ?? id;
+
+  // Resolved floor switch IDs for VLAN edge source checking (virtual + non-stacked)
+  const resolvedFloorSwitchIds = new Set([
+    ...floorSwitches.filter((fs) => !fs.stack_name).map((fs) => fs.id),
+    ...stackVirtualIds,
+  ]);
 
   /* ------ Determine effective tier layout ------ */
   // Meraki case: no core switches → collapse tiers upward
@@ -371,27 +402,68 @@ function buildHybridGraph(
 
   /* ------ 4. Floor Switches (Tier 1 when no core, Tier 2 otherwise) ------ */
 
-  // Sort floor switches by id for consistent ordering
-  floorSwitches.sort((a, b) => a.id.localeCompare(b.id));
+  // Build logical switch units: one entry per non-stacked switch or per stack group
+  type SwitchUnit =
+    | { kind: 'single'; device: Device }
+    | { kind: 'stack'; virtualId: string; stackName: string; members: Device[] };
+
+  const switchUnits: SwitchUnit[] = [];
+  const addedStackNames = new Set<string>();
+
+  for (const fs of floorSwitches) {
+    if (fs.stack_name && stackGroups.has(fs.stack_name)) {
+      if (!addedStackNames.has(fs.stack_name)) {
+        addedStackNames.add(fs.stack_name);
+        const members = stackGroups.get(fs.stack_name)!;
+        const active = members.find((m) => m.stack_role === 'active') ?? members[0];
+        const virtualId = `stack-${active.id}`;
+        switchUnits.push({ kind: 'stack', virtualId, stackName: fs.stack_name, members });
+      }
+    } else {
+      switchUnits.push({ kind: 'single', device: fs });
+    }
+  }
+
+  switchUnits.sort((a, b) => {
+    const idA = a.kind === 'single' ? a.device.id : a.virtualId;
+    const idB = b.kind === 'single' ? b.device.id : b.virtualId;
+    return idA.localeCompare(idB);
+  });
 
   const fsSpacing = 210;
   const fsTotalWidth =
-    floorSwitches.length * 190 + (floorSwitches.length - 1) * (fsSpacing - 190);
+    switchUnits.length * 190 + (switchUnits.length - 1) * (fsSpacing - 190);
   const fsStartX = gridTotalWidth / 2 - fsTotalWidth / 2;
 
-  floorSwitches.forEach((fs, i) => {
-    nodes.push({
-      id: fs.id,
-      type: 'deviceNode',
-      position: { x: fsStartX + i * fsSpacing, y: effectiveFloorSwitchY },
-      data: { device: fs },
-      draggable: true,
-    });
+  switchUnits.forEach((unit, i) => {
+    const x = fsStartX + i * fsSpacing;
+    if (unit.kind === 'single') {
+      nodes.push({
+        id: unit.device.id,
+        type: 'deviceNode',
+        position: { x, y: effectiveFloorSwitchY },
+        data: { device: unit.device },
+        draggable: true,
+      });
+    } else {
+      nodes.push({
+        id: unit.virtualId,
+        type: 'switchStackNode',
+        position: { x, y: effectiveFloorSwitchY },
+        data: {
+          stackName: unit.stackName,
+          members: unit.members,
+          onSelectMember: onSelectDevice,
+        },
+        draggable: true,
+      });
+    }
   });
 
   if (hasCoreSwitches) {
     // Edges: Core Switches -> Floor Switches (only where L2 edges exist)
     for (const cs of coreSwitches) {
+      const seenTargets = new Set<string>();
       for (const fs of floorSwitches) {
         const l2Edge = l2.edges.find(
           (e) =>
@@ -399,10 +471,13 @@ function buildHybridGraph(
             (e.source === fs.id && e.target === cs.id),
         );
         if (!l2Edge) continue;
+        const target = resolveId(fs.id);
+        if (seenTargets.has(target)) continue;
+        seenTargets.add(target);
         edges.push({
-          id: `infra-${cs.id}-${fs.id}`,
+          id: `infra-${cs.id}-${target}`,
           source: cs.id,
-          target: fs.id,
+          target,
           style: {
             stroke: 'var(--accent-cyan)',
             strokeWidth: 1.5,
@@ -426,6 +501,7 @@ function buildHybridGraph(
   } else {
     // Meraki: Firewalls connect directly to floor switches using actual L2 edges
     for (const fw of firewalls) {
+      const seenTargets = new Set<string>();
       for (const fs of floorSwitches) {
         const l2Edge = l2.edges.find(
           (e) =>
@@ -433,10 +509,13 @@ function buildHybridGraph(
             (e.source === fs.id && e.target === fw.id),
         );
         if (!l2Edge) continue;
+        const target = resolveId(fs.id);
+        if (seenTargets.has(target)) continue;
+        seenTargets.add(target);
         edges.push({
-          id: `infra-${fw.id}-${fs.id}`,
+          id: `infra-${fw.id}-${target}`,
           source: fw.id,
-          target: fs.id,
+          target,
           style: {
             stroke: 'var(--accent-cyan)',
             strokeWidth: 2,
@@ -459,26 +538,38 @@ function buildHybridGraph(
     }
   }
 
-  /* ------ 4b. Stack edges ------ */
+  /* ------ 4b. Stack edges suppressed — stacked switches are collapsed into SwitchStackNode ------ */
 
-  for (const l2Edge of l2.edges) {
-    if (l2Edge.protocol === 'stack') {
+  /* ------ 4c. Switch-to-switch LLDP edges (e.g. core stack → dist stack) ------ */
+  // Any LLDP edge where both endpoints are floor switches and resolve to different
+  // virtual nodes gets rendered as an infra link.  This covers inter-stack uplinks
+  // like the Core Stack → MDF/IDF Dist Stack connections in HYD.
+  {
+    const seenSwitchPairs = new Set<string>();
+    for (const l2Edge of l2.edges) {
+      if (l2Edge.protocol === 'stack') continue;
+      if (deviceMap.get(l2Edge.source)?.type !== 'floor_switch') continue;
+      if (deviceMap.get(l2Edge.target)?.type !== 'floor_switch') continue;
+      const src = resolveId(l2Edge.source);
+      const tgt = resolveId(l2Edge.target);
+      if (src === tgt) continue; // same stack, skip
+      const pairKey = [src, tgt].sort().join('--');
+      if (seenSwitchPairs.has(pairKey)) continue;
+      seenSwitchPairs.add(pairKey);
       edges.push({
-        id: `stack-${l2Edge.source}-${l2Edge.target}`,
-        source: l2Edge.source,
-        target: l2Edge.target,
+        id: `sw-sw-${src}-${tgt}`,
+        source: src,
+        target: tgt,
         style: {
-          stroke: 'var(--accent-green)',
-          strokeWidth: 2,
-          strokeDasharray: '6 3',
-          opacity: 0.8,
+          stroke: 'var(--accent-cyan)',
+          strokeWidth: 1.5,
+          opacity: 0.6,
         },
-        label: 'stack',
+        label: l2Edge.speed ?? '1G',
         labelStyle: {
-          fill: 'var(--accent-green)',
+          fill: 'var(--text-muted)',
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 9,
-          fontWeight: 600,
         },
         labelBgStyle: {
           fill: 'var(--bg-primary)',
@@ -498,16 +589,20 @@ function buildHybridGraph(
   const apToFloorSwitch = new Map<string, string>();
   for (const edge of l2.edges) {
     if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'access_point') {
-      apToFloorSwitch.set(edge.target, edge.source);
+      apToFloorSwitch.set(edge.target, resolveId(edge.source));
     } else if (
       floorSwitchIds.has(edge.target) &&
       deviceMap.get(edge.source)?.type === 'access_point'
     ) {
-      apToFloorSwitch.set(edge.source, edge.target);
+      apToFloorSwitch.set(edge.source, resolveId(edge.target));
     }
   }
 
-  accessPoints.sort((a, b) => a.id.localeCompare(b.id));
+  accessPoints.sort((a, b) => {
+    const pa = apToFloorSwitch.get(a.id) ?? '';
+    const pb = apToFloorSwitch.get(b.id) ?? '';
+    return pa !== pb ? pa.localeCompare(pb) : a.id.localeCompare(b.id);
+  });
 
   const apSpacing = 200;
   const apTotalWidth = accessPoints.length * 180 + (accessPoints.length - 1) * (apSpacing - 180);
@@ -563,19 +658,19 @@ function buildHybridGraph(
   const endpointToFloorSwitch = new Map<string, string>();
   for (const edge of l2.edges) {
     if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'endpoint') {
-      endpointToFloorSwitch.set(edge.target, edge.source);
+      endpointToFloorSwitch.set(edge.target, resolveId(edge.source));
     } else if (
       floorSwitchIds.has(edge.target) &&
       deviceMap.get(edge.source)?.type === 'endpoint'
     ) {
-      endpointToFloorSwitch.set(edge.source, edge.target);
+      endpointToFloorSwitch.set(edge.source, resolveId(edge.target));
     }
     // AP -> floor switch -> endpoint chains (wireless clients)
     if (floorSwitchIds.has(edge.source) && deviceMap.get(edge.target)?.type === 'access_point') {
       const apId = edge.target;
       for (const ep of endpoints) {
         if (ep.connected_ap === apId) {
-          endpointToFloorSwitch.set(ep.id, edge.source);
+          endpointToFloorSwitch.set(ep.id, resolveId(edge.source));
         }
       }
     } else if (
@@ -585,7 +680,7 @@ function buildHybridGraph(
       const apId = edge.source;
       for (const ep of endpoints) {
         if (ep.connected_ap === apId) {
-          endpointToFloorSwitch.set(ep.id, edge.target);
+          endpointToFloorSwitch.set(ep.id, resolveId(edge.target));
         }
       }
     }
@@ -637,7 +732,7 @@ function buildHybridGraph(
     for (const subnet of l3.subnets) {
       const switchSet = new Set<string>();
       for (const fs of floorSwitches) {
-        switchSet.add(fs.id);
+        switchSet.add(resolveId(fs.id));
       }
       vlanToSwitchOrAp.set(subnet.vlan, switchSet);
     }
@@ -682,7 +777,7 @@ function buildHybridGraph(
       addedSwitchVlanEdges.add(edgeKey);
 
       // Only emit this edge if the source node actually exists in the graph
-      const srcIsFloorSwitch = floorSwitchIds.has(srcId);
+      const srcIsFloorSwitch = resolvedFloorSwitchIds.has(srcId);
       const srcIsAp = apIds.has(srcId);
       if (!srcIsFloorSwitch && !srcIsAp) continue;
 
@@ -710,6 +805,9 @@ function miniMapNodeColor(node: RFNode): string {
   if (node.type === 'vlanGroupNode') {
     const d = node.data as VlanGroupNodeData;
     return d.vlanColor;
+  }
+  if (node.type === 'switchStackNode') {
+    return '#f5a623'; // var(--device-floor-switch)
   }
   if (node.type === 'deviceNode') {
     const d = node.data as { device: Device };
