@@ -1,39 +1,39 @@
 {
-  "name": "b579e606-6ef2-4922-a770-707fdd3e8cee",
-  "hash": "f699d60342a9a73aaeb5",
+  "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37",
+  "hash": "2064c32ed6a16aa5f2cb",
   "version": "5.93.0",
-  "time": 717,
-  "builtAt": 1777365563160,
+  "time": 1053,
+  "builtAt": 1777489335464,
   "publicPath": "auto",
   "outputPath": "/Users/jkarnik/Code/Topology Maps/nerdpack/dist",
   "assetsByChunkName": {
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app": [
-      "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app~efcdf3f2.js"
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app": [
+      "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~e250ef22.js"
     ],
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab": [
-      "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab~e2b9c39d.js"
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab": [
+      "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~3ced2f47.js"
     ]
   },
   "assets": [
     {
       "type": "asset",
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app~efcdf3f2.js",
-      "size": 14207,
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~e250ef22.js",
+      "size": 40698,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "efcdf3f2",
+        "contenthash": "e250ef22",
         "javascriptModule": false,
         "minimized": true,
         "related": {
-          "sourceMap": "bf346f2314f3a859.map"
+          "sourceMap": "d71946034931ecc0.map"
         },
-        "size": 14207
+        "size": 40698
       },
       "chunkNames": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
@@ -42,56 +42,56 @@
       "related": [
         {
           "type": "sourceMap",
-          "name": "bf346f2314f3a859.map",
-          "size": 34354,
+          "name": "d71946034931ecc0.map",
+          "size": 104939,
           "emitted": true,
           "comparedForEmit": false,
           "cached": false,
           "info": {
             "immutable": true,
-            "contenthash": "bf346f2314f3a859",
+            "contenthash": "d71946034931ecc0",
             "development": true,
-            "size": 34354
+            "size": 104939
           },
           "chunkNames": [],
           "chunkIdHints": [],
           "auxiliaryChunkNames": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "auxiliaryChunkIdHints": [],
           "related": {},
           "chunks": [],
           "auxiliaryChunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "isOverSizeLimit": false
         }
       ],
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "auxiliaryChunks": [],
       "isOverSizeLimit": false
     },
     {
       "type": "asset",
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab~e2b9c39d.js",
-      "size": 7034,
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~3ced2f47.js",
+      "size": 7087,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "e2b9c39d",
+        "contenthash": "3ced2f47",
         "javascriptModule": false,
         "minimized": true,
         "related": {
-          "sourceMap": "e9596a86bc31ef74.map"
+          "sourceMap": "05ba37645980ac36.map"
         },
-        "size": 7034
+        "size": 7087
       },
       "chunkNames": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
@@ -100,33 +100,33 @@
       "related": [
         {
           "type": "sourceMap",
-          "name": "e9596a86bc31ef74.map",
-          "size": 16732,
+          "name": "05ba37645980ac36.map",
+          "size": 16835,
           "emitted": true,
           "comparedForEmit": false,
           "cached": false,
           "info": {
             "immutable": true,
-            "contenthash": "e9596a86bc31ef74",
+            "contenthash": "05ba37645980ac36",
             "development": true,
-            "size": 16732
+            "size": 16835
           },
           "chunkNames": [],
           "chunkIdHints": [],
           "auxiliaryChunkNames": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "auxiliaryChunkIdHints": [],
           "related": {},
           "chunks": [],
           "auxiliaryChunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "isOverSizeLimit": false
         }
       ],
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "auxiliaryChunks": [],
       "isOverSizeLimit": false
@@ -138,27 +138,27 @@
       "initial": true,
       "entry": true,
       "recorded": false,
-      "size": 21789,
+      "size": 68941,
       "sizes": {
-        "javascript": 20852,
+        "javascript": 68004,
         "runtime": 937
       },
       "names": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "idHints": [],
       "runtime": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "files": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app~efcdf3f2.js"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~e250ef22.js"
       ],
       "auxiliaryFiles": [
-        "bf346f2314f3a859.map"
+        "d71946034931ecc0.map"
       ],
-      "hash": "3ed7975e5910be914411",
+      "hash": "d1a03d753cb750bcaf20",
       "childrenByOrder": {},
-      "id": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+      "id": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
       "siblings": [],
       "parents": [],
       "children": [],
@@ -167,9 +167,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 3798,
+          "size": 21555,
           "sizes": {
-            "javascript": 3798
+            "javascript": 21555
           },
           "built": true,
           "codeGenerated": true,
@@ -180,8 +180,8 @@
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
           "index": 6,
           "preOrderIndex": 6,
-          "index2": 6,
-          "postOrderIndex": 6,
+          "index2": 5,
+          "postOrderIndex": 5,
           "cacheable": true,
           "optional": false,
           "orphan": false,
@@ -201,7 +201,7 @@
           "id": "./nerdlets/config-app/components/ChangeHistory.js",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -229,7 +229,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "./components/ChangeHistory",
-              "loc": "62:40-53",
+              "loc": "114:40-53",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             }
@@ -249,9 +249,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 4737,
+          "size": 26430,
           "sizes": {
-            "javascript": 4737
+            "javascript": 26430
           },
           "built": true,
           "codeGenerated": true,
@@ -260,10 +260,10 @@
           "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
           "name": "./nerdlets/config-app/components/CompareView.js",
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
-          "index": 8,
-          "preOrderIndex": 8,
-          "index2": 7,
-          "postOrderIndex": 7,
+          "index": 7,
+          "preOrderIndex": 7,
+          "index2": 6,
+          "postOrderIndex": 6,
           "cacheable": true,
           "optional": false,
           "orphan": false,
@@ -283,7 +283,7 @@
           "id": "./nerdlets/config-app/components/CompareView.js",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -311,7 +311,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "./components/CompareView",
-              "loc": "69:40-51",
+              "loc": "120:40-51",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             }
@@ -331,9 +331,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 3444,
+          "size": 8128,
           "sizes": {
-            "javascript": 3444
+            "javascript": 8128
           },
           "built": true,
           "codeGenerated": true,
@@ -365,7 +365,7 @@
           "id": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -393,7 +393,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "./components/ConfigAreaViewer",
-              "loc": "55:40-56",
+              "loc": "108:40-56",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             }
@@ -413,9 +413,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 2466,
+          "size": 6348,
           "sizes": {
-            "javascript": 2466
+            "javascript": 6348
           },
           "built": true,
           "codeGenerated": true,
@@ -447,7 +447,7 @@
           "id": "./nerdlets/config-app/components/ConfigTree.js",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -475,7 +475,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "./components/ConfigTree",
-              "loc": "43:40-50",
+              "loc": "94:40-50",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             }
@@ -495,125 +495,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 2334,
+          "size": 1424,
           "sizes": {
-            "javascript": 2334
-          },
-          "built": true,
-          "codeGenerated": true,
-          "buildTimeExecuted": false,
-          "cached": false,
-          "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
-          "name": "./nerdlets/config-app/components/DiffViewer.js",
-          "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
-          "index": 7,
-          "preOrderIndex": 7,
-          "index2": 5,
-          "postOrderIndex": 5,
-          "cacheable": true,
-          "optional": false,
-          "orphan": false,
-          "dependent": true,
-          "issuer": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "issuerName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "issuerPath": [
-            {
-              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "name": "./nerdlets/config-app/index.js",
-              "id": "./nerdlets/config-app/index.js"
-            },
-            {
-              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "name": "./nerdlets/config-app/components/ChangeHistory.js",
-              "id": "./nerdlets/config-app/components/ChangeHistory.js"
-            }
-          ],
-          "failed": false,
-          "errors": 0,
-          "warnings": 0,
-          "id": "./nerdlets/config-app/components/DiffViewer.js",
-          "issuerId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
-          ],
-          "assets": [],
-          "reasons": [
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony side effect evaluation",
-              "active": true,
-              "explanation": "",
-              "userRequest": "./DiffViewer",
-              "loc": "5:0-38",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "./DiffViewer",
-              "loc": "90:50-60",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-              "module": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "moduleName": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModule": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "type": "harmony side effect evaluation",
-              "active": true,
-              "explanation": "",
-              "userRequest": "../../config-app/components/DiffViewer",
-              "loc": "4:0-64",
-              "moduleId": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModuleId": "./nerdlets/config-entity-tab/components/RecentChanges.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-              "module": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "moduleName": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModule": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "../../config-app/components/DiffViewer",
-              "loc": "35:40-50",
-              "moduleId": "./nerdlets/config-entity-tab/components/RecentChanges.js",
-              "resolvedModuleId": "./nerdlets/config-entity-tab/components/RecentChanges.js"
-            }
-          ],
-          "usedExports": [
-            "default"
-          ],
-          "providedExports": [
-            "default"
-          ],
-          "optimizationBailout": [
-            "Statement (VariableDeclaration) with side effects in source code at 1:0-65"
-          ],
-          "depth": 2
-        },
-        {
-          "type": "module",
-          "moduleType": "javascript/auto",
-          "layer": null,
-          "size": 1364,
-          "sizes": {
-            "javascript": 1364
+            "javascript": 1424
           },
           "built": true,
           "codeGenerated": true,
@@ -645,7 +529,7 @@
           "id": "./nerdlets/config-app/components/OrgSelector.js",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -673,7 +557,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "./components/OrgSelector",
-              "loc": "20:40-51",
+              "loc": "66:40-51",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             }
@@ -693,9 +577,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 2625,
+          "size": 4035,
           "sizes": {
-            "javascript": 2625
+            "javascript": 4035
           },
           "built": true,
           "codeGenerated": true,
@@ -706,8 +590,8 @@
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
           "index": 0,
           "preOrderIndex": 0,
-          "index2": 8,
-          "postOrderIndex": 8,
+          "index2": 7,
+          "postOrderIndex": 7,
           "cacheable": true,
           "optional": false,
           "orphan": false,
@@ -721,7 +605,7 @@
           "id": "./nerdlets/config-app/index.js",
           "issuerId": null,
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [
@@ -735,7 +619,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+              "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
               "moduleId": null,
               "resolvedModuleId": null
             },
@@ -799,8 +683,8 @@
           "id": "__nr1-internal__",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -989,8 +873,8 @@
           "id": "nr1",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -1004,7 +888,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-102",
+              "loc": "4:0-41",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1018,7 +902,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "21:97-106",
+              "loc": "198:59-68",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1032,7 +916,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "29:57-64",
+              "loc": "211:44-53",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1046,7 +930,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "41:44-49",
+              "loc": "219:59-66",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1060,7 +944,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:40-51",
+              "loc": "488:56-65",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1074,7 +958,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:92-107",
+              "loc": "499:40-47",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1088,7 +972,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:159-174",
+              "loc": "537:88-97",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1102,119 +986,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:231-246",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:299-314",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:371-386",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:43-51",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:92-104",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:182-194",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:254-266",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:329-341",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:401-413",
+              "loc": "545:57-64",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -1242,7 +1014,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "12:42-51",
+              "loc": "234:43-52",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1256,7 +1028,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "20:57-64",
+              "loc": "240:41-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1270,7 +1042,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "22:44-50",
+              "loc": "247:58-65",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1284,7 +1056,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "26:40-50",
+              "loc": "296:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1298,7 +1070,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "28:87-97",
+              "loc": "303:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1312,7 +1084,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "81:42-51",
+              "loc": "320:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1326,7 +1098,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "87:41-50",
+              "loc": "329:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1340,7 +1112,91 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "94:58-65",
+              "loc": "338:44-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "345:40-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "350:43-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "369:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "377:59-66",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "591:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "599:59-66",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1354,7 +1210,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-102",
+              "loc": "5:0-41",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -1368,7 +1224,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "20:67-76",
+              "loc": "73:67-76",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -1382,7 +1238,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "30:57-64",
+              "loc": "83:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -1396,7 +1252,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "37:99-104",
+              "loc": "189:42-51",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -1410,133 +1266,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "39:40-51",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "39:92-107",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:56-71",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "47:49-64",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "53:43-51",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:40-52",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:105-117",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:231-243",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:312-321",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "68:54-61",
+              "loc": "199:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -1564,7 +1294,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "54:42-51",
+              "loc": "67:42-51",
               "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
             },
@@ -1578,7 +1308,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "64:57-64",
+              "loc": "78:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
             },
@@ -1676,7 +1406,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-59",
+              "loc": "4:0-43",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             },
@@ -1690,63 +1420,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "14:42-71",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "24:41-45",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "29:40-48",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:44-52",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": true,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "66:42-50",
+              "loc": "58:42-71",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             },
@@ -1938,14 +1612,7 @@
             "PlatformStateContext",
             "Select",
             "SelectItem",
-            "Spinner",
-            "Table",
-            "TableHeader",
-            "TableHeaderCell",
-            "TableRow",
-            "TableRowCell",
-            "Tabs",
-            "TabsItem"
+            "Spinner"
           ],
           "providedExports": null,
           "optimizationBailout": [],
@@ -1978,7 +1645,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [],
@@ -2014,7 +1681,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [],
@@ -2050,7 +1717,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [],
@@ -2086,7 +1753,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
           ],
           "assets": [],
           "reasons": [],
@@ -2101,7 +1768,7 @@
           "module": "",
           "moduleIdentifier": "",
           "moduleName": "",
-          "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+          "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
           "request": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js"
         }
       ]
@@ -2111,27 +1778,27 @@
       "initial": true,
       "entry": true,
       "recorded": false,
-      "size": 9786,
+      "size": 9849,
       "sizes": {
-        "javascript": 8849,
+        "javascript": 8912,
         "runtime": 937
       },
       "names": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "idHints": [],
       "runtime": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "files": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab~e2b9c39d.js"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~3ced2f47.js"
       ],
       "auxiliaryFiles": [
-        "e9596a86bc31ef74.map"
+        "05ba37645980ac36.map"
       ],
-      "hash": "4183d8a06e274f1fdeaa",
+      "hash": "3758ffef0011c43dac22",
       "childrenByOrder": {},
-      "id": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+      "id": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
       "siblings": [],
       "parents": [],
       "children": [],
@@ -2140,9 +1807,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 2334,
+          "size": 2397,
           "sizes": {
-            "javascript": 2334
+            "javascript": 2397
           },
           "built": true,
           "codeGenerated": true,
@@ -2151,67 +1818,38 @@
           "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
           "name": "./nerdlets/config-app/components/DiffViewer.js",
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
-          "index": 7,
-          "preOrderIndex": 7,
-          "index2": 5,
-          "postOrderIndex": 5,
+          "index": 11,
+          "preOrderIndex": 11,
+          "index2": 9,
+          "postOrderIndex": 9,
           "cacheable": true,
           "optional": false,
           "orphan": false,
           "dependent": true,
-          "issuer": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "issuerName": "./nerdlets/config-app/components/ChangeHistory.js",
+          "issuer": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
+          "issuerName": "./nerdlets/config-entity-tab/components/RecentChanges.js",
           "issuerPath": [
             {
-              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "name": "./nerdlets/config-app/index.js",
-              "id": "./nerdlets/config-app/index.js"
+              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
+              "name": "./nerdlets/config-entity-tab/index.js",
+              "id": "./nerdlets/config-entity-tab/index.js"
             },
             {
-              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "name": "./nerdlets/config-app/components/ChangeHistory.js",
-              "id": "./nerdlets/config-app/components/ChangeHistory.js"
+              "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
+              "name": "./nerdlets/config-entity-tab/components/RecentChanges.js",
+              "id": "./nerdlets/config-entity-tab/components/RecentChanges.js"
             }
           ],
           "failed": false,
           "errors": 0,
           "warnings": 0,
           "id": "./nerdlets/config-app/components/DiffViewer.js",
-          "issuerId": "./nerdlets/config-app/components/ChangeHistory.js",
+          "issuerId": "./nerdlets/config-entity-tab/components/RecentChanges.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony side effect evaluation",
-              "active": true,
-              "explanation": "",
-              "userRequest": "./DiffViewer",
-              "loc": "5:0-38",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "./DiffViewer",
-              "loc": "90:50-60",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
             {
               "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
               "module": "./nerdlets/config-entity-tab/components/RecentChanges.js",
@@ -2267,10 +1905,10 @@
           "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/ConfigSummary.js",
           "name": "./nerdlets/config-entity-tab/components/ConfigSummary.js",
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/ConfigSummary.js",
-          "index": 10,
-          "preOrderIndex": 10,
-          "index2": 9,
-          "postOrderIndex": 9,
+          "index": 9,
+          "preOrderIndex": 9,
+          "index2": 8,
+          "postOrderIndex": 8,
           "cacheable": true,
           "optional": false,
           "orphan": false,
@@ -2290,7 +1928,7 @@
           "id": "./nerdlets/config-entity-tab/components/ConfigSummary.js",
           "issuerId": "./nerdlets/config-entity-tab/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -2349,8 +1987,8 @@
           "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
           "name": "./nerdlets/config-entity-tab/components/RecentChanges.js",
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-          "index": 11,
-          "preOrderIndex": 11,
+          "index": 10,
+          "preOrderIndex": 10,
           "index2": 10,
           "postOrderIndex": 10,
           "cacheable": true,
@@ -2372,7 +2010,7 @@
           "id": "./nerdlets/config-entity-tab/components/RecentChanges.js",
           "issuerId": "./nerdlets/config-entity-tab/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -2431,8 +2069,8 @@
           "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
           "name": "./nerdlets/config-entity-tab/index.js",
           "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
-          "index": 9,
-          "preOrderIndex": 9,
+          "index": 8,
+          "preOrderIndex": 8,
           "index2": 11,
           "postOrderIndex": 11,
           "cacheable": true,
@@ -2448,7 +2086,7 @@
           "id": "./nerdlets/config-entity-tab/index.js",
           "issuerId": null,
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -2462,7 +2100,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
-              "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+              "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
               "moduleId": null,
               "resolvedModuleId": null
             },
@@ -2526,8 +2164,8 @@
           "id": "__nr1-internal__",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -2716,8 +2354,8 @@
           "id": "nr1",
           "issuerId": "./nerdlets/config-app/index.js",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [
@@ -2731,7 +2369,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-102",
+              "loc": "4:0-41",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2745,7 +2383,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "21:97-106",
+              "loc": "198:59-68",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2759,7 +2397,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "29:57-64",
+              "loc": "211:44-53",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2773,7 +2411,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "41:44-49",
+              "loc": "219:59-66",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2787,7 +2425,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:40-51",
+              "loc": "488:56-65",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2801,7 +2439,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:92-107",
+              "loc": "499:40-47",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2815,7 +2453,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:159-174",
+              "loc": "537:88-97",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2829,119 +2467,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "43:231-246",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:299-314",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:371-386",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:43-51",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:92-104",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:182-194",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:254-266",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:329-341",
-              "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "module": "./nerdlets/config-app/components/ChangeHistory.js",
-              "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-              "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "45:401-413",
+              "loc": "545:57-64",
               "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
             },
@@ -2969,7 +2495,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "12:42-51",
+              "loc": "234:43-52",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2983,7 +2509,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "20:57-64",
+              "loc": "240:41-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2997,7 +2523,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "22:44-50",
+              "loc": "247:58-65",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3011,7 +2537,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "26:40-50",
+              "loc": "296:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3025,7 +2551,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "28:87-97",
+              "loc": "303:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3039,7 +2565,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "81:42-51",
+              "loc": "320:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3053,7 +2579,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "87:41-50",
+              "loc": "329:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3067,7 +2593,91 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "94:58-65",
+              "loc": "338:44-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "345:40-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "350:43-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "369:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "377:59-66",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "591:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "599:59-66",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3081,7 +2691,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-102",
+              "loc": "5:0-41",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -3095,7 +2705,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "20:67-76",
+              "loc": "73:67-76",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -3109,7 +2719,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "30:57-64",
+              "loc": "83:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -3123,7 +2733,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "37:99-104",
+              "loc": "189:42-51",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -3137,133 +2747,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "39:40-51",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "39:92-107",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "43:56-71",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "47:49-64",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "53:43-51",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:40-52",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:105-117",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:231-243",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:312-321",
-              "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-              "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "68:54-61",
+              "loc": "199:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
             },
@@ -3291,7 +2775,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "54:42-51",
+              "loc": "67:42-51",
               "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
             },
@@ -3305,7 +2789,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "64:57-64",
+              "loc": "78:57-64",
               "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
               "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
             },
@@ -3403,7 +2887,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-59",
+              "loc": "4:0-43",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             },
@@ -3417,63 +2901,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "14:42-71",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "24:41-45",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "29:40-48",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "59:44-52",
-              "moduleId": "./nerdlets/config-app/index.js",
-              "resolvedModuleId": "./nerdlets/config-app/index.js"
-            },
-            {
-              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "module": "./nerdlets/config-app/index.js",
-              "moduleName": "./nerdlets/config-app/index.js",
-              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-              "resolvedModule": "./nerdlets/config-app/index.js",
-              "type": "harmony import specifier",
-              "active": false,
-              "explanation": "",
-              "userRequest": "nr1",
-              "loc": "66:42-50",
+              "loc": "58:42-71",
               "moduleId": "./nerdlets/config-app/index.js",
               "resolvedModuleId": "./nerdlets/config-app/index.js"
             },
@@ -3699,7 +3127,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [],
@@ -3735,7 +3163,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [],
@@ -3771,7 +3199,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [],
@@ -3807,7 +3235,7 @@
           "warnings": 0,
           "id": "",
           "chunks": [
-            "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+            "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
           ],
           "assets": [],
           "reasons": [],
@@ -3822,7 +3250,7 @@
           "module": "",
           "moduleIdentifier": "",
           "moduleName": "",
-          "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+          "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
           "request": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js"
         }
       ]
@@ -3833,9 +3261,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 2625,
+      "size": 4035,
       "sizes": {
-        "javascript": 2625
+        "javascript": 4035
       },
       "built": true,
       "codeGenerated": true,
@@ -3846,8 +3274,8 @@
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
       "index": 0,
       "preOrderIndex": 0,
-      "index2": 8,
-      "postOrderIndex": 8,
+      "index2": 7,
+      "postOrderIndex": 7,
       "cacheable": true,
       "optional": false,
       "orphan": false,
@@ -3860,7 +3288,7 @@
       "id": "./nerdlets/config-app/index.js",
       "issuerId": null,
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -3874,7 +3302,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+          "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
           "moduleId": null,
           "resolvedModuleId": null
         },
@@ -3916,8 +3344,8 @@
       "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
       "name": "./nerdlets/config-entity-tab/index.js",
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
-      "index": 9,
-      "preOrderIndex": 9,
+      "index": 8,
+      "preOrderIndex": 8,
       "index2": 11,
       "postOrderIndex": 11,
       "cacheable": true,
@@ -3932,7 +3360,7 @@
       "id": "./nerdlets/config-entity-tab/index.js",
       "issuerId": null,
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
@@ -3946,7 +3374,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
-          "loc": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+          "loc": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
           "moduleId": null,
           "resolvedModuleId": null
         },
@@ -4009,8 +3437,8 @@
       "id": "__nr1-internal__",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
@@ -4198,8 +3626,8 @@
       "id": "nr1",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
@@ -4213,7 +3641,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "4:0-102",
+          "loc": "4:0-41",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4227,7 +3655,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "21:97-106",
+          "loc": "198:59-68",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4241,7 +3669,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "29:57-64",
+          "loc": "211:44-53",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4255,7 +3683,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "41:44-49",
+          "loc": "219:59-66",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4269,7 +3697,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "43:40-51",
+          "loc": "488:56-65",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4283,7 +3711,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "43:92-107",
+          "loc": "499:40-47",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4297,7 +3725,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "43:159-174",
+          "loc": "537:88-97",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4311,119 +3739,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "43:231-246",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "43:299-314",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "43:371-386",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:43-51",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:92-104",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:182-194",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:254-266",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:329-341",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "45:401-413",
+          "loc": "545:57-64",
           "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
         },
@@ -4451,7 +3767,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "12:42-51",
+          "loc": "234:43-52",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4465,7 +3781,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "20:57-64",
+          "loc": "240:41-50",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4479,7 +3795,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "22:44-50",
+          "loc": "247:58-65",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4493,7 +3809,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "26:40-50",
+          "loc": "296:42-51",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4507,7 +3823,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "28:87-97",
+          "loc": "303:57-64",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4521,7 +3837,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "81:42-51",
+          "loc": "320:42-51",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4535,7 +3851,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "87:41-50",
+          "loc": "329:57-64",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4549,7 +3865,91 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "94:58-65",
+          "loc": "338:44-50",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "345:40-50",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "350:43-53",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "369:44-53",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "377:59-66",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "591:44-53",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "599:59-66",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4563,7 +3963,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "4:0-102",
+          "loc": "5:0-41",
           "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
         },
@@ -4577,7 +3977,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "20:67-76",
+          "loc": "73:67-76",
           "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
         },
@@ -4591,7 +3991,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "30:57-64",
+          "loc": "83:57-64",
           "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
         },
@@ -4605,7 +4005,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "37:99-104",
+          "loc": "189:42-51",
           "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
         },
@@ -4619,133 +4019,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "39:40-51",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "39:92-107",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "43:56-71",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "47:49-64",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "53:43-51",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "59:40-52",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "59:105-117",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "59:231-243",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "59:312-321",
-          "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "module": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "moduleName": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ConfigAreaViewer.js",
-          "resolvedModule": "./nerdlets/config-app/components/ConfigAreaViewer.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "68:54-61",
+          "loc": "199:57-64",
           "moduleId": "./nerdlets/config-app/components/ConfigAreaViewer.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigAreaViewer.js"
         },
@@ -4773,7 +4047,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "54:42-51",
+          "loc": "67:42-51",
           "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
         },
@@ -4787,7 +4061,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "64:57-64",
+          "loc": "78:57-64",
           "moduleId": "./nerdlets/config-app/components/ConfigTree.js",
           "resolvedModuleId": "./nerdlets/config-app/components/ConfigTree.js"
         },
@@ -4885,7 +4159,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "4:0-59",
+          "loc": "4:0-43",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         },
@@ -4899,63 +4173,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "14:42-71",
-          "moduleId": "./nerdlets/config-app/index.js",
-          "resolvedModuleId": "./nerdlets/config-app/index.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "module": "./nerdlets/config-app/index.js",
-          "moduleName": "./nerdlets/config-app/index.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "resolvedModule": "./nerdlets/config-app/index.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "24:41-45",
-          "moduleId": "./nerdlets/config-app/index.js",
-          "resolvedModuleId": "./nerdlets/config-app/index.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "module": "./nerdlets/config-app/index.js",
-          "moduleName": "./nerdlets/config-app/index.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "resolvedModule": "./nerdlets/config-app/index.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "29:40-48",
-          "moduleId": "./nerdlets/config-app/index.js",
-          "resolvedModuleId": "./nerdlets/config-app/index.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "module": "./nerdlets/config-app/index.js",
-          "moduleName": "./nerdlets/config-app/index.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "resolvedModule": "./nerdlets/config-app/index.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "59:44-52",
-          "moduleId": "./nerdlets/config-app/index.js",
-          "resolvedModuleId": "./nerdlets/config-app/index.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "module": "./nerdlets/config-app/index.js",
-          "moduleName": "./nerdlets/config-app/index.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "resolvedModule": "./nerdlets/config-app/index.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "nr1",
-          "loc": "66:42-50",
+          "loc": "58:42-71",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         },
@@ -5151,14 +4369,7 @@
         "PlatformStateContext",
         "Select",
         "SelectItem",
-        "Spinner",
-        "Table",
-        "TableHeader",
-        "TableHeaderCell",
-        "TableRow",
-        "TableRowCell",
-        "Tabs",
-        "TabsItem"
+        "Spinner"
       ],
       "providedExports": null,
       "optimizationBailout": [],
@@ -5168,9 +4379,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 1364,
+      "size": 1424,
       "sizes": {
-        "javascript": 1364
+        "javascript": 1424
       },
       "built": true,
       "codeGenerated": true,
@@ -5201,7 +4412,7 @@
       "id": "./nerdlets/config-app/components/OrgSelector.js",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -5229,7 +4440,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "./components/OrgSelector",
-          "loc": "20:40-51",
+          "loc": "66:40-51",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         }
@@ -5249,9 +4460,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 2466,
+      "size": 6348,
       "sizes": {
-        "javascript": 2466
+        "javascript": 6348
       },
       "built": true,
       "codeGenerated": true,
@@ -5282,7 +4493,7 @@
       "id": "./nerdlets/config-app/components/ConfigTree.js",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -5310,7 +4521,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "./components/ConfigTree",
-          "loc": "43:40-50",
+          "loc": "94:40-50",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         }
@@ -5330,9 +4541,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 3444,
+      "size": 8128,
       "sizes": {
-        "javascript": 3444
+        "javascript": 8128
       },
       "built": true,
       "codeGenerated": true,
@@ -5363,7 +4574,7 @@
       "id": "./nerdlets/config-app/components/ConfigAreaViewer.js",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -5391,7 +4602,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "./components/ConfigAreaViewer",
-          "loc": "55:40-56",
+          "loc": "108:40-56",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         }
@@ -5411,9 +4622,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 3798,
+      "size": 21555,
       "sizes": {
-        "javascript": 3798
+        "javascript": 21555
       },
       "built": true,
       "codeGenerated": true,
@@ -5424,8 +4635,8 @@
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
       "index": 6,
       "preOrderIndex": 6,
-      "index2": 6,
-      "postOrderIndex": 6,
+      "index2": 5,
+      "postOrderIndex": 5,
       "cacheable": true,
       "optional": false,
       "orphan": false,
@@ -5444,7 +4655,7 @@
       "id": "./nerdlets/config-app/components/ChangeHistory.js",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -5472,7 +4683,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "./components/ChangeHistory",
-          "loc": "62:40-53",
+          "loc": "114:40-53",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         }
@@ -5492,9 +4703,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 4737,
+      "size": 26430,
       "sizes": {
-        "javascript": 4737
+        "javascript": 26430
       },
       "built": true,
       "codeGenerated": true,
@@ -5503,10 +4714,10 @@
       "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
       "name": "./nerdlets/config-app/components/CompareView.js",
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
-      "index": 8,
-      "preOrderIndex": 8,
-      "index2": 7,
-      "postOrderIndex": 7,
+      "index": 7,
+      "preOrderIndex": 7,
+      "index2": 6,
+      "postOrderIndex": 6,
       "cacheable": true,
       "optional": false,
       "orphan": false,
@@ -5525,7 +4736,7 @@
       "id": "./nerdlets/config-app/components/CompareView.js",
       "issuerId": "./nerdlets/config-app/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [
@@ -5553,7 +4764,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "./components/CompareView",
-          "loc": "69:40-51",
+          "loc": "120:40-51",
           "moduleId": "./nerdlets/config-app/index.js",
           "resolvedModuleId": "./nerdlets/config-app/index.js"
         }
@@ -5584,10 +4795,10 @@
       "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/ConfigSummary.js",
       "name": "./nerdlets/config-entity-tab/components/ConfigSummary.js",
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/ConfigSummary.js",
-      "index": 10,
-      "preOrderIndex": 10,
-      "index2": 9,
-      "postOrderIndex": 9,
+      "index": 9,
+      "preOrderIndex": 9,
+      "index2": 8,
+      "postOrderIndex": 8,
       "cacheable": true,
       "optional": false,
       "orphan": false,
@@ -5606,7 +4817,7 @@
       "id": "./nerdlets/config-entity-tab/components/ConfigSummary.js",
       "issuerId": "./nerdlets/config-entity-tab/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
@@ -5665,8 +4876,8 @@
       "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
       "name": "./nerdlets/config-entity-tab/components/RecentChanges.js",
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
-      "index": 11,
-      "preOrderIndex": 11,
+      "index": 10,
+      "preOrderIndex": 10,
       "index2": 10,
       "postOrderIndex": 10,
       "cacheable": true,
@@ -5687,7 +4898,7 @@
       "id": "./nerdlets/config-entity-tab/components/RecentChanges.js",
       "issuerId": "./nerdlets/config-entity-tab/index.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
@@ -5735,9 +4946,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 2334,
+      "size": 2397,
       "sizes": {
-        "javascript": 2334
+        "javascript": 2397
       },
       "built": true,
       "codeGenerated": true,
@@ -5746,66 +4957,37 @@
       "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
       "name": "./nerdlets/config-app/components/DiffViewer.js",
       "nameForCondition": "/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/DiffViewer.js",
-      "index": 7,
-      "preOrderIndex": 7,
-      "index2": 5,
-      "postOrderIndex": 5,
+      "index": 11,
+      "preOrderIndex": 11,
+      "index2": 9,
+      "postOrderIndex": 9,
       "cacheable": true,
       "optional": false,
       "orphan": false,
-      "issuer": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-      "issuerName": "./nerdlets/config-app/components/ChangeHistory.js",
+      "issuer": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
+      "issuerName": "./nerdlets/config-entity-tab/components/RecentChanges.js",
       "issuerPath": [
         {
-          "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/index.js",
-          "name": "./nerdlets/config-app/index.js",
-          "id": "./nerdlets/config-app/index.js"
+          "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/index.js",
+          "name": "./nerdlets/config-entity-tab/index.js",
+          "id": "./nerdlets/config-entity-tab/index.js"
         },
         {
-          "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "name": "./nerdlets/config-app/components/ChangeHistory.js",
-          "id": "./nerdlets/config-app/components/ChangeHistory.js"
+          "identifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
+          "name": "./nerdlets/config-entity-tab/components/RecentChanges.js",
+          "id": "./nerdlets/config-entity-tab/components/RecentChanges.js"
         }
       ],
       "failed": false,
       "errors": 0,
       "warnings": 0,
       "id": "./nerdlets/config-app/components/DiffViewer.js",
-      "issuerId": "./nerdlets/config-app/components/ChangeHistory.js",
+      "issuerId": "./nerdlets/config-entity-tab/components/RecentChanges.js",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony side effect evaluation",
-          "active": true,
-          "explanation": "",
-          "userRequest": "./DiffViewer",
-          "loc": "5:0-38",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
-        {
-          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "module": "./nerdlets/config-app/components/ChangeHistory.js",
-          "moduleName": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModule": "./nerdlets/config-app/components/ChangeHistory.js",
-          "type": "harmony import specifier",
-          "active": true,
-          "explanation": "",
-          "userRequest": "./DiffViewer",
-          "loc": "90:50-60",
-          "moduleId": "./nerdlets/config-app/components/ChangeHistory.js",
-          "resolvedModuleId": "./nerdlets/config-app/components/ChangeHistory.js"
-        },
         {
           "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.181.2/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-entity-tab/components/RecentChanges.js",
           "module": "./nerdlets/config-entity-tab/components/RecentChanges.js",
@@ -5872,7 +5054,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [],
@@ -5907,7 +5089,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [],
@@ -5942,7 +5124,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [],
@@ -5977,7 +5159,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [],
@@ -6012,7 +5194,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [],
@@ -6047,7 +5229,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [],
@@ -6082,7 +5264,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [],
       "reasons": [],
@@ -6117,7 +5299,7 @@
       "warnings": 0,
       "id": "",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [],
       "reasons": [],
@@ -6128,104 +5310,104 @@
     }
   ],
   "entrypoints": {
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app": {
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app": {
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [
         {
-          "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app~efcdf3f2.js",
-          "size": 14207
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~e250ef22.js",
+          "size": 40698
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 14207,
+      "assetsSize": 40698,
       "auxiliaryAssets": [
         {
-          "name": "bf346f2314f3a859.map",
-          "size": 34354
+          "name": "d71946034931ecc0.map",
+          "size": 104939
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 34354,
+      "auxiliaryAssetsSize": 104939,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
     },
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab": {
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab": {
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [
         {
-          "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab~e2b9c39d.js",
-          "size": 7034
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~3ced2f47.js",
+          "size": 7087
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 7034,
+      "assetsSize": 7087,
       "auxiliaryAssets": [
         {
-          "name": "e9596a86bc31ef74.map",
-          "size": 16732
+          "name": "05ba37645980ac36.map",
+          "size": 16835
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 16732,
+      "auxiliaryAssetsSize": 16835,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
     }
   },
   "namedChunkGroups": {
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app": {
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app",
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app": {
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "assets": [
         {
-          "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-app~efcdf3f2.js",
-          "size": 14207
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~e250ef22.js",
+          "size": 40698
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 14207,
+      "assetsSize": 40698,
       "auxiliaryAssets": [
         {
-          "name": "bf346f2314f3a859.map",
-          "size": 34354
+          "name": "d71946034931ecc0.map",
+          "size": 104939
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 34354,
+      "auxiliaryAssetsSize": 104939,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
     },
-    "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab": {
-      "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab",
+    "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab": {
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab",
       "chunks": [
-        "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab"
       ],
       "assets": [
         {
-          "name": "b579e606-6ef2-4922-a770-707fdd3e8cee--config-entity-tab~e2b9c39d.js",
-          "size": 7034
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~3ced2f47.js",
+          "size": 7087
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 7034,
+      "assetsSize": 7087,
       "auxiliaryAssets": [
         {
-          "name": "e9596a86bc31ef74.map",
-          "size": 16732
+          "name": "05ba37645980ac36.map",
+          "size": 16835
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 16732,
+      "auxiliaryAssetsSize": 16835,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
