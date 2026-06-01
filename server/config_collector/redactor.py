@@ -13,6 +13,7 @@ import re
 from typing import Any
 
 from server.config_collector.canonical_json import dumps as _canonical_dumps
+from server.config_collector.redaction_catalog import REDACTION_PATHS, NORMALIZATION_PATHS
 import hashlib as _hashlib
 
 # Path parser ----------------------------------------------------------------
@@ -133,8 +134,6 @@ def delete_path(payload: Any, steps: list[tuple]) -> None:
 
 
 # Top-level entry point -------------------------------------------------------
-
-from server.config_collector.redaction_catalog import REDACTION_PATHS, NORMALIZATION_PATHS
 
 
 def _extract_hot_columns(payload: Any) -> dict:
