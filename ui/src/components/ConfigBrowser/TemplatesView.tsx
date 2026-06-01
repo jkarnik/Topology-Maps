@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTemplates } from '../../hooks/useTemplates'
-import { useTemplateScores } from '../../hooks/useTemplateScores'
+import { useTemplateScores, isSiteScores } from '../../hooks/useTemplateScores'
 import { useDevicesForTemplate } from '../../hooks/useDevicesForTemplate'
 import type {
   ConfigTemplate,
@@ -8,6 +8,9 @@ import type {
   NetworkTemplateScore,
   TemplateKind,
   TemplateScoresResponse,
+  DeviceTemplateScoresResponse,
+  NetworkDeviceScores,
+  DeviceScore,
 } from '../../types/config'
 
 const KIND_META: Record<TemplateKind, { label: string; color: string; badge: string }> = {
@@ -233,30 +236,104 @@ function TemplateCard({ tmpl, selected, onSelect, onDelete }: TemplateCardProps)
   )
 }
 
-function ScoresPanel({ scoresData, kind }: { scoresData: TemplateScoresResponse; kind: TemplateKind | null }) {
-  const prefix = kind ? KIND_AREA_PREFIX[kind] : undefined
-  const scores = prefix
-    ? scoresData.scores.filter(s =>
-        s.area_scores.some(a => a.config_area.startsWith(prefix) && !s.missing_areas.includes(a.config_area))
-      )
-    : scoresData.scores
+function DeviceScoreRow({ device }: { device: DeviceScore }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border border-white/10 rounded mb-1 overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
+      >
+        <span className="text-xs opacity-80 w-32 text-left truncate">{device.name ?? device.serial}</span>
+        <span className="text-[10px] opacity-40 font-mono w-24 text-left truncate">{device.serial}</span>
+        <div className="flex-1"><ScoreBar pct={device.score_pct} /></div>
+      </button>
+      {open && (
+        <div className="border-t border-white/10 p-2 space-y-1">
+          {device.missing_areas.length > 0 && (
+            <p className="text-xs text-red-400/70">Missing areas: {device.missing_areas.join(', ')}</p>
+          )}
+          {device.area_scores.map(as => (
+            <div key={as.config_area} className="flex items-center gap-2">
+              <span className="text-xs font-mono opacity-60 w-40 truncate">{as.config_area}</span>
+              <div className="flex-1"><ScoreBar pct={as.score_pct} /></div>
+              {as.change_count > 0 && (
+                <span className="text-xs text-red-400/60">{as.change_count} change{as.change_count !== 1 ? 's' : ''}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
+function NetworkDeviceGroup({ group }: { group: NetworkDeviceScores }) {
+  const [open, setOpen] = useState(false)
+  const color = group.aggregate_score >= 90 ? 'text-green-400' : group.aggregate_score >= 60 ? 'text-amber-400' : 'text-red-400'
+  return (
+    <div className="border border-white/10 rounded mb-2 overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
+      >
+        <span className="text-xs opacity-50">{open ? '▼' : '▶'}</span>
+        <span className="text-xs font-medium flex-1 text-left truncate">{group.network_name}</span>
+        <span className="text-xs opacity-40">{group.device_count} device{group.device_count !== 1 ? 's' : ''}</span>
+        <span className={`text-xs font-semibold ml-2 ${color}`}>{group.aggregate_score}%</span>
+      </button>
+      {open && (
+        <div className="border-t border-white/10 p-2">
+          {group.devices.map(d => <DeviceScoreRow key={d.serial} device={d} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ScoresPanel({ scoresData, kind }: { scoresData: TemplateScoresResponse | DeviceTemplateScoresResponse; kind: TemplateKind | null }) {
+  if (isSiteScores(scoresData)) {
+    const prefix = kind ? KIND_AREA_PREFIX[kind] : undefined
+    const scores = prefix
+      ? scoresData.scores.filter(s =>
+          s.area_scores.some(a => a.config_area.startsWith(prefix) && !s.missing_areas.includes(a.config_area))
+        )
+      : scoresData.scores
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <p className="text-xs opacity-50">
+            {scoresData.template.name} · {scores.length} network{scores.length !== 1 ? 's' : ''} · {scoresData.template.area_count} template areas
+          </p>
+          <KindBadge kind={kind} />
+        </div>
+        {scores.length === 0 ? (
+          <p className="text-xs opacity-40 p-4 text-center">
+            {scoresData.scores.length === 0
+              ? 'No networks collected yet — run a baseline first.'
+              : `No networks with ${kind ? KIND_META[kind].label.toLowerCase() : ''} devices found.`}
+          </p>
+        ) : (
+          scores.map(score => <NetworkScoreRow key={score.network_id} score={score} />)
+        )}
+      </div>
+    )
+  }
+
+  // Device template
+  const { networks } = scoresData as DeviceTemplateScoresResponse
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
         <p className="text-xs opacity-50">
-          {scoresData.template.name} · {scores.length} network{scores.length !== 1 ? 's' : ''} · {scoresData.template.area_count} template areas
+          {scoresData.template.name} · {networks.length} network{networks.length !== 1 ? 's' : ''} · {scoresData.template.area_count} template areas
         </p>
         <KindBadge kind={kind} />
       </div>
-      {scores.length === 0 ? (
-        <p className="text-xs opacity-40 p-4 text-center">
-          {scoresData.scores.length === 0
-            ? 'No networks collected yet — run a baseline first.'
-            : `No networks with ${kind ? KIND_META[kind].label.toLowerCase() : ''} devices found.`}
-        </p>
+      {networks.length === 0 ? (
+        <p className="text-xs opacity-40 p-4 text-center">No devices collected yet — run a baseline first.</p>
       ) : (
-        scores.map(score => <NetworkScoreRow key={score.network_id} score={score} />)
+        networks.map(g => <NetworkDeviceGroup key={g.network_id} group={g} />)
       )}
     </div>
   )
