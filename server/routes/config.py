@@ -717,81 +717,176 @@ async def get_template_scores(template_id: int, org_id: str) -> dict:
 
         template_areas = get_template_areas(conn, template_id=template_id)
         area_count = len(template_areas)
-
-        networks = conn.execute(
-            """SELECT DISTINCT entity_id, MAX(name_hint) as name_hint
-               FROM config_observations
-               WHERE org_id=? AND entity_type='network'
-               GROUP BY entity_id""",
-            (org_id,),
-        ).fetchall()
-
-        scores = []
-        for net in networks:
-            network_id = net["entity_id"]
-            network_name = net["name_hint"] or network_id
-
-            net_obs = conn.execute(
-                """SELECT config_area, sub_key, hash FROM config_observations
-                   WHERE org_id=? AND entity_type='network' AND entity_id=?
-                   GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
-                (org_id, network_id),
-            ).fetchall()
-            net_map = {(r["config_area"], r["sub_key"]): r["hash"] for r in net_obs}
-
-            total_fields = 0
-            total_changes = 0
-            missing_areas = []
-            area_scores = []
-
-            for ta in template_areas:
-                key = (ta["config_area"], ta["sub_key"])
-                if key not in net_map:
-                    missing_areas.append(ta["config_area"])
-                    area_scores.append({"config_area": ta["config_area"], "score_pct": 0, "change_count": 0})
-                    continue
-
-                tmpl_blob_row = get_blob_by_hash(conn, ta["blob_hash"])
-                net_blob_row = get_blob_by_hash(conn, net_map[key])
-                tmpl_blob = json.loads(tmpl_blob_row["payload"]) if tmpl_blob_row else {}
-                net_blob = json.loads(net_blob_row["payload"]) if net_blob_row else {}
-
-                diff = compute_diff(tmpl_blob, net_blob)
-                n_changes = len(diff.changes)
-                n_fields = diff.unchanged_count + n_changes
-                total_fields += n_fields
-                total_changes += n_changes
-
-                area_score = 100 if n_fields == 0 else round((n_fields - n_changes) / n_fields * 100)
-                area_scores.append({
-                    "config_area": ta["config_area"],
-                    "score_pct": area_score,
-                    "change_count": n_changes,
-                })
-
-            score_pct = 100 if total_fields == 0 else round((total_fields - total_changes) / total_fields * 100)
-            scores.append({
-                "network_id": network_id,
-                "network_name": network_name,
-                "score_pct": score_pct,
-                "change_count": total_changes,
-                "total_fields": total_fields,
-                "missing_areas": missing_areas,
-                "area_scores": area_scores,
-            })
-
-        scores.sort(key=lambda s: s["score_pct"])
-
-        return {
-            "template": {
-                "id": template_id,
-                "name": tmpl_row["name"],
-                "area_count": area_count,
-            },
-            "scores": scores,
+        template_info = {
+            "id": template_id,
+            "name": tmpl_row["name"],
+            "area_count": area_count,
+            "kind": tmpl_row["kind"],
         }
+
+        if tmpl_row["source_device_serial"]:
+            return await _score_device_template(conn, org_id, template_info, template_areas)
+        else:
+            return _score_network_template(conn, org_id, template_info, template_areas)
     finally:
         conn.close()
+
+
+def _score_network_template(conn, org_id: str, template_info: dict, template_areas: list[dict]) -> dict:
+    networks = conn.execute(
+        """SELECT DISTINCT entity_id, MAX(name_hint) as name_hint
+           FROM config_observations
+           WHERE org_id=? AND entity_type='network'
+           GROUP BY entity_id""",
+        (org_id,),
+    ).fetchall()
+
+    scores = []
+    for net in networks:
+        network_id = net["entity_id"]
+        network_name = net["name_hint"] or network_id
+        net_obs = conn.execute(
+            """SELECT config_area, sub_key, hash FROM config_observations
+               WHERE org_id=? AND entity_type='network' AND entity_id=?
+               GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
+            (org_id, network_id),
+        ).fetchall()
+        net_map = {(r["config_area"], r["sub_key"]): r["hash"] for r in net_obs}
+
+        total_fields = total_changes = 0
+        missing_areas: list[str] = []
+        area_scores = []
+        for ta in template_areas:
+            key = (ta["config_area"], ta["sub_key"])
+            if key not in net_map:
+                missing_areas.append(ta["config_area"])
+                area_scores.append({"config_area": ta["config_area"], "score_pct": 0, "change_count": 0})
+                continue
+            tmpl_blob = json.loads((get_blob_by_hash(conn, ta["blob_hash"]) or {}).get("payload") or "{}")
+            net_blob = json.loads((get_blob_by_hash(conn, net_map[key]) or {}).get("payload") or "{}")
+            diff = compute_diff(tmpl_blob, net_blob)
+            n_changes = len(diff.changes)
+            n_fields = diff.unchanged_count + n_changes
+            total_fields += n_fields
+            total_changes += n_changes
+            area_score = 100 if n_fields == 0 else round((n_fields - n_changes) / n_fields * 100)
+            area_scores.append({"config_area": ta["config_area"], "score_pct": area_score, "change_count": n_changes})
+
+        score_pct = 100 if total_fields == 0 else round((total_fields - total_changes) / total_fields * 100)
+        scores.append({
+            "network_id": network_id,
+            "network_name": network_name,
+            "score_pct": score_pct,
+            "change_count": total_changes,
+            "total_fields": total_fields,
+            "missing_areas": missing_areas,
+            "area_scores": area_scores,
+        })
+
+    scores.sort(key=lambda s: s["score_pct"])
+    return {"template": template_info, "scores": scores}
+
+
+async def _score_device_template(conn, org_id: str, template_info: dict, template_areas: list[dict]) -> dict:
+    kind = template_info.get("kind")
+
+    # Find all devices with observations matching the kind's area prefix
+    prefix = _kind_area_prefix_for_scoring(kind)
+    device_rows = conn.execute(
+        """SELECT DISTINCT entity_id, MAX(name_hint) AS name
+           FROM config_observations
+           WHERE org_id=? AND entity_type='device' AND config_area LIKE ?
+           GROUP BY entity_id""",
+        (org_id, f"{prefix}%"),
+    ).fetchall() if prefix else []
+
+    all_serials = {r["entity_id"]: r["name"] or r["entity_id"] for r in device_rows}
+
+    # Resolve device → network via Meraki inventory (best-effort)
+    network_for_device: dict[str, str] = {}
+    network_names: dict[str, str] = {}
+    client = _get_meraki_client()
+    if client.is_configured and all_serials:
+        try:
+            inventory = await client.get_org_inventory_devices(org_id)
+            for d in inventory:
+                serial = d.get("serial")
+                nid = d.get("networkId")
+                if serial and nid:
+                    network_for_device[serial] = nid
+                    if nid not in network_names:
+                        network_names[nid] = nid
+        except Exception as exc:
+            logger.warning("Device template scoring: inventory fetch failed: %s", exc)
+
+    # Score each device
+    device_scores: list[dict] = []
+    for serial, dev_name in all_serials.items():
+        dev_obs = conn.execute(
+            """SELECT config_area, sub_key, hash FROM config_observations
+               WHERE org_id=? AND entity_type='device' AND entity_id=?
+               GROUP BY config_area, sub_key HAVING MAX(observed_at)""",
+            (org_id, serial),
+        ).fetchall()
+        dev_map = {(r["config_area"], r["sub_key"]): r["hash"] for r in dev_obs}
+
+        total_fields = total_changes = 0
+        missing_areas: list[str] = []
+        area_scores = []
+        for ta in template_areas:
+            key = (ta["config_area"], ta["sub_key"])
+            if key not in dev_map:
+                missing_areas.append(ta["config_area"])
+                area_scores.append({"config_area": ta["config_area"], "score_pct": 0, "change_count": 0})
+                continue
+            tmpl_blob = json.loads((get_blob_by_hash(conn, ta["blob_hash"]) or {}).get("payload") or "{}")
+            dev_blob = json.loads((get_blob_by_hash(conn, dev_map[key]) or {}).get("payload") or "{}")
+            diff = compute_diff(tmpl_blob, dev_blob)
+            n_changes = len(diff.changes)
+            n_fields = diff.unchanged_count + n_changes
+            total_fields += n_fields
+            total_changes += n_changes
+            area_score = 100 if n_fields == 0 else round((n_fields - n_changes) / n_fields * 100)
+            area_scores.append({"config_area": ta["config_area"], "score_pct": area_score, "change_count": n_changes})
+
+        score_pct = 100 if total_fields == 0 else round((total_fields - total_changes) / total_fields * 100)
+        device_scores.append({
+            "serial": serial,
+            "name": dev_name,
+            "network_id": network_for_device.get(serial, "__unknown__"),
+            "score_pct": score_pct,
+            "change_count": total_changes,
+            "missing_areas": missing_areas,
+            "area_scores": area_scores,
+        })
+
+    # Group by network
+    nets: dict[str, list[dict]] = {}
+    for ds in device_scores:
+        nid = ds["network_id"]
+        nets.setdefault(nid, []).append(ds)
+
+    networks_out = []
+    for nid, devices in nets.items():
+        agg = round(sum(d["score_pct"] for d in devices) / len(devices)) if devices else 0
+        networks_out.append({
+            "network_id": nid,
+            "network_name": network_names.get(nid, "Unknown network" if nid == "__unknown__" else nid),
+            "aggregate_score": agg,
+            "device_count": len(devices),
+            "devices": sorted(devices, key=lambda d: d["score_pct"]),
+        })
+
+    networks_out.sort(key=lambda n: n["aggregate_score"])
+    return {"template": template_info, "networks": networks_out}
+
+
+def _kind_area_prefix_for_scoring(kind: Optional[str]) -> str:
+    return {
+        "gateway": "appliance_device_",
+        "switch": "switch_device_",
+        "access_point": "wireless_device_",
+    }.get(kind or "", "")
 
 
 class ConfigWebSocketHub:

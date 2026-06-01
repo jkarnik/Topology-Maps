@@ -209,3 +209,60 @@ def test_create_device_template_via_api(client, monkeypatch, tmp_path):
     assert data["source_device_serial"] == "Q2SW-0001"
     assert data["source_device_name"] == "Core-SW-01"
     assert any(a["config_area"] == "switch_device_ports" for a in data["areas"])
+
+
+def test_device_template_scores(client, monkeypatch, tmp_path):
+    """Device template scores return networks-keyed response with per-device scores."""
+    db_path = tmp_path / "topology.db"
+    monkeypatch.setattr(database, "DB_PATH", db_path)
+    conn = database.get_connection()
+    import hashlib, json as j
+
+    payload_gold = j.dumps({"portId": "1", "enabled": True})
+    payload_drift = j.dumps({"portId": "1", "enabled": False})
+    h_gold = hashlib.sha256(payload_gold.encode()).hexdigest()
+    h_drift = hashlib.sha256(payload_drift.encode()).hexdigest()
+    store.upsert_blob(conn, h_gold, payload_gold, len(payload_gold))
+    store.upsert_blob(conn, h_drift, payload_drift, len(payload_drift))
+
+    # Golden device
+    store.insert_observation_if_changed(
+        conn, org_id="org1", entity_type="device", entity_id="Q2SW-GOLD",
+        config_area="switch_device_ports", sub_key=None, hash_hex=h_gold,
+        source_event="baseline", change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": "Golden-SW"},
+    )
+    # Another device that drifted
+    store.insert_observation_if_changed(
+        conn, org_id="org1", entity_type="device", entity_id="Q2SW-DRIFT",
+        config_area="switch_device_ports", sub_key=None, hash_hex=h_drift,
+        source_event="baseline", change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": "Drift-SW"},
+    )
+    conn.close()
+
+    # Create device template
+    resp = client.post("/api/config/templates", json={
+        "org_id": "org1", "name": "Golden Switch", "network_id": "net1",
+        "kind": "switch", "device_serial": "Q2SW-GOLD", "device_name": "Golden-SW",
+    })
+    tmpl_id = resp.json()["id"]
+
+    # Get scores
+    resp = client.get(f"/api/config/templates/{tmpl_id}/scores?org_id=org1")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert "networks" in data
+    assert "scores" not in data
+
+    # Unknown-network bucket holds both devices (no Meraki configured)
+    all_devices = [d for n in data["networks"] for d in n["devices"]]
+    serials = [d["serial"] for d in all_devices]
+    assert "Q2SW-GOLD" in serials
+    assert "Q2SW-DRIFT" in serials
+
+    gold = next(d for d in all_devices if d["serial"] == "Q2SW-GOLD")
+    drift = next(d for d in all_devices if d["serial"] == "Q2SW-DRIFT")
+    assert gold["score_pct"] == 100
+    assert drift["score_pct"] < 100
