@@ -178,3 +178,34 @@ def test_devices_for_template_no_meraki(client, monkeypatch, tmp_path):
     serials = [d["serial"] for d in data["devices"]]
     assert "Q2SW-0001" in serials
     assert data["network_filter_unavailable"] is True
+
+
+def test_create_device_template_via_api(client, monkeypatch, tmp_path):
+    db_path = tmp_path / "topology.db"
+    monkeypatch.setattr(database, "DB_PATH", db_path)
+    conn = database.get_connection()
+    import hashlib, json as j
+    payload = j.dumps({"ports": [{"id": 1}]})
+    h = hashlib.sha256(payload.encode()).hexdigest()
+    store.upsert_blob(conn, h, payload, len(payload))
+    store.insert_observation_if_changed(
+        conn, org_id="org1", entity_type="device", entity_id="Q2SW-0001",
+        config_area="switch_device_ports", sub_key=None, hash_hex=h,
+        source_event="baseline", change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": "Core-SW-01"},
+    )
+    conn.close()
+
+    resp = client.post("/api/config/templates", json={
+        "org_id": "org1",
+        "name": "Standard Switch",
+        "network_id": "net1",
+        "kind": "switch",
+        "device_serial": "Q2SW-0001",
+        "device_name": "Core-SW-01",
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["source_device_serial"] == "Q2SW-0001"
+    assert data["source_device_name"] == "Core-SW-01"
+    assert any(a["config_area"] == "switch_device_ports" for a in data["areas"])

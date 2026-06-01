@@ -523,6 +523,8 @@ class PromoteTemplateRequest(BaseModel):
     name: str
     network_id: str
     kind: Optional[str] = None
+    device_serial: Optional[str] = None
+    device_name: Optional[str] = None
 
 
 @router.get("/templates")
@@ -538,16 +540,25 @@ async def list_templates_route(org_id: str) -> list[dict]:
 async def create_template_route(req: PromoteTemplateRequest) -> dict:
     conn = get_connection()
     try:
-        name_row = conn.execute(
-            """SELECT name_hint FROM config_observations
-               WHERE org_id=? AND entity_type='network' AND entity_id=?
-               AND name_hint IS NOT NULL ORDER BY observed_at DESC LIMIT 1""",
-            (req.org_id, req.network_id),
-        ).fetchone()
-        network_name = name_row["name_hint"] if name_row else None
-        return create_template(conn, org_id=req.org_id, name=req.name,
-                               network_id=req.network_id, network_name=network_name,
-                               kind=req.kind)
+        network_name = None
+        if not req.device_serial:
+            name_row = conn.execute(
+                """SELECT name_hint FROM config_observations
+                   WHERE org_id=? AND entity_type='network' AND entity_id=?
+                   AND name_hint IS NOT NULL ORDER BY observed_at DESC LIMIT 1""",
+                (req.org_id, req.network_id),
+            ).fetchone()
+            network_name = name_row["name_hint"] if name_row else None
+        return create_template(
+            conn,
+            org_id=req.org_id,
+            name=req.name,
+            network_id=req.network_id,
+            network_name=network_name,
+            kind=req.kind,
+            device_serial=req.device_serial,
+            device_name=req.device_name,
+        )
     finally:
         conn.close()
 
