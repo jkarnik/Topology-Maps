@@ -21,7 +21,7 @@ from server.config_collector.store import (
     create_sweep_run, get_active_sweep_run,
     get_observations_in_window,
     create_template, list_templates, get_template_areas,
-    delete_template, get_coverage,
+    delete_template, get_coverage, list_devices_for_kind,
 )
 from server.config_collector.diff_engine import compute_diff
 from server.meraki_client import MerakiClient
@@ -558,6 +558,44 @@ async def delete_template_route(template_id: int) -> dict:
     try:
         delete_template(conn, template_id=template_id)
         return {"deleted": template_id}
+    finally:
+        conn.close()
+
+
+@router.get("/devices-for-template")
+async def list_devices_for_template(org_id: str, network_id: str, kind: str) -> dict:
+    """Return devices of the matching kind observed in the given network."""
+    conn = get_connection()
+    try:
+        network_filter_unavailable = False
+        serials_in_network: Optional[list[str]] = None
+
+        client = _get_meraki_client()
+        if client.is_configured:
+            try:
+                inventory = await client.get_org_inventory_devices(org_id)
+                serials_in_network = [
+                    d["serial"] for d in inventory
+                    if d.get("networkId") == network_id and d.get("serial")
+                ]
+            except Exception as exc:
+                logger.warning("devices-for-template: Meraki inventory failed: %s", exc)
+                network_filter_unavailable = True
+        else:
+            network_filter_unavailable = True
+
+        if serials_in_network is not None:
+            devices = list_devices_for_kind(conn, org_id=org_id, serials=serials_in_network, kind=kind)
+        else:
+            # Fallback: return all observed devices of this kind (no network filter)
+            all_device_rows = conn.execute(
+                "SELECT DISTINCT entity_id FROM config_observations WHERE org_id=? AND entity_type='device'",
+                (org_id,),
+            ).fetchall()
+            all_serials = [r["entity_id"] for r in all_device_rows]
+            devices = list_devices_for_kind(conn, org_id=org_id, serials=all_serials, kind=kind)
+
+        return {"devices": devices, "network_filter_unavailable": network_filter_unavailable}
     finally:
         conn.close()
 

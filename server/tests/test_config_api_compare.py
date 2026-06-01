@@ -153,3 +153,28 @@ def test_template_scores(client, monkeypatch, tmp_path):
     scores = {s["network_id"]: s for s in resp.json()["scores"]}
     assert scores["net1"]["score_pct"] == 100
     assert scores["net2"]["score_pct"] < 100
+
+
+def test_devices_for_template_no_meraki(client, monkeypatch, tmp_path):
+    """With Meraki unconfigured, falls back to all org devices of matching kind."""
+    db_path = tmp_path / "topology.db"
+    monkeypatch.setattr(database, "DB_PATH", db_path)
+    conn = database.get_connection()
+    import hashlib, json as j
+    payload = j.dumps({"ports": []})
+    h = hashlib.sha256(payload.encode()).hexdigest()
+    store.upsert_blob(conn, h, payload, len(payload))
+    store.insert_observation_if_changed(
+        conn, org_id="org1", entity_type="device", entity_id="Q2SW-0001",
+        config_area="switch_device_ports", sub_key=None, hash_hex=h,
+        source_event="baseline", change_event_id=None, sweep_run_id=None,
+        hot_columns={"name_hint": "Core-SW-01"},
+    )
+    conn.close()
+
+    resp = client.get("/api/config/devices-for-template?org_id=org1&network_id=net1&kind=switch")
+    assert resp.status_code == 200
+    data = resp.json()
+    serials = [d["serial"] for d in data["devices"]]
+    assert "Q2SW-0001" in serials
+    assert data["network_filter_unavailable"] is True
