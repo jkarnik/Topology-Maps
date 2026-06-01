@@ -45,3 +45,41 @@ REDACTION_PATHS: dict[str, list[str]] = {
         "[*].sharedSecret",
     ],
 }
+
+NORMALIZATION_PATHS: dict[str, list[str]] = {
+    # Per-device identity fields in management interface
+    "device_management_interface": [
+        "ddnsHostname",
+        "wan1.staticIp",
+        "wan1.staticGateway",
+        "wan2.staticIp",
+        "wan2.staticGateway",
+    ],
+    # Read-only hardware capability list — not a setting
+    "switch_device_ports": [
+        "[*].linkNegotiationCapabilities",
+    ],
+    # Serial of the paired HA device — unique per install
+    "switch_device_warm_spare": [
+        "spareSerial",
+    ],
+    # Per-device/site IP addresses and internal Meraki IDs
+    "switch_device_routing_interfaces": [
+        "[*].interfaceId",
+        "[*].ip",
+        "[*].subnet",
+        "[*].defaultGateway",
+    ],
+    # Site-specific routing details and internal IDs
+    "switch_device_routing_static_routes": [
+        "[*].staticRouteId",
+        "[*].nextHopIp",
+        "[*].subnet",
+    ],
+    # Per-AP BLE beacon identifiers
+    "wireless_device_bluetooth": [
+        "uuid",
+        "major",
+        "minor",
+    ],
+}
