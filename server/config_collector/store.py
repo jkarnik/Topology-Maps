@@ -376,24 +376,39 @@ def create_template(
     name: str,
     network_id: str,
     network_name: Optional[str],
+    kind: Optional[str] = None,
+    device_serial: Optional[str] = None,
+    device_name: Optional[str] = None,
 ) -> dict:
-    """Promote a network snapshot to a template. Returns the full template dict."""
+    """Promote a network or device snapshot to a template. Returns the full template dict."""
     now = _now_iso()
     cursor = conn.execute(
-        """INSERT INTO config_templates (org_id, name, source_network_id, source_network_name, created_at)
-           VALUES (?, ?, ?, ?, ?)""",
-        (org_id, name, network_id, network_name, now),
+        """INSERT INTO config_templates
+               (org_id, name, source_network_id, source_network_name, created_at, kind,
+                source_device_serial, source_device_name)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (org_id, name, network_id, network_name, now, kind, device_serial, device_name),
     )
     template_id = cursor.lastrowid
 
-    rows = conn.execute(
-        """SELECT config_area, sub_key, hash
-           FROM config_observations
-           WHERE org_id=? AND entity_type='network' AND entity_id=?
-           GROUP BY config_area, sub_key
-           HAVING MAX(observed_at)""",
-        (org_id, network_id),
-    ).fetchall()
+    if device_serial:
+        rows = conn.execute(
+            """SELECT config_area, sub_key, hash
+               FROM config_observations
+               WHERE org_id=? AND entity_type='device' AND entity_id=?
+               GROUP BY config_area, sub_key
+               HAVING MAX(observed_at)""",
+            (org_id, device_serial),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            """SELECT config_area, sub_key, hash
+               FROM config_observations
+               WHERE org_id=? AND entity_type='network' AND entity_id=?
+               GROUP BY config_area, sub_key
+               HAVING MAX(observed_at)""",
+            (org_id, network_id),
+        ).fetchall()
 
     areas = []
     for row in rows:
@@ -412,6 +427,9 @@ def create_template(
         "source_network_id": network_id,
         "source_network_name": network_name,
         "created_at": now,
+        "kind": kind,
+        "source_device_serial": device_serial,
+        "source_device_name": device_name,
         "areas": areas,
     }
 

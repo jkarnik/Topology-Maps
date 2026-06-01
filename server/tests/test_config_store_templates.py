@@ -96,3 +96,62 @@ def test_get_coverage(conn):
     assert areas["appliance_vlans"]["network_total"] == 2
     assert len(areas["appliance_vlans"]["missing_networks"]) == 1
     assert areas["appliance_vlans"]["missing_networks"][0]["id"] == "net2"
+
+
+def _seed_device_observation(conn, org_id, serial, config_area, blob_hash, name=None):
+    store.insert_observation_if_changed(
+        conn,
+        org_id=org_id,
+        entity_type="device",
+        entity_id=serial,
+        config_area=config_area,
+        sub_key=None,
+        hash_hex=blob_hash,
+        source_event="baseline",
+        change_event_id=None,
+        sweep_run_id=None,
+        hot_columns={"name_hint": name} if name else {},
+    )
+
+
+def test_create_device_template(conn):
+    h = _seed_blob(conn, '{"ports": [{"id": 1}]}')
+    _seed_device_observation(conn, "org1", "Q2SW-0001", "switch_device_ports", h, name="Core-SW-01")
+
+    tmpl = store.create_template(
+        conn,
+        org_id="org1",
+        name="Standard Core Switch",
+        network_id="net1",
+        network_name=None,
+        kind="switch",
+        device_serial="Q2SW-0001",
+        device_name="Core-SW-01",
+    )
+
+    assert tmpl["source_device_serial"] == "Q2SW-0001"
+    assert tmpl["source_device_name"] == "Core-SW-01"
+    assert len(tmpl["areas"]) == 1
+    assert tmpl["areas"][0]["config_area"] == "switch_device_ports"
+
+
+def test_device_template_excludes_network_areas(conn):
+    h_net = _seed_blob(conn, '{"ssids": []}')
+    h_dev = _seed_blob(conn, '{"ports": []}')
+    _seed_observation(conn, "org1", "net1", "wireless_ssids", h_net)
+    _seed_device_observation(conn, "org1", "Q2SW-0001", "switch_device_ports", h_dev)
+
+    tmpl = store.create_template(
+        conn,
+        org_id="org1",
+        name="Switch Template",
+        network_id="net1",
+        network_name="Store 1",
+        kind="switch",
+        device_serial="Q2SW-0001",
+        device_name="Core-SW-01",
+    )
+
+    area_names = [a["config_area"] for a in tmpl["areas"]]
+    assert "switch_device_ports" in area_names
+    assert "wireless_ssids" not in area_names
