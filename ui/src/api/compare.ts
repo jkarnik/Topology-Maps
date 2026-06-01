@@ -2,7 +2,9 @@ import type {
   NetworkCompareResponse,
   CoverageResponse,
   ConfigTemplate,
+  TemplateKind,
   TemplateScoresResponse,
+  DeviceTemplateScoresResponse,
 } from '../types/config'
 
 const BASE = '/api/config'
@@ -30,11 +32,25 @@ export function listTemplates(orgId: string): Promise<ConfigTemplate[]> {
   return _fetch(`/templates?${new URLSearchParams({ org_id: orgId })}`)
 }
 
-export function createTemplate(orgId: string, name: string, networkId: string): Promise<ConfigTemplate> {
+export function createTemplate(
+  orgId: string,
+  name: string,
+  networkId: string,
+  kind: TemplateKind | null,
+  deviceSerial: string | null,
+  deviceName: string | null,
+): Promise<ConfigTemplate> {
   return _fetch('/templates', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ org_id: orgId, name, network_id: networkId }),
+    body: JSON.stringify({
+      org_id: orgId,
+      name,
+      network_id: networkId,
+      kind,
+      device_serial: deviceSerial,
+      device_name: deviceName,
+    }),
   })
 }
 
@@ -42,6 +58,18 @@ export function deleteTemplate(templateId: number): Promise<{ deleted: number }>
   return _fetch(`/templates/${templateId}`, { method: 'DELETE' })
 }
 
-export function getTemplateScores(templateId: number, orgId: string): Promise<TemplateScoresResponse> {
+export function getTemplateScores(
+  templateId: number,
+  orgId: string,
+): Promise<TemplateScoresResponse | DeviceTemplateScoresResponse> {
   return _fetch(`/templates/${templateId}/scores?${new URLSearchParams({ org_id: orgId })}`)
+}
+
+export function listDevicesForTemplate(
+  orgId: string,
+  networkId: string,
+  kind: TemplateKind,
+): Promise<{ devices: { serial: string; name: string | null }[]; network_filter_unavailable: boolean }> {
+  const qs = new URLSearchParams({ org_id: orgId, network_id: networkId, kind })
+  return _fetch(`/devices-for-template?${qs}`)
 }
