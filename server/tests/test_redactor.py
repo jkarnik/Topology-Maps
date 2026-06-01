@@ -1,6 +1,10 @@
 """Tests for the redactor walker (Plan 1.03)."""
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
+
 import pytest
 
 from server.config_collector.redactor import parse_path, mask_path, delete_path
@@ -108,8 +112,6 @@ def test_delete_array_step_on_non_array_is_silent():
 
 # helper
 def _sha256(value):
-    import hashlib
-    import json
     canonical = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
@@ -127,7 +129,6 @@ def test_redact_wireless_ssids_masks_psks():
     redacted_str, hash_hex, byte_size, hot = redact(payload, "wireless_ssids")
 
     # Canonical string is valid JSON
-    import json
     parsed = json.loads(redacted_str)
     assert parsed[0]["psk"] == {"_redacted": True, "_hash": _sha256("corppass123")}
     assert parsed[1]["psk"] == {"_redacted": True, "_hash": _sha256("guestpass")}
@@ -205,9 +206,6 @@ def test_redact_unknown_area_no_normalization():
 
 
 # Fixture sanity tests --------------------------------------------------------
-
-import json
-from pathlib import Path
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "meraki"
