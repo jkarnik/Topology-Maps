@@ -155,3 +155,28 @@ def test_device_template_excludes_network_areas(conn):
     area_names = [a["config_area"] for a in tmpl["areas"]]
     assert "switch_device_ports" in area_names
     assert "wireless_ssids" not in area_names
+
+
+def test_list_devices_for_kind(conn):
+    h = _seed_blob(conn)
+    _seed_device_observation(conn, "org1", "Q2SW-0001", "switch_device_ports", h, name="Core-SW-01")
+    _seed_device_observation(conn, "org1", "Q2SW-0002", "switch_device_ports", h, name="Floor-SW-02")
+    # AP device — should NOT appear for switch kind
+    _seed_device_observation(conn, "org1", "Q2MR-0001", "wireless_device_radio_settings", h, name="AP-01")
+
+    devices = store.list_devices_for_kind(
+        conn,
+        org_id="org1",
+        serials=["Q2SW-0001", "Q2SW-0002", "Q2MR-0001"],
+        kind="switch",
+    )
+
+    serials = [d["serial"] for d in devices]
+    assert "Q2SW-0001" in serials
+    assert "Q2SW-0002" in serials
+    assert "Q2MR-0001" not in serials
+
+
+def test_list_devices_for_kind_empty_serials(conn):
+    devices = store.list_devices_for_kind(conn, org_id="org1", serials=[], kind="switch")
+    assert devices == []

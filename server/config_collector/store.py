@@ -464,6 +464,37 @@ def delete_template(conn: sqlite3.Connection, *, template_id: int) -> None:
     conn.commit()
 
 
+_KIND_AREA_PREFIX: dict[str, str] = {
+    "gateway":      "appliance_device_",
+    "switch":       "switch_device_",
+    "access_point": "wireless_device_",
+}
+
+
+def list_devices_for_kind(
+    conn: sqlite3.Connection,
+    *,
+    org_id: str,
+    serials: list[str],
+    kind: str,
+) -> list[dict]:
+    """Return serials (from the given list) that have device-scope observations for kind."""
+    prefix = _KIND_AREA_PREFIX.get(kind)
+    if not prefix or not serials:
+        return []
+    placeholders = ",".join("?" * len(serials))
+    rows = conn.execute(
+        f"""SELECT entity_id, MAX(name_hint) AS name
+            FROM config_observations
+            WHERE org_id=? AND entity_type='device'
+              AND entity_id IN ({placeholders})
+              AND config_area LIKE ?
+            GROUP BY entity_id""",
+        [org_id, *serials, f"{prefix}%"],
+    ).fetchall()
+    return [{"serial": r["entity_id"], "name": r["name"]} for r in rows]
+
+
 def get_coverage(conn: sqlite3.Connection, *, org_id: str) -> list[dict]:
     """Return per-config-area coverage counts for all networks in an org."""
     all_nets = conn.execute(
