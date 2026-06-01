@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { listTemplates, createTemplate, deleteTemplate } from '../api/compare'
-import type { ConfigTemplate } from '../types/config'
+import type { ConfigTemplate, TemplateKind } from '../types/config'
 
 export function useTemplates(orgId: string | null) {
   const [templates, setTemplates] = useState<ConfigTemplate[]>([])
@@ -17,9 +17,15 @@ export function useTemplates(orgId: string | null) {
 
   useEffect(() => { reload() }, [reload])
 
-  const promote = useCallback(async (name: string, networkId: string) => {
+  const promote = useCallback(async (
+    name: string,
+    networkId: string,
+    kind: TemplateKind | null,
+    deviceSerial: string | null,
+    deviceName: string | null,
+  ) => {
     if (!orgId) return
-    await createTemplate(orgId, name, networkId)
+    await createTemplate(orgId, name, networkId, kind, deviceSerial, deviceName)
     reload()
   }, [orgId, reload])
 
