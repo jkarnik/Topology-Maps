@@ -16,6 +16,9 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+_TEMPLATE_EXCLUDED_AREAS: frozenset[str] = frozenset({"device_metadata"})
+
+
 def upsert_blob(
     conn: sqlite3.Connection,
     hash_hex: str,
@@ -412,6 +415,8 @@ def create_template(
 
     areas = []
     for row in rows:
+        if row["config_area"] in _TEMPLATE_EXCLUDED_AREAS:
+            continue
         conn.execute(
             """INSERT INTO config_template_areas (template_id, config_area, sub_key, blob_hash)
                VALUES (?, ?, ?, ?)""",

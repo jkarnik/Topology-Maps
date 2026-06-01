@@ -180,3 +180,27 @@ def test_list_devices_for_kind(conn):
 def test_list_devices_for_kind_empty_serials(conn):
     devices = store.list_devices_for_kind(conn, org_id="org1", serials=[], kind="switch")
     assert devices == []
+
+
+def test_create_device_template_excludes_device_metadata(conn):
+    """device_metadata must never appear in template areas."""
+    h_ports = _seed_blob(conn, '{"portId": "1", "vlan": 10}')
+    h_meta = _seed_blob(conn, '{"serial": "Q2SW-0001", "name": "Core-SW"}')
+
+    _seed_device_observation(conn, "org1", "Q2SW-0001", "switch_device_ports", h_ports)
+    _seed_device_observation(conn, "org1", "Q2SW-0001", "device_metadata", h_meta)
+
+    tmpl = store.create_template(
+        conn,
+        org_id="org1",
+        name="No Metadata Template",
+        network_id="net1",
+        network_name=None,
+        kind="switch",
+        device_serial="Q2SW-0001",
+        device_name="Core-SW",
+    )
+
+    area_names = [a["config_area"] for a in tmpl["areas"]]
+    assert "device_metadata" not in area_names
+    assert "switch_device_ports" in area_names
