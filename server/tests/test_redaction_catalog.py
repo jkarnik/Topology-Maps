@@ -1,7 +1,7 @@
 """Tests for the redaction catalog (Plan 1.03)."""
 from __future__ import annotations
 
-from server.config_collector.redaction_catalog import REDACTION_PATHS
+from server.config_collector.redaction_catalog import NORMALIZATION_PATHS, REDACTION_PATHS
 
 
 def test_catalog_is_a_dict():
@@ -30,16 +30,14 @@ def test_catalog_values_are_non_empty_path_lists():
             assert isinstance(p, str) and p, f"{area}: path must be a non-empty string"
 
 
-from server.config_collector.redaction_catalog import NORMALIZATION_PATHS
-
-
 def test_normalization_paths_is_dict_of_lists():
     assert isinstance(NORMALIZATION_PATHS, dict)
     for area, paths in NORMALIZATION_PATHS.items():
         assert isinstance(area, str), f"{area!r} key is not a str"
         assert isinstance(paths, list), f"{area!r} value is not a list"
+        assert len(paths) > 0, f"{area!r} must have at least one path"
         for p in paths:
-            assert isinstance(p, str), f"path {p!r} in {area!r} is not a str"
+            assert isinstance(p, str) and p, f"path {p!r} in {area!r} must be a non-empty string"
 
 
 def test_normalization_paths_covers_expected_areas():
