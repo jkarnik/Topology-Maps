@@ -16,9 +16,6 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-_TEMPLATE_EXCLUDED_AREAS: frozenset[str] = frozenset({"device_metadata"})
-
-
 def upsert_blob(
     conn: sqlite3.Connection,
     hash_hex: str,
@@ -371,6 +368,9 @@ def get_observations_in_window(
 
 
 # ── Phase 6: Templates ────────────────────────────────────────────────────────
+
+_TEMPLATE_EXCLUDED_AREAS: frozenset[str] = frozenset({"device_metadata"})
+
 
 def create_template(
     conn: sqlite3.Connection,
