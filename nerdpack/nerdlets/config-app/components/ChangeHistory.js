@@ -83,8 +83,8 @@ function HistoryEntityItem({ entity, selected, onSelect }) {
 }
 
 function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }) {
-  const fromISO = fromDate.toISOString().slice(0, 10);
-  const toISO = toDate.toISOString().slice(0, 10);
+  const fromEpoch = Math.floor(fromDate.getTime() / 1000);
+  const toEpoch = Math.floor(toDate.getTime() / 1000);
   return (
     <div>
       <div style={{ fontSize: '11px', opacity: 0.6, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Changed Entities</div>
@@ -100,7 +100,7 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
           });
           return (
             <NrqlQuery accountIds={[accountId]}
-              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${nrqlEsc(orgId)}' FACET entity_type, entity_id, entity_name, network_id SINCE '${fromISO}' UNTIL '${toISO}' LIMIT MAX`}>
+              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${nrqlEsc(orgId)}' FACET entity_type, entity_id, entity_name, network_id SINCE ${fromEpoch} UNTIL ${toEpoch} LIMIT MAX`}>
               {({ data, loading, error }) => {
                 if (loading) return <Spinner />;
                 if (error) return <p style={{ color: '#c0392b', fontSize: '12px' }}>Failed to load.</p>;
@@ -297,14 +297,14 @@ function DiffTile({ row, showEntity, accountId, orgId }) {
 }
 
 function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fromDate, toDate }) {
-  const fromISO = fromDate.toISOString().slice(0, 10);
-  const toISO = toDate.toISOString().slice(0, 10);
+  const fromEpoch = Math.floor(fromDate.getTime() / 1000);
+  const toEpoch = Math.floor(toDate.getTime() / 1000);
   const entityFilter = selectedEntityId ? `AND entity_id = '${nrqlEsc(selectedEntityId)}'` : '';
   // Lightweight query — payloads loaded lazily per tile on expand to avoid NR1 response size limits.
   const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at
                  FROM MerakiConfigChange
                  WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
-                 SINCE '${fromISO}' UNTIL '${toISO}'
+                 SINCE ${fromEpoch} UNTIL ${toEpoch}
                  ORDER BY detected_at DESC LIMIT 300`;
   const headerLabel = selectedEntityName || 'All entities';
   return (
@@ -312,7 +312,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
       <NrqlQuery accountIds={[accountId]} query={query}>
         {({ data, loading, error }) => {
           if (loading) return <Spinner />;
-          if (error) return <span style={{ color: '#c0392b' }}>Failed to load changes.</span>;
+          if (error) return <span style={{ color: '#c0392b', fontSize: '11px', fontFamily: 'monospace' }}>Failed to load changes: {error.message || JSON.stringify(error)}</span>;
           // Deduplicate by (entity_id, config_area, detected_at): prefer version with entity_name populated.
           const seen = new Map();
           (data?.[0]?.data || []).forEach(row => {
@@ -330,7 +330,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
                 <span style={{ opacity: 0.4 }}>·</span>
                 <span style={{ opacity: 0.6 }}>{rows.length} changes</span>
                 <span style={{ opacity: 0.4 }}>·</span>
-                <span style={{ opacity: 0.5, fontSize: '11px' }}>{fromISO} – {toISO}</span>
+                <span style={{ opacity: 0.5, fontSize: '11px' }}>{fromDate.toISOString().slice(0, 10)} – {toDate.toISOString().slice(0, 10)}</span>
               </div>
               {!rows.length
                 ? <p style={{ opacity: 0.6 }}>No changes found for this selection.</p>

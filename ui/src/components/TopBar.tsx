@@ -252,7 +252,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               Start Simulation
             </button>
           )
-        ) : (
+        ) : dataSource === 'configs' ? null : (
           /* Meraki right controls */
           <>
             {/* Last updated timestamp */}

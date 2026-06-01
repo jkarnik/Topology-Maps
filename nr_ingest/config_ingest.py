@@ -8,6 +8,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -220,6 +221,36 @@ def _serialize_diff(diff_result) -> str:
     return json.dumps([dataclasses.asdict(c) for c in diff_result.changes])
 
 
+def _make_change_id(entity_id: str, config_area: str, from_hash: str, to_hash: str) -> str:
+    key = f"{entity_id}|{config_area}|{from_hash}|{to_hash}"
+    return hashlib.sha256(key.encode()).hexdigest()[:16]
+
+
+def query_nr_existing_change_ids(account_id: str, user_api_key: str) -> set:
+    """Return the set of change_id values already in NR (within retention window)."""
+    nrql = "SELECT uniques(change_id) FROM MerakiConfigChange SINCE 30 days ago LIMIT MAX"
+    body = {
+        "query": (
+            "{ actor { account(id: %s) { nrql(query: \"%s\") { results } } } }"
+            % (account_id, nrql)
+        )
+    }
+    try:
+        resp = httpx.post(
+            NR_GRAPHQL_API,
+            headers={"Api-Key": user_api_key, "Content-Type": "application/json"},
+            json=body,
+            timeout=15.0,
+        )
+        resp.raise_for_status()
+        results = resp.json()["data"]["actor"]["account"]["nrql"]["results"]
+        if results:
+            return set(results[0].get("uniques.change_id", []))
+    except Exception as exc:
+        print(f"[warn] Could not query NR for existing change IDs: {exc}", file=sys.stderr)
+    return set()
+
+
 def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entity_meta: Optional[dict] = None) -> list[dict]:
     """Return MerakiConfigChange events for hash changes detected after since_ts."""
     sql = """
@@ -264,6 +295,7 @@ def build_change_events(conn: sqlite3.Connection, since_ts: Optional[str], entit
             summary = "diff unavailable"
         events.append({
             "eventType": "MerakiConfigChange",
+            "change_id": _make_change_id(row["entity_id"], row["config_area"], row["from_hash"] or "", row["to_hash"]),
             "entity_type": row["entity_type"],
             "entity_id": row["entity_id"],
             "entity_name": _derive_name(row["entity_id"], row["name_hint"] or None, entity_meta),
@@ -365,7 +397,25 @@ def main(
     nr_hashes = query_nr_snapshot_hashes(account_id, user_api_key) if user_api_key else {}
     snapshot_events = filter_new_snapshots(snapshot_events, nr_hashes)
 
-    change_events = build_change_events(conn, since_ts=since_ts, entity_meta=entity_meta)
+    # When NR has been purged (no recent snapshots found) and this is not a manual
+    # --since override, pull the full change history from the DB so the history tab
+    # is always populated after a gap of any length.
+    nr_is_empty = (since_override is None) and (user_api_key is not None) and (nr_ts is None)
+    change_since_ts = None if nr_is_empty else since_ts
+    if nr_is_empty:
+        print("NR has no recent data — fetching full change history from DB.")
+
+    change_events = build_change_events(conn, since_ts=change_since_ts, entity_meta=entity_meta)
+
+    # Deduplicate change events against what NR already holds to avoid duplicates.
+    if user_api_key and change_events:
+        existing_ids = query_nr_existing_change_ids(account_id, user_api_key)
+        if existing_ids:
+            before = len(change_events)
+            change_events = [e for e in change_events if e.get("change_id") not in existing_ids]
+            skipped = before - len(change_events)
+            if skipped:
+                print(f"Skipped {skipped} change events already in NR.")
     all_events = snapshot_events + change_events
 
     print(f"Snapshot events:  {len(snapshot_events)}")
