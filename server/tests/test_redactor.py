@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from server.config_collector.redactor import parse_path, mask_path
+from server.config_collector.redactor import parse_path, mask_path, delete_path
 
 
 def test_parse_simple_key():
@@ -149,3 +149,40 @@ def test_all_fixtures_parse_as_valid_json():
     for f in files:
         data = json.loads(f.read_text())
         assert data is not None
+
+
+# Deletion tests ---------------------------------------------------------------
+
+
+def test_delete_top_level_key():
+    payload = {"serial": "Q2KD-0001", "enabled": True}
+    delete_path(payload, [("key", "serial")])
+    assert "serial" not in payload
+    assert payload["enabled"] is True
+
+
+def test_delete_nested_key():
+    payload = {"wan1": {"staticIp": "1.2.3.4", "vlan": 10}}
+    delete_path(payload, [("key", "wan1"), ("key", "staticIp")])
+    assert "staticIp" not in payload["wan1"]
+    assert payload["wan1"]["vlan"] == 10
+
+
+def test_delete_array_wildcard_field():
+    payload = [{"id": "1", "caps": ["auto"]}, {"id": "2", "caps": ["100M"]}]
+    delete_path(payload, [("array",), ("key", "caps")])
+    assert "caps" not in payload[0]
+    assert "caps" not in payload[1]
+    assert payload[0]["id"] == "1"
+
+
+def test_delete_missing_path_is_silent():
+    payload = {"enabled": True}
+    delete_path(payload, [("key", "doesNotExist")])  # must not raise
+    assert payload == {"enabled": True}
+
+
+def test_delete_array_step_on_non_array_is_silent():
+    payload = {"ports": "not-a-list"}
+    delete_path(payload, [("array",), ("key", "id")])  # must not raise
+    assert payload == {"ports": "not-a-list"}

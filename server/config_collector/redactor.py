@@ -106,6 +106,32 @@ def mask_path(payload: Any, steps: list[tuple]) -> None:
                 mask_path(item, rest)
 
 
+def delete_path(payload: Any, steps: list[tuple]) -> None:
+    """Mutate `payload` in place, deleting the field at `steps`.
+
+    Missing keys and type mismatches are silently skipped — same
+    leniency as mask_path.
+    """
+    if not steps:
+        return
+    head, *rest = steps
+
+    if head[0] == "key":
+        key = head[1]
+        if not isinstance(payload, dict) or key not in payload:
+            return
+        if not rest:
+            del payload[key]
+        else:
+            delete_path(payload[key], rest)
+
+    elif head[0] == "array":
+        if not isinstance(payload, list):
+            return
+        for item in payload:
+            delete_path(item, rest)
+
+
 # Top-level entry point -------------------------------------------------------
 
 from server.config_collector.redaction_catalog import REDACTION_PATHS
