@@ -581,6 +581,7 @@ async def list_devices_for_template(org_id: str, network_id: str, kind: str) -> 
         network_filter_unavailable = False
         serials_in_network: Optional[list[str]] = None
 
+        meraki_names: dict[str, str] = {}
         client = _get_meraki_client()
         if client.is_configured:
             try:
@@ -589,6 +590,11 @@ async def list_devices_for_template(org_id: str, network_id: str, kind: str) -> 
                     d["serial"] for d in inventory
                     if d.get("networkId") == network_id and d.get("serial")
                 ]
+                meraki_names = {
+                    d["serial"]: d.get("name") or d.get("model")
+                    for d in inventory
+                    if d.get("serial") and (d.get("name") or d.get("model"))
+                }
             except Exception as exc:
                 logger.warning("devices-for-template: Meraki inventory failed: %s", exc)
                 network_filter_unavailable = True
@@ -605,6 +611,13 @@ async def list_devices_for_template(org_id: str, network_id: str, kind: str) -> 
             ).fetchall()
             all_serials = [r["entity_id"] for r in all_device_rows]
             devices = list_devices_for_kind(conn, org_id=org_id, serials=all_serials, kind=kind)
+
+        # Enrich names from Meraki inventory (more reliable than name_hint observations)
+        if meraki_names:
+            devices = [
+                {**d, "name": meraki_names.get(d["serial"]) or d["name"]}
+                for d in devices
+            ]
 
         return {"devices": devices, "network_filter_unavailable": network_filter_unavailable}
     finally:
@@ -802,9 +815,18 @@ async def _score_device_template(conn, org_id: str, template_info: dict, templat
 
     all_serials = {r["entity_id"]: r["name"] or r["entity_id"] for r in device_rows}
 
+    # Pre-populate network names from local observations (same source as network scoring)
+    net_name_rows = conn.execute(
+        """SELECT entity_id, MAX(name_hint) AS name_hint
+           FROM config_observations
+           WHERE org_id=? AND entity_type='network'
+           GROUP BY entity_id""",
+        (org_id,),
+    ).fetchall()
+    network_names: dict[str, str] = {r["entity_id"]: r["name_hint"] or r["entity_id"] for r in net_name_rows}
+
     # Resolve device → network via Meraki inventory (best-effort)
     network_for_device: dict[str, str] = {}
-    network_names: dict[str, str] = {}
     client = _get_meraki_client()
     if client.is_configured and all_serials:
         try:
@@ -814,8 +836,9 @@ async def _score_device_template(conn, org_id: str, template_info: dict, templat
                 nid = d.get("networkId")
                 if serial and nid:
                     network_for_device[serial] = nid
-                    if nid not in network_names:
-                        network_names[nid] = nid
+                display_name = d.get("name") or d.get("model")
+                if serial and display_name and serial in all_serials:
+                    all_serials[serial] = display_name
         except Exception as exc:
             logger.warning("Device template scoring: inventory fetch failed: %s", exc)
 

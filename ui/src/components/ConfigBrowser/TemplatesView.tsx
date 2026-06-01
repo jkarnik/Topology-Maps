@@ -160,7 +160,9 @@ function PromoteModal({ orgId, tree, onConfirm, onCancel }: PromoteModalProps) {
                     ].join(' ')}
                   >
                     <span className="flex-1 font-medium">{d.name ?? d.serial}</span>
-                    <span className="opacity-40 font-mono text-[10px]">{d.serial}</span>
+                    {d.name && d.name !== d.serial && (
+                      <span className="opacity-40 font-mono text-[10px]">{d.serial}</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -244,8 +246,10 @@ function DeviceScoreRow({ device }: { device: DeviceScore }) {
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
       >
-        <span className="text-xs opacity-80 w-32 text-left truncate">{device.name ?? device.serial}</span>
-        <span className="text-[10px] opacity-40 font-mono w-24 text-left truncate">{device.serial}</span>
+        <span className="text-xs opacity-80 flex-1 text-left truncate">{device.name ?? device.serial}</span>
+        {device.name && device.name !== device.serial && (
+          <span className="text-[10px] opacity-40 font-mono w-24 text-left truncate">{device.serial}</span>
+        )}
         <div className="flex-1"><ScoreBar pct={device.score_pct} /></div>
       </button>
       {open && (
@@ -426,7 +430,7 @@ export function TemplatesView({ orgId, tree }: Props) {
           onClick={() => setShowPromote(true)}
           className="mt-1 p-2 border border-dashed border-white/20 rounded text-xs opacity-50 hover:opacity-80 text-center"
         >
-          + Promote a network
+          + Create Golden Template
         </button>
       </div>
 
