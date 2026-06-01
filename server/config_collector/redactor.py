@@ -134,7 +134,7 @@ def delete_path(payload: Any, steps: list[tuple]) -> None:
 
 # Top-level entry point -------------------------------------------------------
 
-from server.config_collector.redaction_catalog import REDACTION_PATHS
+from server.config_collector.redaction_catalog import REDACTION_PATHS, NORMALIZATION_PATHS
 
 
 def _extract_hot_columns(payload: Any) -> dict:
@@ -168,6 +168,9 @@ def redact(payload: Any, config_area: str) -> tuple[str, str, int, dict]:
 
     for path in REDACTION_PATHS.get(config_area, ()):
         mask_path(working, parse_path(path))
+
+    for path in NORMALIZATION_PATHS.get(config_area, ()):
+        delete_path(working, parse_path(path))
 
     canonical = _canonical_dumps(working)
     encoded = canonical.encode("utf-8")

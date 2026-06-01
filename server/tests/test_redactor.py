@@ -171,6 +171,39 @@ def test_redact_hot_columns_none_when_absent():
     assert hot == {"name_hint": None, "enabled_hint": None}
 
 
+def test_redact_strips_normalization_fields():
+    """redact() must delete per-device noise fields for known areas."""
+    payload = [
+        {"portId": "1", "vlan": 10, "linkNegotiationCapabilities": ["Auto negotiate", "100M"]},
+        {"portId": "2", "vlan": 20, "linkNegotiationCapabilities": ["Auto negotiate"]},
+    ]
+    canonical, hash_hex, byte_size, hot = redact(payload, "switch_device_ports")
+    result = json.loads(canonical)
+    assert "linkNegotiationCapabilities" not in result[0]
+    assert "linkNegotiationCapabilities" not in result[1]
+    assert result[0]["vlan"] == 10
+    assert result[1]["portId"] == "2"
+
+
+def test_redact_strips_bluetooth_identifiers():
+    payload = {"uuid": "abc-123", "major": 1, "minor": 5, "advertisingEnabled": True, "scanningEnabled": False}
+    canonical, _, _, _ = redact(payload, "wireless_device_bluetooth")
+    result = json.loads(canonical)
+    assert "uuid" not in result
+    assert "major" not in result
+    assert "minor" not in result
+    assert result["advertisingEnabled"] is True
+    assert result["scanningEnabled"] is False
+
+
+def test_redact_unknown_area_no_normalization():
+    """Areas not in NORMALIZATION_PATHS are left untouched."""
+    payload = {"serial": "Q2KD-0001", "firmware": "18.107.2"}
+    canonical, _, _, _ = redact(payload, "device_metadata")
+    result = json.loads(canonical)
+    assert result["serial"] == "Q2KD-0001"
+
+
 # Fixture sanity tests --------------------------------------------------------
 
 import json
