@@ -177,13 +177,18 @@ export interface TemplateAreaRef {
   blob_hash: string
 }
 
+export type TemplateKind = 'site' | 'gateway' | 'switch' | 'access_point'
+
 export interface ConfigTemplate {
   id: number
   org_id: string
   name: string
   source_network_id: string
   source_network_name: string | null
+  source_device_serial: string | null
+  source_device_name: string | null
   created_at: string
+  kind: TemplateKind | null
   areas: TemplateAreaRef[]
 }
 
@@ -204,6 +209,29 @@ export interface NetworkTemplateScore {
 }
 
 export interface TemplateScoresResponse {
-  template: { id: number; name: string; area_count: number }
+  template: { id: number; name: string; area_count: number; kind: TemplateKind | null }
   scores: NetworkTemplateScore[]
+}
+
+export interface DeviceScore {
+  serial: string
+  name: string
+  network_id: string
+  score_pct: number
+  change_count: number
+  missing_areas: string[]
+  area_scores: TemplateAreaScore[]
+}
+
+export interface NetworkDeviceScores {
+  network_id: string
+  network_name: string
+  aggregate_score: number
+  device_count: number
+  devices: DeviceScore[]
+}
+
+export interface DeviceTemplateScoresResponse {
+  template: { id: number; name: string; area_count: number; kind: TemplateKind | null }
+  networks: NetworkDeviceScores[]
 }
