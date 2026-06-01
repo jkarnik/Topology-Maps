@@ -522,6 +522,7 @@ class PromoteTemplateRequest(BaseModel):
     org_id: str
     name: str
     network_id: str
+    kind: Optional[str] = None
 
 
 @router.get("/templates")
@@ -545,7 +546,8 @@ async def create_template_route(req: PromoteTemplateRequest) -> dict:
         ).fetchone()
         network_name = name_row["name_hint"] if name_row else None
         return create_template(conn, org_id=req.org_id, name=req.name,
-                               network_id=req.network_id, network_name=network_name)
+                               network_id=req.network_id, network_name=network_name,
+                               kind=req.kind)
     finally:
         conn.close()
 

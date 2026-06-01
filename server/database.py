@@ -170,6 +170,20 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             ON config_sweep_runs(org_id, kind, started_at DESC);
     """)
     conn.commit()
+    _run_migrations(conn)
+
+
+def _run_migrations(conn: sqlite3.Connection) -> None:
+    for ddl in [
+        "ALTER TABLE config_templates ADD COLUMN kind TEXT",
+        "ALTER TABLE config_templates ADD COLUMN source_device_serial TEXT",
+        "ALTER TABLE config_templates ADD COLUMN source_device_name TEXT",
+    ]:
+        try:
+            conn.execute(ddl)
+            conn.commit()
+        except Exception:
+            pass  # column already exists
 
 
 def save_device(conn: sqlite3.Connection, device: dict) -> None:
