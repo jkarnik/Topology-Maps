@@ -46,15 +46,21 @@ Config observations do not store a `network_id` for device-scope records. The sc
 GET /api/config/devices-for-template?org_id=&network_id=&kind=
 ```
 
-Returns devices of the matching kind that have been observed in the given network. Device kind is detected from which config areas exist in `config_observations`:
-- `gateway` → devices with any `appliance_device_*` area
-- `switch` → devices with any `switch_device_*` area
-- `access_point` → devices with any `wireless_device_*` area
+Returns devices of the matching kind observed in the given network. Because config observations don't store `network_id` for device-scope records, the endpoint:
+
+1. Calls the Meraki `/organizations/{org_id}/inventory/devices` API to get all devices in the org with their `networkId`
+2. Filters that list to the given `network_id`
+3. Cross-references with `config_observations` to keep only serials that have been collected AND match the kind prefix:
+   - `gateway` → any `appliance_device_*` observation
+   - `switch` → any `switch_device_*` observation
+   - `access_point` → any `wireless_device_*` observation
 
 Response:
 ```json
 [{ "serial": "Q2KD-XXXX-0001", "name": "Core-SW-01" }, …]
 ```
+
+If the Meraki API is unavailable, the endpoint falls back to returning all observed devices of the matching kind (ignoring the network filter) with a `"network_filter_unavailable": true` flag in the response.
 
 ### Modified `POST /api/config/templates`
 
