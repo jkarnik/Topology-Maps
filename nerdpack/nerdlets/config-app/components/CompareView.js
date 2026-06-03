@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NrqlQuery, Spinner, Select, SelectItem } from 'nr1';
+import React, { useState, useEffect } from 'react';
+import { NrqlQuery, Spinner, Select, SelectItem, AccountStorageMutation, AccountStorageQuery } from 'nr1';
 
 // ── Module-level helpers ────────────────────────────────────────────────────
 
@@ -55,6 +55,49 @@ function computeCompareBadges(jsonA, jsonB) {
   if (added) badges.push({ text: `+ ${added} added`, color: '#27ae60' });
   if (removed) badges.push({ text: `− ${removed} removed`, color: '#e74c3c' });
   return badges;
+}
+
+const KIND_ORDER = ['site', 'gateway', 'switch', 'access_point'];
+const KIND_META = {
+  site:         { label: 'Site (Network)',  prefix: null },
+  gateway:      { label: 'Gateway',         prefix: 'appliance_device_' },
+  switch:       { label: 'Switch',          prefix: 'switch_device_' },
+  access_point: { label: 'Access Point',    prefix: 'wireless_device_' },
+};
+const STORAGE_COLLECTION = 'golden-templates';
+
+function useTemplates(accountId, orgId) {
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading]     = useState(true);
+
+  useEffect(() => {
+    if (!accountId || !orgId) { setLoading(false); return; }
+    setLoading(true);
+    AccountStorageQuery.query({
+      accountId,
+      collection: STORAGE_COLLECTION,
+      documentId: orgId,
+    }).then(({ data }) => {
+      setTemplates((data && data.templates) || []);
+      setLoading(false);
+    }).catch(() => { setTemplates([]); setLoading(false); });
+  }, [accountId, orgId]);
+
+  function save(next) {
+    setTemplates(next);
+    AccountStorageMutation.mutate({
+      accountId,
+      actionType: AccountStorageMutation.ACTION_TYPE.WRITE_DOCUMENT,
+      collection: STORAGE_COLLECTION,
+      documentId: orgId,
+      document: { templates: next },
+    });
+  }
+
+  function addTemplate(tmpl)    { save([...templates, tmpl]); }
+  function deleteTemplate(id)   { save(templates.filter(t => t.id !== id)); }
+
+  return { templates, loading, addTemplate, deleteTemplate };
 }
 
 function CompareJsonPane({ label, jsonStr, otherJsonStr, side }) {
