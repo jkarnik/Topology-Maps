@@ -459,6 +459,113 @@ function PromoteModal({ accountId, orgId, onConfirm, onCancel }) {
   );
 }
 
+function ScoreBar({ pct }) {
+  const color = pct >= 90 ? '#27ae60' : pct >= 60 ? '#e67e22' : '#e74c3c';
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ flex: 1, height: '5px', background: 'rgba(128,128,128,0.15)', borderRadius: '3px', overflow: 'hidden' }}>
+        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '3px' }} />
+      </div>
+      <span style={{ fontSize: '12px', fontWeight: 600, color, minWidth: '34px', textAlign: 'right' }}>{pct}%</span>
+    </div>
+  );
+}
+
+function NetworkScoreRow({ score, nameMap }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', cursor: 'pointer', background: 'rgba(128,128,128,0.03)' }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{open ? '▼' : '▶'}</span>
+        <span style={{ flex: 1, fontSize: '13px' }}>{nameMap[score.network_id] || score.network_id}</span>
+        <span style={{ fontSize: '11px', opacity: 0.4 }}>{score.matched}/{score.total} areas</span>
+        <div style={{ width: '140px' }}><ScoreBar pct={score.pct} /></div>
+      </div>
+      {open && (
+        <div style={{ borderTop: '1px solid rgba(128,128,128,0.1)', padding: '8px 12px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {score.area_scores.map(a => (
+              <span key={a.area} style={{
+                fontSize: '10px', padding: '2px 7px', borderRadius: '10px',
+                background: a.match ? 'rgba(39,174,96,0.15)' : a.missing ? 'rgba(128,128,128,0.1)' : 'rgba(231,76,60,0.15)',
+                color: a.match ? '#27ae60' : a.missing ? '#999' : '#e74c3c',
+              }}>
+                {a.area} {a.match ? '✓' : a.missing ? '⊘' : '✗'}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NetworkTemplateScoring({ accountId, orgId, template }) {
+  const query = `SELECT latest(config_hash) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}' AND entity_type = 'network'
+                 FACET entity_id, config_area
+                 SINCE 30 days ago LIMIT MAX`;
+  return (
+    <WithNetworkNames accountId={accountId} orgId={orgId}>
+      {(nameMap) => (
+        <NrqlQuery accountIds={[accountId]} query={query}>
+          {({ data, loading, error }) => {
+            if (loading) return <Spinner />;
+            if (error) return <p style={{ color: '#c0392b', fontSize: '12px' }}>Failed to load snapshot data.</p>;
+
+            // Build: { networkId -> { configArea -> hash } }
+            const snapshots = {};
+            (data || []).forEach(s => {
+              const fg       = (s.metadata && s.metadata.groups || []).filter(g => g.type === 'facet');
+              const entityId = fg[0] && fg[0].value;
+              const area     = fg[1] && fg[1].value;
+              if (!entityId || !area) return;
+              const hash = s.data && s.data[0] && (s.data[0]['latest.config_hash'] || s.data[0]['config_hash']) || null;
+              if (!snapshots[entityId]) snapshots[entityId] = {};
+              snapshots[entityId][area] = hash;
+            });
+
+            const templateAreas    = snapshots[template.source_entity_id] || {};
+            const templateAreaKeys = Object.keys(templateAreas);
+
+            if (!templateAreaKeys.length) {
+              return <p style={{ opacity: 0.6, fontSize: '12px' }}>No snapshot data found for the golden network.</p>;
+            }
+
+            const scores = Object.entries(snapshots)
+              .filter(([id]) => id !== template.source_entity_id)
+              .map(([networkId, areaMap]) => {
+                let matched = 0;
+                const area_scores = templateAreaKeys.map(a => {
+                  if (!areaMap[a]) return { area: a, match: false, missing: true };
+                  const match = areaMap[a] === templateAreas[a];
+                  if (match) matched++;
+                  return { area: a, match, missing: false };
+                });
+                const pct = Math.round((matched / templateAreaKeys.length) * 100);
+                return { network_id: networkId, matched, total: templateAreaKeys.length, pct, area_scores };
+              })
+              .sort((a, b) => a.pct - b.pct);
+
+            if (!scores.length) {
+              return <p style={{ opacity: 0.6, fontSize: '12px' }}>No other networks to score.</p>;
+            }
+
+            return (
+              <div>
+                <div style={{ marginBottom: '14px', fontSize: '12px', opacity: 0.6 }}>
+                  Template: <strong>{template.source_entity_name || template.source_entity_id}</strong> · {templateAreaKeys.length} config areas
+                </div>
+                {scores.map(score => <NetworkScoreRow key={score.network_id} score={score} nameMap={nameMap} />)}
+              </div>
+            );
+          }}
+        </NrqlQuery>
+      )}
+    </WithNetworkNames>
+  );
+}
+
 function CoverageTab({ accountId, orgId }) {
   const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
                  WHERE org_id = '${orgId}'
