@@ -611,10 +611,47 @@ function NetworkDeviceGroup({ networkId, networkName, devices }) {
   );
 }
 
+// Fetches { serial -> { name, network_id } } for all devices of a given kind.
+// Uses two separate single-metric queries (same pattern as WithNetworkNames) because
+// NR1's chart format only exposes the first latest() value reliably per series.
+function WithDeviceInfo({ accountId, orgId, prefix, children }) {
+  const nameQ = `SELECT latest(entity_name) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}' AND entity_type = 'device'
+                 AND config_area = 'device_metadata'
+                 FACET entity_id SINCE 30 days ago LIMIT MAX`;
+  const netQ  = `SELECT latest(network_id) FROM MerakiConfigSnapshot
+                 WHERE org_id = '${orgId}' AND entity_type = 'device'
+                 AND config_area = 'device_metadata'
+                 FACET entity_id SINCE 30 days ago LIMIT MAX`;
+  return (
+    <NrqlQuery accountIds={[accountId]} query={nameQ}>
+      {({ data: nameData, loading: nameLoading }) => (
+        <NrqlQuery accountIds={[accountId]} query={netQ}>
+          {({ data: netData, loading: netLoading }) => {
+            if (nameLoading || netLoading) return <Spinner />;
+            const info = {};
+            (nameData || []).forEach(s => {
+              const serial = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
+              if (!serial) return;
+              info[serial] = { name: s.data?.[0]?.['entity_name'] ?? s.data?.[0]?.['latest.entity_name'] ?? serial, network_id: '__unknown__' };
+            });
+            (netData || []).forEach(s => {
+              const serial = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
+              const nid    = s.data?.[0]?.['network_id'] ?? s.data?.[0]?.['latest.network_id'] ?? '';
+              if (serial && nid && info[serial]) info[serial].network_id = nid;
+            });
+            return children(info);
+          }}
+        </NrqlQuery>
+      )}
+    </NrqlQuery>
+  );
+}
+
 function DeviceTemplateScoring({ accountId, orgId, template }) {
   const prefix = KIND_META[template.kind] && KIND_META[template.kind].prefix;
   const query = prefix
-    ? `SELECT latest(config_hash), latest(entity_name), latest(network_id) FROM MerakiConfigSnapshot
+    ? `SELECT latest(config_hash) FROM MerakiConfigSnapshot
        WHERE org_id = '${orgId}'
          AND entity_type = 'device'
          AND config_area LIKE '${prefix}%'
@@ -625,8 +662,10 @@ function DeviceTemplateScoring({ accountId, orgId, template }) {
   if (!query) return <p style={{ opacity: 0.6, fontSize: '12px' }}>Unsupported template kind.</p>;
 
   return (
-    <WithNetworkNames accountId={accountId} orgId={orgId}>
-      {(nameMap) => (
+    <WithDeviceInfo accountId={accountId} orgId={orgId} prefix={prefix}>
+      {(deviceInfo) => (
+        <WithNetworkNames accountId={accountId} orgId={orgId}>
+          {(nameMap) => (
         <NrqlQuery accountIds={[accountId]} query={query}>
           {({ data, loading, error }) => {
             if (loading) return <Spinner />;
@@ -639,10 +678,11 @@ function DeviceTemplateScoring({ accountId, orgId, template }) {
               const serial = fg[0] && fg[0].value;
               const area   = fg[1] && fg[1].value;
               if (!serial || !area) return;
-              const hash      = s.data && s.data[0] && (s.data[0]['latest.config_hash'] || s.data[0]['config_hash']) || null;
-              const devName   = s.data && s.data[0] && (s.data[0]['latest.entity_name'] || s.data[0]['entity_name']) || serial;
-              const networkId = s.data && s.data[0] && (s.data[0]['latest.network_id'] || s.data[0]['network_id']) || '__unknown__';
-              if (!deviceSnaps[serial]) deviceSnaps[serial] = { name: devName, network_id: networkId, areas: {} };
+              const hash = s.data && s.data[0] && (s.data[0]['latest.config_hash'] || s.data[0]['config_hash']) || null;
+              if (!deviceSnaps[serial]) {
+                const di = deviceInfo[serial] || {};
+                deviceSnaps[serial] = { name: di.name || serial, network_id: di.network_id || '__unknown__', areas: {} };
+              }
               deviceSnaps[serial].areas[area] = hash;
             });
 
@@ -703,8 +743,10 @@ function DeviceTemplateScoring({ accountId, orgId, template }) {
             );
           }}
         </NrqlQuery>
+          )}
+        </WithNetworkNames>
       )}
-    </WithNetworkNames>
+    </WithDeviceInfo>
   );
 }
 
