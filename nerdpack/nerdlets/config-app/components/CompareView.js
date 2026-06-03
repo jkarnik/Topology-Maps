@@ -566,6 +566,152 @@ function NetworkTemplateScoring({ accountId, orgId, template }) {
   );
 }
 
+function DeviceScoreRow({ device }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ border: '1px solid rgba(128,128,128,0.15)', borderRadius: '4px', marginBottom: '6px', overflow: 'hidden' }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', cursor: 'pointer' }}>
+        <span style={{ flex: 1, fontSize: '12px' }}>{device.name}</span>
+        <span style={{ fontSize: '10px', opacity: 0.4, fontFamily: 'monospace' }}>{device.serial}</span>
+        <div style={{ width: '130px' }}><ScoreBar pct={device.pct} /></div>
+      </div>
+      {open && (
+        <div style={{ borderTop: '1px solid rgba(128,128,128,0.1)', padding: '8px 12px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {device.area_scores.map(a => (
+              <span key={a.area} style={{
+                fontSize: '10px', padding: '2px 7px', borderRadius: '10px',
+                background: a.match ? 'rgba(39,174,96,0.15)' : a.missing ? 'rgba(128,128,128,0.1)' : 'rgba(231,76,60,0.15)',
+                color: a.match ? '#27ae60' : a.missing ? '#999' : '#e74c3c',
+              }}>
+                {a.area} {a.match ? '✓' : a.missing ? '⊘' : '✗'}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NetworkDeviceGroup({ networkId, networkName, devices }) {
+  const [open, setOpen] = useState(false);
+  const avg   = devices.length ? Math.round(devices.reduce((s, d) => s + d.pct, 0) / devices.length) : 0;
+  const color = avg >= 90 ? '#27ae60' : avg >= 60 ? '#e67e22' : '#e74c3c';
+  return (
+    <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '10px', overflow: 'hidden' }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', cursor: 'pointer', background: 'rgba(128,128,128,0.04)' }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{open ? '▼' : '▶'}</span>
+        <span style={{ flex: 1, fontSize: '13px', fontWeight: 500 }}>{networkName || networkId}</span>
+        <span style={{ fontSize: '11px', opacity: 0.4 }}>{devices.length} device{devices.length !== 1 ? 's' : ''}</span>
+        <span style={{ fontSize: '14px', fontWeight: 700, color }}>{avg}%</span>
+      </div>
+      {open && (
+        <div style={{ borderTop: '1px solid rgba(128,128,128,0.1)', padding: '8px 12px' }}>
+          {devices.map(d => <DeviceScoreRow key={d.serial} device={d} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DeviceTemplateScoring({ accountId, orgId, template }) {
+  const prefix = KIND_META[template.kind] && KIND_META[template.kind].prefix;
+  const query = prefix
+    ? `SELECT latest(config_hash), latest(entity_name), latest(network_id) FROM MerakiConfigSnapshot
+       WHERE org_id = '${orgId}'
+         AND entity_type = 'device'
+         AND config_area LIKE '${prefix}%'
+       FACET entity_id, config_area
+       SINCE 30 days ago LIMIT MAX`
+    : null;
+
+  if (!query) return <p style={{ opacity: 0.6, fontSize: '12px' }}>Unsupported template kind.</p>;
+
+  return (
+    <WithNetworkNames accountId={accountId} orgId={orgId}>
+      {(nameMap) => (
+        <NrqlQuery accountIds={[accountId]} query={query}>
+          {({ data, loading, error }) => {
+            if (loading) return <Spinner />;
+            if (error) return <p style={{ color: '#c0392b', fontSize: '12px' }}>Failed to load device snapshot data.</p>;
+
+            // Build: { serial -> { name, network_id, areas: { config_area -> hash } } }
+            const deviceSnaps = {};
+            (data || []).forEach(s => {
+              const fg     = (s.metadata && s.metadata.groups || []).filter(g => g.type === 'facet');
+              const serial = fg[0] && fg[0].value;
+              const area   = fg[1] && fg[1].value;
+              if (!serial || !area) return;
+              const hash      = s.data && s.data[0] && (s.data[0]['latest.config_hash'] || s.data[0]['config_hash']) || null;
+              const devName   = s.data && s.data[0] && (s.data[0]['latest.entity_name'] || s.data[0]['entity_name']) || serial;
+              const networkId = s.data && s.data[0] && (s.data[0]['latest.network_id'] || s.data[0]['network_id']) || '__unknown__';
+              if (!deviceSnaps[serial]) deviceSnaps[serial] = { name: devName, network_id: networkId, areas: {} };
+              deviceSnaps[serial].areas[area] = hash;
+            });
+
+            const golden         = deviceSnaps[template.source_entity_id];
+            const goldenAreaKeys = golden ? Object.keys(golden.areas) : [];
+
+            if (!golden || !goldenAreaKeys.length) {
+              return <p style={{ opacity: 0.6, fontSize: '12px' }}>No snapshot data found for golden device ({template.source_entity_name || template.source_entity_id}).</p>;
+            }
+
+            // Score each device against the golden
+            const deviceScores = Object.entries(deviceSnaps)
+              .filter(([serial]) => serial !== template.source_entity_id)
+              .map(([serial, snap]) => {
+                let matched = 0;
+                const area_scores = goldenAreaKeys.map(a => {
+                  if (!snap.areas[a]) return { area: a, match: false, missing: true };
+                  const match = snap.areas[a] === golden.areas[a];
+                  if (match) matched++;
+                  return { area: a, match, missing: false };
+                });
+                const pct = Math.round((matched / goldenAreaKeys.length) * 100);
+                return { serial, name: snap.name, network_id: snap.network_id, pct, area_scores };
+              });
+
+            // Group by network_id
+            const netGroups = {};
+            deviceScores.forEach(d => {
+              if (!netGroups[d.network_id]) netGroups[d.network_id] = [];
+              netGroups[d.network_id].push(d);
+            });
+            const sortedNets = Object.entries(netGroups)
+              .map(([nid, devices]) => ({
+                networkId: nid,
+                devices:   devices.sort((a, b) => a.pct - b.pct),
+                avg:       Math.round(devices.reduce((s, d) => s + d.pct, 0) / devices.length),
+              }))
+              .sort((a, b) => a.avg - b.avg);
+
+            if (!sortedNets.length) {
+              return <p style={{ opacity: 0.6, fontSize: '12px' }}>No other {KIND_META[template.kind].label} devices found.</p>;
+            }
+
+            return (
+              <div>
+                <div style={{ marginBottom: '14px', fontSize: '12px', opacity: 0.6 }}>
+                  Golden device: <strong>{template.source_entity_name || template.source_entity_id}</strong> · {goldenAreaKeys.length} config areas
+                </div>
+                {sortedNets.map(({ networkId, devices }) => (
+                  <NetworkDeviceGroup
+                    key={networkId}
+                    networkId={networkId}
+                    networkName={networkId === '__unknown__' ? 'Unknown network' : (nameMap[networkId] || networkId)}
+                    devices={devices}
+                  />
+                ))}
+              </div>
+            );
+          }}
+        </NrqlQuery>
+      )}
+    </WithNetworkNames>
+  );
+}
+
 function CoverageTab({ accountId, orgId }) {
   const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
                  WHERE org_id = '${orgId}'
