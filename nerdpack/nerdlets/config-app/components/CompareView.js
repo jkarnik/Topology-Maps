@@ -795,113 +795,59 @@ function CoverageTab({ accountId, orgId }) {
 }
 
 function TemplatesTab({ accountId, orgId }) {
-  const [selectedNet, setSelectedNet] = useState(null);
-  const [selectedNetName, setSelectedNetName] = useState(null);
-  const [templateNet, setTemplateNet] = useState(null);
-  const [templateNetName, setTemplateNetName] = useState(null);
+  const { templates, loading, addTemplate, deleteTemplate } = useTemplates(accountId, orgId);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showPromote, setShowPromote]            = useState(false);
 
-  const query = templateNet
-    ? `SELECT latest(config_json) FROM MerakiConfigSnapshot
-       WHERE org_id = '${orgId}'
-       FACET entity_id, config_area
-       SINCE 30 days ago LIMIT MAX`
-    : null;
+  function handlePromote(tmpl) {
+    addTemplate(tmpl);
+    setShowPromote(false);
+    setSelectedTemplate(tmpl);
+  }
+
+  function handleDelete(id) {
+    deleteTemplate(id);
+    if (selectedTemplate && selectedTemplate.id === id) setSelectedTemplate(null);
+  }
+
+  const isDevice = selectedTemplate && selectedTemplate.source_entity_type === 'device';
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', padding: '12px', background: 'rgba(0,120,191,0.07)', border: '1px solid rgba(0,120,191,0.2)', borderRadius: '6px' }}>
-        <span style={{ fontSize: '12px', opacity: 0.6, whiteSpace: 'nowrap' }}>Golden template:</span>
-        <div style={{ flex: 1 }}>
-          <NetworkSelector accountId={accountId} orgId={orgId} label="" value={selectedNet} onChange={(id, name) => { setSelectedNet(id); setSelectedNetName(name); }} />
-        </div>
-        <button
-          onClick={() => { setTemplateNet(selectedNet); setTemplateNetName(selectedNetName); }}
-          disabled={!selectedNet}
-          style={{ padding: '6px 14px', background: selectedNet ? 'rgba(0,120,191,0.2)' : 'rgba(128,128,128,0.1)', border: `1px solid ${selectedNet ? '#0078bf' : 'rgba(128,128,128,0.3)'}`, borderRadius: '4px', color: selectedNet ? '#0078bf' : 'inherit', fontSize: '12px', cursor: selectedNet ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
-          Set as Template
-        </button>
+    <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ width: '260px', flexShrink: 0 }}>
+        <TemplateList
+          templates={templates}
+          loading={loading}
+          selectedId={selectedTemplate && selectedTemplate.id}
+          onSelect={setSelectedTemplate}
+          onDelete={handleDelete}
+          onPromote={() => setShowPromote(true)}
+        />
       </div>
 
-      {!templateNet && (
-        <p style={{ opacity: 0.6 }}>Select a network above and click "Set as Template" to score all other networks against it.</p>
-      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {!selectedTemplate && !loading && (
+          <p style={{ opacity: 0.5, fontSize: '12px' }}>
+            {templates.length === 0
+              ? 'Create a golden template to start scoring your networks and devices.'
+              : 'Select a template on the left to see compliance scores.'}
+          </p>
+        )}
 
-      {templateNet && (
-        <WithNetworkNames accountId={accountId} orgId={orgId}>
-          {(nameMap) => {
-            const networkIds = new Set(Object.keys(nameMap));
-            return (
-              <NrqlQuery accountIds={[accountId]} query={query}>
-                {({ data, loading, error }) => {
-                  if (loading) return <Spinner />;
-                  if (error) return <p style={{ color: '#c0392b' }}>Failed to load snapshot data.</p>;
+        {selectedTemplate && (
+          isDevice
+            ? <DeviceTemplateScoring accountId={accountId} orgId={orgId} template={selectedTemplate} />
+            : <NetworkTemplateScoring accountId={accountId} orgId={orgId} template={selectedTemplate} />
+        )}
+      </div>
 
-                  const snapshots = {};
-                  (data || []).forEach(s => {
-                    const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
-                    const entityId = fg[0]?.value;
-                    const area = fg[1]?.value;
-                    if (!entityId || !area || !networkIds.has(entityId)) return;
-                    const json = s.data?.[0]?.['latest.config_json'] ?? s.data?.[0]?.['config_json'] ?? s.data?.[0]?.json ?? null;
-                    if (!snapshots[entityId]) snapshots[entityId] = {};
-                    snapshots[entityId][area] = json;
-                  });
-
-                  const templateAreas = snapshots[templateNet] || {};
-                  const templateAreaKeys = Object.keys(templateAreas);
-
-                  if (!templateAreaKeys.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for the selected template network.</p>;
-
-                  const scored = Object.entries(snapshots)
-                    .filter(([id]) => id !== templateNet)
-                    .map(([entityId, areaMap]) => {
-                      const matched = templateAreaKeys.filter(a => areaMap[a] != null && areaMap[a] === templateAreas[a]);
-                      const pct = Math.round((matched.length / templateAreaKeys.length) * 100);
-                      return { entityId, matched: new Set(matched), pct };
-                    })
-                    .sort((a, b) => b.pct - a.pct);
-
-                  if (!scored.length) return <p style={{ opacity: 0.6 }}>No other networks to score against this template.</p>;
-
-                  return (
-                    <div>
-                      <div style={{ marginBottom: '14px', fontSize: '12px' }}>
-                        <span style={{ opacity: 0.5 }}>Scoring against: </span>
-                        <span style={{ color: '#0078bf', fontWeight: 'bold' }}>{templateNetName || templateNet}</span>
-                        <span style={{ opacity: 0.5 }}> · {templateAreaKeys.length} config areas</span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {scored.map(({ entityId, matched, pct }) => {
-                          const c = scoreColor(pct);
-                          return (
-                            <div key={entityId} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: '6px', padding: '10px 14px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                <div style={{ flex: 1, fontSize: '13px' }}>{nameMap[entityId] || entityId}</div>
-                                <div style={{ fontSize: '20px', fontWeight: 'bold', color: c.text }}>{pct}%</div>
-                                <div style={{ fontSize: '11px', opacity: 0.5 }}>{matched.size} / {templateAreaKeys.length} areas</div>
-                              </div>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                                {templateAreaKeys.map(a => (
-                                  <span key={a} style={{
-                                    fontSize: '10px', padding: '2px 7px', borderRadius: '10px',
-                                    background: matched.has(a) ? 'rgba(39,174,96,0.15)' : 'rgba(231,76,60,0.15)',
-                                    color: matched.has(a) ? '#27ae60' : '#e74c3c',
-                                  }}>
-                                    {a} {matched.has(a) ? '✓' : '✗'}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                }}
-              </NrqlQuery>
-            );
-          }}
-        </WithNetworkNames>
+      {showPromote && (
+        <PromoteModal
+          accountId={accountId}
+          orgId={orgId}
+          onConfirm={handlePromote}
+          onCancel={() => setShowPromote(false)}
+        />
       )}
     </div>
   );
