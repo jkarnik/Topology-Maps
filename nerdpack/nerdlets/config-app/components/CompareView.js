@@ -54,10 +54,12 @@ function computeCompareBadges(jsonA, jsonB) {
 
 const KIND_ORDER = ['site', 'gateway', 'switch', 'access_point'];
 const KIND_META = {
-  site:         { label: 'Site (Network)',  prefix: null },
-  gateway:      { label: 'Gateway',         prefix: 'appliance_device_' },
-  switch:       { label: 'Switch',          prefix: 'switch_device_' },
-  access_point: { label: 'Access Point',    prefix: 'wireless_device_' },
+  // scorePrefix: area filter for the scoring query (null = all areas)
+  // scoreAt: 'network' uses source_network_id + entity_type='network'; 'device' uses source_entity_id + entity_type='device'
+  site:         { label: 'Site (Network)',  prefix: null,               scoreAt: 'network', scorePrefix: null },
+  gateway:      { label: 'Gateway',         prefix: 'appliance_device_', scoreAt: 'network', scorePrefix: 'appliance_' },
+  switch:       { label: 'Switch',          prefix: 'switch_device_',   scoreAt: 'device',  scorePrefix: 'switch_device_' },
+  access_point: { label: 'Access Point',    prefix: 'wireless_device_', scoreAt: 'network', scorePrefix: 'wireless_' },
 };
 const STORAGE_COLLECTION = 'golden-templates';
 
@@ -495,11 +497,15 @@ function NetworkScoreRow({ score, nameMap }) {
   );
 }
 
-function NetworkTemplateScoring({ accountId, orgId, template }) {
+// areaPrefix: optional filter like 'appliance_' or 'wireless_' for gateway/AP templates
+// goldenEntityId: override for the golden entity (used when template source is a device but scoring uses network)
+function NetworkTemplateScoring({ accountId, orgId, template, areaPrefix, goldenEntityId }) {
+  const prefixClause = areaPrefix ? `AND config_area LIKE '${areaPrefix}%'` : '';
   const query = `SELECT latest(config_hash) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}' AND entity_type = 'network'
+                 WHERE org_id = '${orgId}' AND entity_type = 'network' ${prefixClause}
                  FACET entity_id, config_area
                  SINCE 30 days ago LIMIT MAX`;
+  const effectiveGoldenId = goldenEntityId || template.source_entity_id;
   return (
     <WithNetworkNames accountId={accountId} orgId={orgId}>
       {(nameMap) => (
@@ -520,7 +526,7 @@ function NetworkTemplateScoring({ accountId, orgId, template }) {
               snapshots[entityId][area] = hash;
             });
 
-            const templateAreas    = snapshots[template.source_entity_id] || {};
+            const templateAreas    = snapshots[effectiveGoldenId] || {};
             const templateAreaKeys = Object.keys(templateAreas);
 
             if (!templateAreaKeys.length) {
@@ -528,7 +534,7 @@ function NetworkTemplateScoring({ accountId, orgId, template }) {
             }
 
             const scores = Object.entries(snapshots)
-              .filter(([id]) => id !== template.source_entity_id)
+              .filter(([id]) => id !== effectiveGoldenId)
               .map(([networkId, areaMap]) => {
                 let matched = 0;
                 const area_scores = templateAreaKeys.map(a => {
@@ -847,7 +853,17 @@ function TemplatesTab({ accountId, orgId }) {
     if (selectedTemplate && selectedTemplate.id === id) setSelectedTemplate(null);
   }
 
-  const isDevice = selectedTemplate && selectedTemplate.source_entity_type === 'device';
+  function renderScoring(tmpl) {
+    const meta = KIND_META[tmpl.kind] || KIND_META.site;
+    if (meta.scoreAt === 'device') {
+      return <DeviceTemplateScoring accountId={accountId} orgId={orgId} template={tmpl} />;
+    }
+    // network-scored: gateway uses source_network_id as golden entity + appliance_ prefix
+    //                 access_point uses source_network_id + wireless_ prefix
+    //                 site uses source_entity_id (already the network) + no prefix
+    const goldenEntityId = tmpl.source_entity_type === 'device' ? tmpl.source_network_id : tmpl.source_entity_id;
+    return <NetworkTemplateScoring accountId={accountId} orgId={orgId} template={tmpl} areaPrefix={meta.scorePrefix} goldenEntityId={goldenEntityId} />;
+  }
 
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
@@ -871,11 +887,7 @@ function TemplatesTab({ accountId, orgId }) {
           </p>
         )}
 
-        {selectedTemplate && (
-          isDevice
-            ? <DeviceTemplateScoring accountId={accountId} orgId={orgId} template={selectedTemplate} />
-            : <NetworkTemplateScoring accountId={accountId} orgId={orgId} template={selectedTemplate} />
-        )}
+        {selectedTemplate && renderScoring(selectedTemplate)}
       </div>
 
       {showPromote && (
