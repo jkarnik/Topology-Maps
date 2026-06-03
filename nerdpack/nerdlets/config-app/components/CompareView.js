@@ -268,6 +268,56 @@ function NetworkSelector({ accountId, orgId, label, value, onChange }) {
   );
 }
 
+function TemplateList({ templates, loading, onSelect, selectedId, onDelete, onPromote }) {
+  if (loading) return <Spinner />;
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <span style={{ fontSize: '12px', opacity: 0.6 }}>
+          {templates.length} template{templates.length !== 1 ? 's' : ''}
+        </span>
+        <button
+          onClick={onPromote}
+          style={{ padding: '5px 12px', background: 'rgba(0,120,191,0.15)', border: '1px solid #0078bf', borderRadius: '4px', color: '#0078bf', fontSize: '12px', cursor: 'pointer' }}>
+          + Promote
+        </button>
+      </div>
+
+      {templates.length === 0 && (
+        <p style={{ opacity: 0.5, fontSize: '12px' }}>No templates yet. Click "+ Promote" to create one.</p>
+      )}
+
+      {templates.map(t => {
+        const meta       = KIND_META[t.kind] || KIND_META.site;
+        const isSelected = t.id === selectedId;
+        return (
+          <div
+            key={t.id}
+            onClick={() => onSelect(t)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+              border: `1px solid ${isSelected ? '#0078bf' : 'rgba(128,128,128,0.2)'}`,
+              background: isSelected ? 'rgba(0,120,191,0.08)' : 'transparent',
+              borderRadius: '5px', marginBottom: '6px', cursor: 'pointer',
+            }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '13px', fontWeight: isSelected ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.name}</div>
+              <div style={{ fontSize: '11px', opacity: 0.5, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {meta.label} · {t.source_entity_name || t.source_entity_id}
+              </div>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(t.id); }}
+              style={{ background: 'transparent', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '14px', opacity: 0.6, padding: '2px 4px', flexShrink: 0 }}>
+              ✕
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function CoverageTab({ accountId, orgId }) {
   const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
                  WHERE org_id = '${orgId}'
