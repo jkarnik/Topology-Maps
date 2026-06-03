@@ -388,14 +388,14 @@ function PromoteModal({ accountId, orgId, onConfirm, onCancel }) {
   }
 
   const inputStyle = {
-    width: '100%', background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '4px',
+    width: '100%', background: 'rgba(0,0,0,0.04)',
+    border: '1px solid rgba(0,0,0,0.15)', borderRadius: '4px',
     padding: '7px 10px', fontSize: '12px', color: 'inherit', boxSizing: 'border-box',
   };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-      <div style={{ background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '20px', width: '340px' }}>
+      <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.15)', borderRadius: '8px', padding: '20px', width: '340px' }}>
         <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>Promote as Golden Template</div>
 
         <div style={{ marginBottom: '14px' }}>
