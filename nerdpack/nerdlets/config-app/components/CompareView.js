@@ -318,6 +318,147 @@ function TemplateList({ templates, loading, onSelect, selectedId, onDelete, onPr
   );
 }
 
+function DevicePicker({ accountId, orgId, networkId, kind, selectedSerial, onSelect }) {
+  const prefix = KIND_META[kind] && KIND_META[kind].prefix;
+  const query = prefix
+    ? `SELECT latest(entity_name) FROM MerakiConfigSnapshot
+       WHERE org_id = '${orgId}'
+         AND entity_type = 'device'
+         AND network_id = '${networkId}'
+         AND config_area LIKE '${prefix}%'
+       FACET entity_id SINCE 30 days ago LIMIT 100`
+    : null;
+
+  if (!query) return null;
+
+  return (
+    <NrqlQuery accountIds={[accountId]} query={query}>
+      {({ data, loading }) => {
+        if (loading) return <Spinner />;
+        const devices = (data || []).map(s => {
+          const serial = s.metadata && s.metadata.groups && s.metadata.groups.find(g => g.type === 'facet') && s.metadata.groups.find(g => g.type === 'facet').value;
+          const name   = (s.data && s.data[0] && (s.data[0]['latest.entity_name'] || s.data[0]['entity_name'])) || serial;
+          return serial ? { serial, name: name || serial } : null;
+        }).filter(Boolean);
+
+        if (!devices.length) {
+          return <p style={{ fontSize: '11px', color: '#e67e22', margin: '4px 0' }}>No {KIND_META[kind].label.toLowerCase()} devices found in this network.</p>;
+        }
+
+        return (
+          <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', maxHeight: '140px', overflowY: 'auto', marginTop: '4px' }}>
+            {devices.map(d => (
+              <div
+                key={d.serial}
+                onClick={() => onSelect(d)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '7px 10px', cursor: 'pointer',
+                  background: selectedSerial === d.serial ? 'rgba(0,120,191,0.12)' : 'transparent',
+                  borderLeft: `2px solid ${selectedSerial === d.serial ? '#0078bf' : 'transparent'}`,
+                }}>
+                <span style={{ fontSize: '12px', flex: 1 }}>{d.name}</span>
+                <span style={{ fontSize: '10px', opacity: 0.4, fontFamily: 'monospace' }}>{d.serial}</span>
+              </div>
+            ))}
+          </div>
+        );
+      }}
+    </NrqlQuery>
+  );
+}
+
+function PromoteModal({ accountId, orgId, onConfirm, onCancel }) {
+  const [kind, setKind]               = useState('');
+  const [networkId, setNetworkId]     = useState(null);
+  const [networkName, setNetworkName] = useState(null);
+  const [device, setDevice]           = useState(null); // { serial, name }
+  const [name, setName]               = useState('');
+
+  const needsDevice = kind && kind !== 'site';
+  const canSave     = name.trim() && networkId && kind && (kind === 'site' || device);
+
+  function handleConfirm() {
+    onConfirm({
+      id:                  String(Date.now()),
+      name:                name.trim(),
+      kind,
+      org_id:              orgId,
+      source_entity_id:    needsDevice ? device.serial    : networkId,
+      source_entity_name:  needsDevice ? device.name      : networkName,
+      source_entity_type:  needsDevice ? 'device'         : 'network',
+      source_network_id:   networkId,
+      created_at:          new Date().toISOString(),
+    });
+  }
+
+  const inputStyle = {
+    width: '100%', background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.12)', borderRadius: '4px',
+    padding: '7px 10px', fontSize: '12px', color: 'inherit', boxSizing: 'border-box',
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+      <div style={{ background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '20px', width: '340px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>Promote as Golden Template</div>
+
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{ fontSize: '11px', opacity: 0.5, display: 'block', marginBottom: '4px' }}>Template type</label>
+          <select value={kind} onChange={e => { setKind(e.target.value); setDevice(null); }} style={inputStyle}>
+            <option value="">Select a type…</option>
+            {KIND_ORDER.map(k => <option key={k} value={k}>{KIND_META[k].label}</option>)}
+          </select>
+        </div>
+
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{ fontSize: '11px', opacity: 0.5, display: 'block', marginBottom: '4px' }}>
+            {needsDevice ? 'Step 1 — Pick a network' : 'Network'}
+          </label>
+          <NetworkSelector
+            accountId={accountId} orgId={orgId} label="" value={networkId}
+            onChange={(id, nm) => { setNetworkId(id); setNetworkName(nm); setDevice(null); }}
+          />
+        </div>
+
+        {needsDevice && networkId && (
+          <div style={{ marginBottom: '14px' }}>
+            <label style={{ fontSize: '11px', opacity: 0.5, display: 'block', marginBottom: '4px' }}>
+              Step 2 — Pick a {KIND_META[kind].label.toLowerCase()}
+            </label>
+            <DevicePicker
+              accountId={accountId} orgId={orgId}
+              networkId={networkId} kind={kind}
+              selectedSerial={device && device.serial}
+              onSelect={d => setDevice(d)}
+            />
+          </div>
+        )}
+
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{ fontSize: '11px', opacity: 0.5, display: 'block', marginBottom: '4px' }}>Template name</label>
+          <input
+            type="text" value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="e.g. Standard Core Switch"
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+          <button onClick={onCancel} style={{ padding: '6px 14px', background: 'transparent', border: '1px solid rgba(128,128,128,0.3)', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Cancel</button>
+          <button
+            onClick={handleConfirm}
+            disabled={!canSave}
+            style={{ padding: '6px 14px', background: canSave ? 'rgba(0,120,191,0.8)' : 'rgba(128,128,128,0.2)', border: 'none', borderRadius: '4px', cursor: canSave ? 'pointer' : 'not-allowed', color: canSave ? '#fff' : 'inherit', fontSize: '12px' }}>
+            Save Template
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CoverageTab({ accountId, orgId }) {
   const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
                  WHERE org_id = '${orgId}'
