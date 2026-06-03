@@ -571,6 +571,7 @@ function DeviceScoreRow({ device }) {
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.15)', borderRadius: '4px', marginBottom: '6px', overflow: 'hidden' }}>
       <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', cursor: 'pointer' }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '11px', opacity: 0.5 }}>{open ? '▼' : '▶'}</span>
         <span style={{ flex: 1, fontSize: '12px' }}>{device.name}</span>
         <span style={{ fontSize: '10px', opacity: 0.4, fontFamily: 'monospace' }}>{device.serial}</span>
         <div style={{ width: '130px' }}><ScoreBar pct={device.pct} /></div>
