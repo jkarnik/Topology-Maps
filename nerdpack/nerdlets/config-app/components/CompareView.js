@@ -91,7 +91,7 @@ function useTemplates(accountId, orgId) {
       collection: STORAGE_COLLECTION,
       documentId: orgId,
       document: { templates: next },
-    });
+    }).catch(() => {});
   }
 
   function addTemplate(tmpl)    { save([...templates, tmpl]); }
