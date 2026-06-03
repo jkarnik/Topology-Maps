@@ -1,14 +1,14 @@
 {
   "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37",
-  "hash": "61b3b5fac37ee8a47ee5",
+  "hash": "9c65f287da558c8ac8b7",
   "version": "5.93.0",
-  "time": 803,
-  "builtAt": 1780486189725,
+  "time": 833,
+  "builtAt": 1780493502735,
   "publicPath": "auto",
   "outputPath": "/Users/jkarnik/Code/Topology Maps/nerdpack/dist",
   "assetsByChunkName": {
     "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app": [
-      "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~09022add.js"
+      "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~97b6e2a0.js"
     ],
     "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab": [
       "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-entity-tab~ea3bae9e.js"
@@ -17,20 +17,20 @@
   "assets": [
     {
       "type": "asset",
-      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~09022add.js",
-      "size": 36395,
+      "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~97b6e2a0.js",
+      "size": 49908,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "09022add",
+        "contenthash": "97b6e2a0",
         "javascriptModule": false,
         "minimized": true,
         "related": {
-          "sourceMap": "8a2cb6e258c89559.map"
+          "sourceMap": "9400918396201668.map"
         },
-        "size": 36395
+        "size": 49908
       },
       "chunkNames": [
         "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
@@ -42,16 +42,16 @@
       "related": [
         {
           "type": "sourceMap",
-          "name": "8a2cb6e258c89559.map",
-          "size": 101934,
+          "name": "9400918396201668.map",
+          "size": 137319,
           "emitted": true,
           "comparedForEmit": false,
           "cached": false,
           "info": {
             "immutable": true,
-            "contenthash": "8a2cb6e258c89559",
+            "contenthash": "9400918396201668",
             "development": true,
-            "size": 101934
+            "size": 137319
           },
           "chunkNames": [],
           "chunkIdHints": [],
@@ -138,9 +138,9 @@
       "initial": true,
       "entry": true,
       "recorded": false,
-      "size": 70130,
+      "size": 93894,
       "sizes": {
-        "javascript": 69193,
+        "javascript": 92957,
         "runtime": 937
       },
       "names": [
@@ -151,12 +151,12 @@
         "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app"
       ],
       "files": [
-        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~09022add.js"
+        "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~97b6e2a0.js"
       ],
       "auxiliaryFiles": [
-        "8a2cb6e258c89559.map"
+        "9400918396201668.map"
       ],
-      "hash": "9879e2d054a2263ded32",
+      "hash": "8a4127b7c9066b7fe721",
       "childrenByOrder": {},
       "id": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app",
       "siblings": [],
@@ -249,9 +249,9 @@
           "type": "module",
           "moduleType": "javascript/auto",
           "layer": null,
-          "size": 25115,
+          "size": 48879,
           "sizes": {
-            "javascript": 25115
+            "javascript": 48879
           },
           "built": true,
           "codeGenerated": true,
@@ -1000,7 +1000,49 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-61",
+              "loc": "5:0-106",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "104:4-29",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "120:4-33",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "122:18-67",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1014,7 +1056,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "234:43-52",
+              "loc": "296:43-52",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1028,7 +1070,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "240:41-50",
+              "loc": "302:41-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1042,7 +1084,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "247:58-65",
+              "loc": "309:58-65",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1056,7 +1098,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "296:42-51",
+              "loc": "358:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1070,7 +1112,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "303:57-64",
+              "loc": "365:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1084,7 +1126,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "320:42-51",
+              "loc": "382:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1098,7 +1140,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "329:57-64",
+              "loc": "391:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1112,7 +1154,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "338:44-50",
+              "loc": "400:44-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1126,7 +1168,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "345:40-50",
+              "loc": "407:40-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1140,7 +1182,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "350:43-53",
+              "loc": "412:43-53",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1154,7 +1196,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "369:44-53",
+              "loc": "426:55-62",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1168,7 +1210,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "377:59-66",
+              "loc": "528:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1182,7 +1224,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "591:44-53",
+              "loc": "535:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1196,7 +1238,119 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "599:59-66",
+              "loc": "875:49-58",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "883:57-64",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1098:42-51",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1104:41-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1111:75-82",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1154:49-58",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1162:57-64",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1275:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1283:59-66",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -1622,6 +1776,8 @@
             }
           ],
           "usedExports": [
+            "AccountStorageMutation",
+            "AccountStorageQuery",
             "AccountsQuery",
             "NrqlQuery",
             "PlatformStateContext",
@@ -2496,7 +2652,7 @@
               "active": true,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "4:0-61",
+              "loc": "5:0-106",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2510,7 +2666,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "234:43-52",
+              "loc": "104:4-29",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2524,7 +2680,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "240:41-50",
+              "loc": "120:4-33",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2538,7 +2694,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "247:58-65",
+              "loc": "122:18-67",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2552,7 +2708,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "296:42-51",
+              "loc": "296:43-52",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2566,7 +2722,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "303:57-64",
+              "loc": "302:41-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2580,7 +2736,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "320:42-51",
+              "loc": "309:58-65",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2594,7 +2750,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "329:57-64",
+              "loc": "358:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2608,7 +2764,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "338:44-50",
+              "loc": "365:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2622,7 +2778,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "345:40-50",
+              "loc": "382:42-51",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2636,7 +2792,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "350:43-53",
+              "loc": "391:57-64",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2650,7 +2806,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "369:44-53",
+              "loc": "400:44-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2664,7 +2820,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "377:59-66",
+              "loc": "407:40-50",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2678,7 +2834,7 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "591:44-53",
+              "loc": "412:43-53",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -2692,7 +2848,161 @@
               "active": false,
               "explanation": "",
               "userRequest": "nr1",
-              "loc": "599:59-66",
+              "loc": "426:55-62",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "528:42-51",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "535:57-64",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "875:49-58",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "883:57-64",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1098:42-51",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1104:41-50",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1111:75-82",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1154:49-58",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1162:57-64",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1275:44-53",
+              "moduleId": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+            },
+            {
+              "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "module": "./nerdlets/config-app/components/CompareView.js",
+              "moduleName": "./nerdlets/config-app/components/CompareView.js",
+              "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+              "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+              "type": "harmony import specifier",
+              "active": false,
+              "explanation": "",
+              "userRequest": "nr1",
+              "loc": "1283:59-66",
               "moduleId": "./nerdlets/config-app/components/CompareView.js",
               "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
             },
@@ -3782,7 +4092,49 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "4:0-61",
+          "loc": "5:0-106",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "104:4-29",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "120:4-33",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "122:18-67",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3796,7 +4148,7 @@
           "active": false,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "234:43-52",
+          "loc": "296:43-52",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3810,7 +4162,7 @@
           "active": false,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "240:41-50",
+          "loc": "302:41-50",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3824,7 +4176,7 @@
           "active": false,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "247:58-65",
+          "loc": "309:58-65",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3838,7 +4190,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "296:42-51",
+          "loc": "358:42-51",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3852,7 +4204,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "303:57-64",
+          "loc": "365:57-64",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3866,7 +4218,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "320:42-51",
+          "loc": "382:42-51",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3880,7 +4232,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "329:57-64",
+          "loc": "391:57-64",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3894,7 +4246,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "338:44-50",
+          "loc": "400:44-50",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3908,7 +4260,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "345:40-50",
+          "loc": "407:40-50",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3922,7 +4274,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "350:43-53",
+          "loc": "412:43-53",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3936,7 +4288,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "369:44-53",
+          "loc": "426:55-62",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3950,7 +4302,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "377:59-66",
+          "loc": "528:42-51",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3964,7 +4316,7 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "591:44-53",
+          "loc": "535:57-64",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -3978,7 +4330,119 @@
           "active": true,
           "explanation": "",
           "userRequest": "nr1",
-          "loc": "599:59-66",
+          "loc": "875:49-58",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "883:57-64",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1098:42-51",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1104:41-50",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1111:75-82",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1154:49-58",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1162:57-64",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1275:44-53",
+          "moduleId": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
+        },
+        {
+          "moduleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "module": "./nerdlets/config-app/components/CompareView.js",
+          "moduleName": "./nerdlets/config-app/components/CompareView.js",
+          "resolvedModuleIdentifier": "/Users/jkarnik/.local/share/newrelic-cli/contexts/third-party/2.185.0/package.json/node_modules/@datanerd/3pp-cli-nerdpack/dist/build/webpack/loaders/babel-loader.js??ruleSet[1].rules[14].use[0]!/Users/jkarnik/Code/Topology Maps/nerdpack/nerdlets/config-app/components/CompareView.js",
+          "resolvedModule": "./nerdlets/config-app/components/CompareView.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "nr1",
+          "loc": "1283:59-66",
           "moduleId": "./nerdlets/config-app/components/CompareView.js",
           "resolvedModuleId": "./nerdlets/config-app/components/CompareView.js"
         },
@@ -4404,6 +4868,8 @@
         }
       ],
       "usedExports": [
+        "AccountStorageMutation",
+        "AccountStorageQuery",
         "AccountsQuery",
         "Collapsible",
         "CollapsibleItem",
@@ -4747,9 +5213,9 @@
       "type": "module",
       "moduleType": "javascript/auto",
       "layer": null,
-      "size": 25115,
+      "size": 48879,
       "sizes": {
-        "javascript": 25115
+        "javascript": 48879
       },
       "built": true,
       "codeGenerated": true,
@@ -5361,20 +5827,20 @@
       ],
       "assets": [
         {
-          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~09022add.js",
-          "size": 36395
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~97b6e2a0.js",
+          "size": 49908
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 36395,
+      "assetsSize": 49908,
       "auxiliaryAssets": [
         {
-          "name": "8a2cb6e258c89559.map",
-          "size": 101934
+          "name": "9400918396201668.map",
+          "size": 137319
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 101934,
+      "auxiliaryAssetsSize": 137319,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
@@ -5413,20 +5879,20 @@
       ],
       "assets": [
         {
-          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~09022add.js",
-          "size": 36395
+          "name": "78036046-9c0a-4ea2-8f57-aaa2a53c3c37--config-app~97b6e2a0.js",
+          "size": 49908
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 36395,
+      "assetsSize": 49908,
       "auxiliaryAssets": [
         {
-          "name": "8a2cb6e258c89559.map",
-          "size": 101934
+          "name": "9400918396201668.map",
+          "size": 137319
         }
       ],
       "filteredAuxiliaryAssets": 0,
-      "auxiliaryAssetsSize": 101934,
+      "auxiliaryAssetsSize": 137319,
       "children": {},
       "childAssets": {},
       "isOverSizeLimit": false
