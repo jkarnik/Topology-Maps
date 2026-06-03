@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import type { ConfigTree } from '../../types/config'
-import { CompareNetworksView } from './CompareNetworksView'
 import { CoverageView } from './CoverageView'
 import { TemplatesView } from './TemplatesView'
 
-type SubView = 'networks' | 'coverage' | 'templates'
+type SubView = 'coverage' | 'templates'
 
 interface Props {
   orgId: string
@@ -12,13 +11,12 @@ interface Props {
 }
 
 const PILLS: { id: SubView; label: string }[] = [
-  { id: 'networks', label: 'Compare Networks' },
+  { id: 'templates', label: 'Golden Template Comparator' },
   { id: 'coverage', label: 'Coverage' },
-  { id: 'templates', label: 'Templates' },
 ]
 
 export function CompareTab({ orgId, tree }: Props) {
-  const [active, setActive] = useState<SubView>('networks')
+  const [active, setActive] = useState<SubView>('templates')
 
   return (
     <div className="flex flex-col gap-3 p-3 h-full">
@@ -40,9 +38,8 @@ export function CompareTab({ orgId, tree }: Props) {
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto">
-        {active === 'networks' && <CompareNetworksView orgId={orgId} tree={tree} />}
-        {active === 'coverage' && <CoverageView orgId={orgId} />}
         {active === 'templates' && <TemplatesView orgId={orgId} tree={tree} />}
+        {active === 'coverage' && <CoverageView orgId={orgId} />}
       </div>
     </div>
   )

@@ -10,6 +10,10 @@ function daysAgo(n) {
 
 function nrqlEsc(val) { return String(val || '').replace(/'/g, "\\'"); }
 
+// Events before this date contain un-normalized per-device fields (IPs, serials, etc.)
+// and should be excluded from all change queries.
+const NORMALIZATION_CUTOFF_MS = 1780444800000; // 2026-06-03T00:00:00Z
+
 function DateRangePanel({ fromDate, toDate, onRangeChange, activeShortcut, onShortcut }) {
   function setShortcut(days) {
     const to = new Date();
@@ -100,7 +104,7 @@ function EntityTree({ accountId, orgId, fromDate, toDate, selectedId, onSelect }
           });
           return (
             <NrqlQuery accountIds={[accountId]}
-              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${nrqlEsc(orgId)}' FACET entity_type, entity_id, entity_name, network_id SINCE ${fromEpoch} UNTIL ${toEpoch} LIMIT MAX`}>
+              query={`SELECT count(*) FROM MerakiConfigChange WHERE org_id = '${nrqlEsc(orgId)}' AND timestamp >= ${NORMALIZATION_CUTOFF_MS} FACET entity_type, entity_id, entity_name, network_id SINCE ${fromEpoch} UNTIL ${toEpoch} LIMIT MAX`}>
               {({ data, loading, error }) => {
                 if (loading) return <Spinner />;
                 if (error) return <p style={{ color: '#c0392b', fontSize: '12px' }}>Failed to load.</p>;
@@ -255,7 +259,7 @@ function DiffTile({ row, showEntity, accountId, orgId }) {
     ? `SELECT from_payload, to_payload FROM MerakiConfigChange
        WHERE org_id = '${nrqlEsc(orgId)}' AND entity_id = '${nrqlEsc(row.entity_id)}'
        AND config_area = '${nrqlEsc(row.config_area)}' AND detected_at = '${nrqlEsc(row.detected_at)}'
-       AND from_payload != '' SINCE 30 days ago LIMIT 1`
+       AND from_payload != '' AND timestamp >= ${NORMALIZATION_CUTOFF_MS} SINCE 30 days ago LIMIT 1`
     : null;
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
@@ -303,7 +307,7 @@ function RightPanel({ accountId, orgId, selectedEntityId, selectedEntityName, fr
   // Lightweight query — payloads loaded lazily per tile on expand to avoid NR1 response size limits.
   const query = `SELECT entity_name, entity_id, config_area, change_summary, detected_at
                  FROM MerakiConfigChange
-                 WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter}
+                 WHERE org_id = '${nrqlEsc(orgId)}' ${entityFilter} AND timestamp >= ${NORMALIZATION_CUTOFF_MS}
                  SINCE ${fromEpoch} UNTIL ${toEpoch}
                  ORDER BY detected_at DESC LIMIT 300`;
   const headerLabel = selectedEntityName || 'All entities';

@@ -2,12 +2,15 @@ import React from 'react';
 import { NrqlQuery, Spinner, Collapsible, CollapsibleItem } from 'nr1';
 import DiffViewer from '../../config-app/components/DiffViewer';
 
+// Events before this date contain un-normalized per-device fields (IPs, serials, etc.)
+const NORMALIZATION_CUTOFF_MS = 1780444800000; // 2026-06-03T00:00:00Z
+
 export default function RecentChanges({ accountId, entityId }) {
   if (!entityId) return null;
   return (
     <NrqlQuery accountIds={[accountId]}
       query={`SELECT config_area, change_summary, detected_at, diff_json
-              FROM MerakiConfigChange WHERE entity_id = '${entityId}'
+              FROM MerakiConfigChange WHERE entity_id = '${entityId}' AND timestamp >= ${NORMALIZATION_CUTOFF_MS}
               SINCE 30 days ago ORDER BY detected_at DESC LIMIT 10`}>
       {({ data, loading, error }) => {
         if (loading) return <Spinner />;

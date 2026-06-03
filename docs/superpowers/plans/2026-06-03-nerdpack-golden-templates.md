@@ -1,57 +1,46 @@
+# Nerdpack Multiple Golden Templates Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Replace the nerdpack's single in-session network template with a persistent multi-template system supporting site, gateway, switch, and access-point templates — matching the feature already live on the website.
+
+**Architecture:** All changes go into `CompareView.js`. Templates are persisted via NR1 NerdStorage (`AccountStorageMutation`/`AccountStorageQuery`) so they survive page reloads. Scoring stays fully client-side via NRQL — network templates compare `config_hash` per `config_area` across all network snapshots; device templates compare per-device snapshots and group results by `network_id`. No FastAPI backend calls; no TypeScript.
+
+**Tech Stack:** NR1 React SDK (`NrqlQuery`, `AccountStorageMutation`, `AccountStorageQuery`, `Spinner`, `Select`, `SelectItem`), React 16 hooks (`useState`, `useEffect`)
+
+**No test infrastructure exists in the nerdpack** — tasks skip the TDD loop. Manual smoke test via `nr1 nerdpack:serve` is the verification step.
+
+---
+
+## File Map
+
+| File | Change |
+|---|---|
+| `nerdpack/nerdlets/config-app/components/CompareView.js` | Replace entire `TemplatesTab`; add NerdStorage CRUD hook, `TemplateList`, `PromoteModal`, `DevicePicker`, `ScoreBar`, `NetworkScoreRow`, `NetworkTemplateScoring`, `DeviceScoreRow`, `NetworkDeviceGroup`, `DeviceTemplateScoring` |
+
+---
+
+### Task 1: Imports, constants, and NerdStorage hook
+
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
+
+- [ ] **Step 1: Update the import line at line 1–2**
+
+Replace:
+```js
+import React, { useState } from 'react';
+import { NrqlQuery, Spinner, Select, SelectItem } from 'nr1';
+```
+With:
+```js
 import React, { useState, useEffect } from 'react';
 import { NrqlQuery, Spinner, Select, SelectItem, AccountStorageMutation, AccountStorageQuery } from 'nr1';
+```
 
-// ── Module-level helpers ────────────────────────────────────────────────────
+- [ ] **Step 2: Add KIND constants and STORAGE keys after the `nrqlEsc` function (around line 12)**
 
-function cellColor(ts, now, STALE_MS) {
-  if (ts == null) return 'rgba(128,128,128,0.12)';
-  return (now - ts) > STALE_MS ? '#e67e22' : '#27ae60';
-}
-
-function pctColor(pct) {
-  if (pct >= 80) return '#27ae60';
-  if (pct >= 50) return '#e67e22';
-  return '#e74c3c';
-}
-
-
-function safeParse(str) {
-  if (!str) return null;
-  try { return JSON.stringify(JSON.parse(str), null, 2).split('\n'); }
-  catch (_) { return str.split('\n'); }
-}
-
-function syntaxHighlight(line) {
-  const tokenRegex = /("(?:[^"\\]|\\.)*":?|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null|[{}[\],:])/g;
-  const result = [];
-  let last = 0, m;
-  while ((m = tokenRegex.exec(line)) !== null) {
-    if (m.index > last) result.push(<span key={`p${last}`}>{line.slice(last, m.index)}</span>);
-    const t = m[0];
-    let cls;
-    if (t.endsWith(':') && t.startsWith('"')) cls = 'json-key';
-    else if (t.startsWith('"')) cls = 'json-str';
-    else if (/^-?\d/.test(t)) cls = 'json-num';
-    else if (t === 'true' || t === 'false') cls = 'json-bool';
-    else if (t === 'null') cls = 'json-null';
-    result.push(<span key={m.index} className={cls}>{t}</span>);
-    last = m.index + t.length;
-  }
-  if (last < line.length) result.push(<span key={`e${last}`}>{line.slice(last)}</span>);
-  return result;
-}
-
-function computeCompareBadges(jsonA, jsonB) {
-  const linesA = new Set((safeParse(jsonA) || []).map(l => l.trim()).filter(Boolean));
-  const linesB = new Set((safeParse(jsonB) || []).map(l => l.trim()).filter(Boolean));
-  const added = [...linesB].filter(l => !linesA.has(l)).length;
-  const removed = [...linesA].filter(l => !linesB.has(l)).length;
-  const badges = [];
-  if (added) badges.push({ text: `+ ${added} added`, color: '#27ae60' });
-  if (removed) badges.push({ text: `− ${removed} removed`, color: '#e74c3c' });
-  return badges;
-}
-
+```js
 const KIND_ORDER = ['site', 'gateway', 'switch', 'access_point'];
 const KIND_META = {
   site:         { label: 'Site (Network)',  prefix: null },
@@ -60,7 +49,11 @@ const KIND_META = {
   access_point: { label: 'Access Point',    prefix: 'wireless_device_' },
 };
 const STORAGE_COLLECTION = 'golden-templates';
+```
 
+- [ ] **Step 3: Add `useTemplates` hook after the KIND constants**
+
+```js
 function useTemplates(accountId, orgId) {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -86,7 +79,7 @@ function useTemplates(accountId, orgId) {
       collection: STORAGE_COLLECTION,
       documentId: orgId,
       document: { templates: next },
-    }).catch(() => {});
+    });
   }
 
   function addTemplate(tmpl)    { save([...templates, tmpl]); }
@@ -94,175 +87,28 @@ function useTemplates(accountId, orgId) {
 
   return { templates, loading, addTemplate, deleteTemplate };
 }
+```
 
-function CompareJsonPane({ label, jsonStr, otherJsonStr, side }) {
-  const borderStyle = { flex: 1, overflow: 'auto', maxHeight: '400px', borderRight: side === 'left' ? '1px solid rgba(128,128,128,0.15)' : 'none' };
-  const labelEl = <div style={{ fontSize: '11px', opacity: 0.5, padding: '4px 8px', borderBottom: '1px solid rgba(128,128,128,0.1)', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>;
-  const lines = safeParse(jsonStr);
-  if (!lines) {
-    return (
-      <div style={borderStyle}>
-        {labelEl}
-        <p style={{ opacity: 0.4, fontSize: '11px', padding: '8px', fontStyle: 'italic' }}>(not observed)</p>
-      </div>
-    );
-  }
-  const otherLines = safeParse(otherJsonStr) || [];
-  const otherSet = new Set(otherLines.map(l => l.trim()).filter(Boolean));
-  return (
-    <div style={borderStyle}>
-      {labelEl}
-      <pre style={{ margin: 0, padding: '8px', fontSize: '11px', fontFamily: 'monospace', lineHeight: '1.6' }}>
-        {lines.map((line, i) => {
-          const trimmed = line.trim();
-          const changed = trimmed && !otherSet.has(trimmed);
-          const bg = changed
-            ? (side === 'left' ? 'rgba(231,76,60,0.15)' : 'rgba(39,174,96,0.15)')
-            : 'transparent';
-          return (
-            <div key={i} style={{ background: bg, paddingLeft: '2px' }}>
-              {syntaxHighlight(line)}
-            </div>
-          );
-        })}
-      </pre>
-    </div>
-  );
-}
+- [ ] **Step 4: Commit**
 
-function CompareTile({ area, jsonA, jsonB, labelA, labelB }) {
-  const [expanded, setExpanded] = useState(false);
-  const badges = computeCompareBadges(jsonA, jsonB);
-  return (
-    <div style={{ border: '1px solid rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '8px', overflow: 'hidden' }}>
-      <div onClick={() => setExpanded(e => !e)} style={{
-        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
-        cursor: 'pointer', background: 'rgba(128,128,128,0.05)',
-      }}>
-        <span style={{ fontFamily: 'monospace', fontSize: '13px' }}>{expanded ? '▼' : '▶'}</span>
-        <span style={{ fontFamily: 'monospace', fontSize: '13px', flex: 1 }}>{area}</span>
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          {badges.map((b, i) => (
-            <span key={i} style={{
-              fontSize: '11px', padding: '2px 6px', borderRadius: '10px',
-              background: `${b.color}22`, color: b.color, fontWeight: 500,
-            }}>{b.text}</span>
-          ))}
-        </div>
-      </div>
-      {expanded && (
-        <div style={{ display: 'flex', borderTop: '1px solid rgba(128,128,128,0.15)' }}>
-          <CompareJsonPane label={labelA} jsonStr={jsonA} otherJsonStr={jsonB} side="left" />
-          <CompareJsonPane label={labelB} jsonStr={jsonB} otherJsonStr={jsonA} side="right" />
-        </div>
-      )}
-    </div>
-  );
-}
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): add NerdStorage hook and KIND constants for golden templates"
+```
 
-function CompareDiffView({ accountId, netA, netB, nameA, nameB }) {
-  const q = (id) => `SELECT latest(config_json) AS json FROM MerakiConfigSnapshot
-                     WHERE entity_id = '${id}' FACET config_area SINCE 30 days ago LIMIT MAX`;
-  return (
-    <>
-      <style>{`
-        .json-key  { color: #0066cc; }
-        .json-str  { color: #a31515; }
-        .json-num  { color: #098658; }
-        .json-bool { color: #0000ff; }
-        .json-null { color: #dd0000; }
-        @media (prefers-color-scheme: dark) {
-          .json-key  { color: #9cdcfe; }
-          .json-str  { color: #ce9178; }
-          .json-num  { color: #b5cea8; }
-          .json-bool { color: #569cd6; }
-          .json-null { color: #f44747; }
-        }
-      `}</style>
-      <NrqlQuery accountIds={[accountId]} query={q(netA)}>
-        {({ data: dA, loading: lA }) => (
-          <NrqlQuery accountIds={[accountId]} query={q(netB)}>
-            {({ data: dB, loading: lB }) => {
-              if (lA || lB) return <Spinner />;
-              const mapA = {}, mapB = {};
-              (dA || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapA[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
-              (dB || []).forEach((s) => { const k = (s.metadata.groups||[]).find(g=>g.type==='facet')?.value; if(k) mapB[k] = s.data?.[0]?.['config_json'] || s.data?.[0]?.['latest.config_json'] || s.data?.[0]?.json; });
-              const allAreas = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])].sort();
-              const diffAreas = allAreas.filter((a) => mapA[a] !== mapB[a]);
-              if (!diffAreas.length) return <p style={{ color: '#27ae60' }}>Networks are identical across all observed config areas.</p>;
-              const labelA = nameA || netA;
-              const labelB = nameB || netB;
-              return (
-                <div>
-                  <div style={{ marginBottom: '12px', fontSize: '12px', opacity: 0.6 }}>
-                    {diffAreas.length} config area{diffAreas.length !== 1 ? 's' : ''} differ · click a tile to expand
-                  </div>
-                  {diffAreas.map(area => (
-                    <CompareTile key={area} area={area}
-                      jsonA={mapA[area]} jsonB={mapB[area]}
-                      labelA={labelA} labelB={labelB} />
-                  ))}
-                </div>
-              );
-            }}
-          </NrqlQuery>
-        )}
-      </NrqlQuery>
-    </>
-  );
-}
+---
 
-// ── Sub-components ──────────────────────────────────────────────────────────
+### Task 2: TemplateList component
 
-// Fetches { entityId -> name } for all networks in the org and passes it to children.
-// Re-uses the same query that drives the dropdown selectors (which is known to work).
-function WithNetworkNames({ accountId, orgId, children }) {
-  const query = `SELECT latest(entity_name) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}' AND entity_type = 'network'
-                 FACET entity_id SINCE 30 days ago LIMIT 100`;
-  return (
-    <NrqlQuery accountIds={[accountId]} query={query}>
-      {({ data, loading }) => {
-        if (loading) return <Spinner />;
-        const nameMap = {};
-        (data || []).forEach(s => {
-          const id = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
-          const name = s.data?.[0]?.['entity_name'] ?? s.data?.[0]?.['latest.entity_name'] ?? null;
-          if (id) nameMap[id] = name || id;
-        });
-        return children(nameMap);
-      }}
-    </NrqlQuery>
-  );
-}
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
 
-function NetworkSelector({ accountId, orgId, label, value, onChange }) {
-  return (
-    <NrqlQuery accountIds={[accountId]}
-      query={`SELECT latest(entity_name) FROM MerakiConfigSnapshot
-              WHERE org_id = '${orgId}' AND entity_type = 'network'
-              FACET entity_id SINCE 30 days ago LIMIT 100`}>
-      {({ data, loading }) => {
-        if (loading) return <Spinner />;
-        const networks = (data || []).map(s => {
-          const id = s.metadata?.groups?.find(g => g.type === 'facet')?.value;
-          const name = s.data?.[0]?.['entity_name'] ?? s.data?.[0]?.['latest.entity_name'] ?? id;
-          return id ? { id, name: name || id } : null;
-        }).filter(Boolean);
-        return (
-          <Select label={label} value={value} onChange={(_, v) => {
-            const net = networks.find(n => n.id === v);
-            onChange(v, net?.name || v);
-          }}>
-            <SelectItem value={null}>— Select network —</SelectItem>
-            {networks.map(({ id, name }) => <SelectItem key={id} value={id}>{name}</SelectItem>)}
-          </Select>
-        );
-      }}
-    </NrqlQuery>
-  );
-}
+Add the left-panel component that lists saved templates with a "+ Promote" button. Insert before the `CoverageTab` function.
 
+- [ ] **Step 1: Add `TemplateList` component**
+
+```js
 function TemplateList({ templates, loading, onSelect, selectedId, onDelete, onPromote }) {
   if (loading) return <Spinner />;
   return (
@@ -312,14 +158,35 @@ function TemplateList({ templates, loading, onSelect, selectedId, onDelete, onPr
     </div>
   );
 }
+```
 
+- [ ] **Step 2: Commit**
+
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): add TemplateList component"
+```
+
+---
+
+### Task 3: PromoteModal with kind + network + device selection
+
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
+
+The modal collects kind → network → (for non-site kinds) a device → template name. Insert before `CoverageTab`.
+
+- [ ] **Step 1: Add `DevicePicker` component**
+
+```js
 function DevicePicker({ accountId, orgId, networkId, kind, selectedSerial, onSelect }) {
   const prefix = KIND_META[kind] && KIND_META[kind].prefix;
   const query = prefix
     ? `SELECT latest(entity_name) FROM MerakiConfigSnapshot
-       WHERE org_id = '${orgId}'
+       WHERE org_id = '${nrqlEsc(orgId)}'
          AND entity_type = 'device'
-         AND network_id = '${networkId}'
+         AND network_id = '${nrqlEsc(networkId)}'
          AND config_area LIKE '${prefix}%'
        FACET entity_id SINCE 30 days ago LIMIT 100`
     : null;
@@ -362,7 +229,11 @@ function DevicePicker({ accountId, orgId, networkId, kind, selectedSerial, onSel
     </NrqlQuery>
   );
 }
+```
 
+- [ ] **Step 2: Add `PromoteModal` component**
+
+```js
 function PromoteModal({ accountId, orgId, onConfirm, onCancel }) {
   const [kind, setKind]               = useState('');
   const [networkId, setNetworkId]     = useState(null);
@@ -453,7 +324,28 @@ function PromoteModal({ accountId, orgId, onConfirm, onCancel }) {
     </div>
   );
 }
+```
 
+- [ ] **Step 3: Commit**
+
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): add PromoteModal with kind/network/device picker"
+```
+
+---
+
+### Task 4: Network template scoring panel
+
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
+
+For site/network templates: query all network `config_hash` values via NRQL, compare each network's hashes against the golden network, show a collapsible scored list. Scoring uses hash comparison (exact match) per config area. Insert before `CoverageTab`.
+
+- [ ] **Step 1: Add `ScoreBar`, `NetworkScoreRow`, and `NetworkTemplateScoring` components**
+
+```js
 function ScoreBar({ pct }) {
   const color = pct >= 90 ? '#27ae60' : pct >= 60 ? '#e67e22' : '#e74c3c';
   return (
@@ -497,7 +389,7 @@ function NetworkScoreRow({ score, nameMap }) {
 
 function NetworkTemplateScoring({ accountId, orgId, template }) {
   const query = `SELECT latest(config_hash) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}' AND entity_type = 'network'
+                 WHERE org_id = '${nrqlEsc(orgId)}' AND entity_type = 'network'
                  FACET entity_id, config_area
                  SINCE 30 days ago LIMIT MAX`;
   return (
@@ -560,13 +452,33 @@ function NetworkTemplateScoring({ accountId, orgId, template }) {
     </WithNetworkNames>
   );
 }
+```
 
+- [ ] **Step 2: Commit**
+
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): add network template scoring panel"
+```
+
+---
+
+### Task 5: Device template scoring panel
+
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
+
+For device templates (gateway/switch/access_point): query all device snapshots matching the kind's `config_area` prefix, score each device's hashes against the golden device, group results by `network_id`. Insert before `CoverageTab`.
+
+- [ ] **Step 1: Add `DeviceScoreRow`, `NetworkDeviceGroup`, and `DeviceTemplateScoring` components**
+
+```js
 function DeviceScoreRow({ device }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ border: '1px solid rgba(128,128,128,0.15)', borderRadius: '4px', marginBottom: '6px', overflow: 'hidden' }}>
       <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', cursor: 'pointer' }}>
-        <span style={{ fontFamily: 'monospace', fontSize: '11px', opacity: 0.5 }}>{open ? '▼' : '▶'}</span>
         <span style={{ flex: 1, fontSize: '12px' }}>{device.name}</span>
         <span style={{ fontSize: '10px', opacity: 0.4, fontFamily: 'monospace' }}>{device.serial}</span>
         <div style={{ width: '130px' }}><ScoreBar pct={device.pct} /></div>
@@ -615,7 +527,7 @@ function DeviceTemplateScoring({ accountId, orgId, template }) {
   const prefix = KIND_META[template.kind] && KIND_META[template.kind].prefix;
   const query = prefix
     ? `SELECT latest(config_hash), latest(entity_name), latest(network_id) FROM MerakiConfigSnapshot
-       WHERE org_id = '${orgId}'
+       WHERE org_id = '${nrqlEsc(orgId)}'
          AND entity_type = 'device'
          AND config_area LIKE '${prefix}%'
        FACET entity_id, config_area
@@ -707,88 +619,28 @@ function DeviceTemplateScoring({ accountId, orgId, template }) {
     </WithNetworkNames>
   );
 }
+```
 
-function CoverageTab({ accountId, orgId }) {
-  const query = `SELECT latest(timestamp) FROM MerakiConfigSnapshot
-                 WHERE org_id = '${orgId}'
-                 FACET entity_id, config_area
-                 SINCE 30 days ago LIMIT MAX`;
-  return (
-    <WithNetworkNames accountId={accountId} orgId={orgId}>
-      {(nameMap) => {
-        const networkIds = new Set(Object.keys(nameMap));
-        return (
-          <NrqlQuery accountIds={[accountId]} query={query}>
-            {({ data, loading, error }) => {
-              if (loading) return <Spinner />;
-              if (error) return <p style={{ color: '#c0392b' }}>Failed to load coverage data.</p>;
+- [ ] **Step 2: Commit**
 
-              const now = Date.now();
-              const STALE_MS = 7 * 24 * 60 * 60 * 1000;
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): add device template scoring panel grouped by network"
+```
 
-              const matrix = {};
-              const allAreas = new Set();
-              (data || []).forEach(s => {
-                const fg = (s.metadata?.groups || []).filter(g => g.type === 'facet');
-                const entityId = fg[0]?.value;
-                const area = fg[1]?.value;
-                if (!entityId || !area || !networkIds.has(entityId)) return;
-                const ts = s.data?.[0]?.['latest.timestamp'] ?? s.data?.[0]?.['timestamp'] ?? null;
-                if (!matrix[entityId]) matrix[entityId] = {};
-                matrix[entityId][area] = ts ? Number(ts) : null;
-                allAreas.add(area);
-              });
+---
 
-              const areas = [...allAreas].sort();
-              const rows = Object.entries(matrix).map(([entityId, areaMap]) => {
-                const observed = areas.filter(a => areaMap[a] != null).length;
-                const pct = areas.length ? Math.round((observed / areas.length) * 100) : 0;
-                return { entityId, name: nameMap[entityId] || entityId, areaMap, pct };
-              }).sort((a, b) => b.pct - a.pct);
+### Task 6: Replace TemplatesTab and wire everything together
 
-              if (!rows.length) return <p style={{ opacity: 0.6 }}>No snapshot data found for this org.</p>;
+**Files:**
+- Modify: `nerdpack/nerdlets/config-app/components/CompareView.js`
 
-              return (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ borderCollapse: 'collapse', fontSize: '12px', width: '100%' }}>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: 'left', padding: '4px 8px 4px 0', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap', minWidth: '140px' }}>Network</th>
-                        <th style={{ textAlign: 'right', padding: '4px 12px 4px 4px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', whiteSpace: 'nowrap' }}>Coverage</th>
-                        {areas.map(a => (
-                          <th key={a} style={{ padding: '4px 3px', color: 'rgba(128,128,128,0.6)', fontWeight: 'normal', textAlign: 'center', fontSize: '11px', whiteSpace: 'nowrap' }}>{a}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map(({ entityId, name, areaMap, pct }) => (
-                        <tr key={entityId}>
-                          <td style={{ padding: '4px 8px 4px 0', whiteSpace: 'nowrap' }}>{name}</td>
-                          <td style={{ padding: '4px 12px 4px 4px', textAlign: 'right', fontWeight: 'bold', color: pctColor(pct) }}>{pct}%</td>
-                          {areas.map(a => (
-                            <td key={a} style={{ padding: '3px' }}>
-                              <div style={{ background: cellColor(areaMap[a], now, STALE_MS), borderRadius: '3px', width: '20px', height: '14px', margin: '0 auto' }} />
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div style={{ display: 'flex', gap: '14px', marginTop: '10px', fontSize: '11px', opacity: 0.5 }}>
-                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#27ae60', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />observed</span>
-                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: '#e67e22', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />stale (&gt;7d)</span>
-                    <span><span style={{ display: 'inline-block', width: '10px', height: '10px', background: 'rgba(128,128,128,0.12)', borderRadius: '2px', verticalAlign: 'middle', marginRight: '4px' }} />never observed</span>
-                  </div>
-                </div>
-              );
-            }}
-          </NrqlQuery>
-        );
-      }}
-    </WithNetworkNames>
-  );
-}
+Delete the entire existing `TemplatesTab` function (lines ~309–420) and replace with the wired-up version.
 
+- [ ] **Step 1: Replace `TemplatesTab` with the wired-up version**
+
+```js
 function TemplatesTab({ accountId, orgId }) {
   const { templates, loading, addTemplate, deleteTemplate } = useTemplates(accountId, orgId);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -847,38 +699,53 @@ function TemplatesTab({ accountId, orgId }) {
     </div>
   );
 }
+```
 
-// ── Main ────────────────────────────────────────────────────────────────────
+- [ ] **Step 2: Verify the build compiles**
 
-export default function CompareView({ accountId, orgId }) {
-  const [subTab, setSubTab] = useState('templates');
+```bash
+cd "/Users/jkarnik/Code/Topology Maps/nerdpack"
+nr1 nerdpack:build 2>&1 | tail -20
+```
 
-  const pillStyle = (key) => ({
-    padding: '5px 14px',
-    borderRadius: '20px',
-    border: subTab === key ? '1px solid #0078bf' : '1px solid rgba(128,128,128,0.3)',
-    background: subTab === key ? 'rgba(0,120,191,0.15)' : 'transparent',
-    color: subTab === key ? '#0078bf' : 'inherit',
-    cursor: 'pointer',
-    fontSize: '12px',
-  });
+Expected: build succeeds with no errors. If there are syntax errors, fix them and re-run.
 
-  if (!orgId) return <p style={{ opacity: 0.6 }}>Select an org to compare networks.</p>;
+- [ ] **Step 3: Commit**
 
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
-        <button style={pillStyle('templates')} onClick={() => setSubTab('templates')}>Golden Template Comparator</button>
-        <button style={pillStyle('coverage')} onClick={() => setSubTab('coverage')}>Coverage</button>
-      </div>
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "feat(nerdpack): wire TemplatesTab with multi-template list and scoring"
+```
 
-      {subTab === 'templates' && (
-        <TemplatesTab accountId={accountId} orgId={orgId} />
-      )}
+---
 
-      {subTab === 'coverage' && (
-        <CoverageTab accountId={accountId} orgId={orgId} />
-      )}
-    </div>
-  );
-}
+### Task 7: Smoke test
+
+- [ ] **Step 1: Serve the nerdpack locally**
+
+```bash
+cd "/Users/jkarnik/Code/Topology Maps/nerdpack"
+nr1 nerdpack:serve
+```
+
+Open the NR1 app (follow terminal URL). Navigate: Config App → Compare tab → Golden Template Comparator sub-tab.
+
+Verify:
+1. Left panel shows "0 templates" with a "+ Promote" button
+2. Clicking "+ Promote" opens the modal with a "Template type" dropdown
+3. Selecting "Site (Network)" shows only the network selector — no device picker
+4. Selecting "Switch" shows "Step 1 — Pick a network", then after picking a network shows "Step 2 — Pick a switch" with device list from NRQL
+5. Filling in a name and clicking "Save Template" adds the template to the list and auto-selects it
+6. Reloading the page shows the template persists (loaded from NerdStorage)
+7. A Site template shows the network scoring panel with collapsible rows
+8. A device template shows devices grouped by network
+9. Clicking ✕ on a template removes it and clears NerdStorage
+
+- [ ] **Step 2: Final commit if any fixes needed**
+
+```bash
+cd "/Users/jkarnik/Code/Topology Maps"
+git add nerdpack/nerdlets/config-app/components/CompareView.js
+git commit -m "fix(nerdpack): smoke test fixes for golden templates"
+```
