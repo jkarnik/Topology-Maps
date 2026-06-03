@@ -14,11 +14,6 @@ function pctColor(pct) {
   return '#e74c3c';
 }
 
-function scoreColor(pct) {
-  if (pct >= 80) return { bg: 'rgba(39,174,96,0.06)', border: 'rgba(39,174,96,0.2)', text: '#27ae60' };
-  if (pct >= 50) return { bg: 'rgba(230,126,34,0.06)', border: 'rgba(230,126,34,0.2)', text: '#e67e22' };
-  return { bg: 'rgba(231,76,60,0.06)', border: 'rgba(231,76,60,0.2)', text: '#e74c3c' };
-}
 
 function safeParse(str) {
   if (!str) return null;
