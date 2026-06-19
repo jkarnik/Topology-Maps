@@ -1,0 +1,2962 @@
+[
+    {
+        "alertTypeId": "vpn_connectivity_change",
+        "alertType": "VPN connectivity changed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.031928Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "VPN connectivity changed",
+            "alertTypeId": "vpn_connectivity_change",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "vpnType": "l2tpv3",
+                "vap": "1",
+                "onSecondary": false,
+                "secondaryEndpoint": "192.168.1.2",
+                "primaryEndpoint": "192.168.1.1",
+                "connectivity": "true",
+                "peerNetworkName": "Corp Access",
+                "peerNetworkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+                "peerNetworkId": "N_24329156"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "vrrp",
+        "alertType": "Failover event detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.034458Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Failover event detected",
+            "alertTypeId": "vrrp",
+            "alertLevel": "critical",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "oldIfUp": "0",
+                "oldMode": "detect",
+                "oldPrio": "75",
+                "electorState": "master",
+                "mode": "detect",
+                "prio": "75",
+                "ifUp": "1"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "critical_temperature",
+        "alertType": "Devices operating at critical temperature",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.036527Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Devices operating at critical temperature",
+            "alertTypeId": "critical_temperature",
+            "alertLevel": "critical",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "temperature": "Critical Level",
+                "action": "Manual shutdown recommended"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "amp_malware_blocked",
+        "alertType": "Malware download blocked",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.041468Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Malware download blocked",
+            "alertTypeId": "amp_malware_blocked",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_alert",
+        "alertType": "Sensor change detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.043805Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor change detected",
+            "alertTypeId": "sensor_alert",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "alertConfigId": "0000000000000000",
+                "alertConfigName": "My Alert Profile",
+                "triggerData": [
+                    {
+                        "conditionId": "0000000000000000",
+                        "trigger": {
+                            "ts": 1518365681,
+                            "type": "door",
+                            "nodeId": "0000000000000000",
+                            "sensorValue": 1.0
+                        }
+                    }
+                ],
+                "startedAlerting": true
+            },
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_alert_test",
+        "alertType": "Test notification",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.045960Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Test notification",
+            "alertTypeId": "sensor_alert_test",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "alertConfigId": "0000000000000000",
+                "alertConfigName": "My Alert Profile",
+                "triggerData": [
+                    {
+                        "conditionId": "0000000000000000",
+                        "trigger": {
+                            "ts": 1518365681,
+                            "type": "door",
+                            "nodeId": "0000000000000000",
+                            "sensorValue": 1.0
+                        }
+                    }
+                ],
+                "startedAlerting": true
+            },
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_automation",
+        "alertType": "Sensor automation action",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.046837Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor automation action",
+            "alertTypeId": "sensor_automation",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "automationId": "0000000000000000",
+                "conditionId": "0000000000000000",
+                "trigger": {
+                    "action": {
+                        "id": "0000000000000000",
+                        "type": null
+                    },
+                    "sensor": {
+                        "name": "My sensor",
+                        "serial": "Q234-ABCD-5678"
+                    },
+                    "metric": "button",
+                    "button": {
+                        "pressType": "short"
+                    },
+                    "ts": "2018-02-11T00:00:00Z"
+                },
+                "message": "This is an example payload for Automations."
+            },
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_automation_test",
+        "alertType": "Sensor automation action test",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.047891Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor automation action test",
+            "alertTypeId": "sensor_automation_test",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "automationId": "0000000000000000",
+                "automationName": "My automation",
+                "conditionId": "0000000000000000",
+                "trigger": {
+                    "action": {
+                        "id": "0000000000000000",
+                        "type": null
+                    },
+                    "sensor": {
+                        "name": "My sensor",
+                        "serial": "Q234-ABCD-5678"
+                    },
+                    "metric": "button",
+                    "button": {
+                        "pressType": "short"
+                    },
+                    "ts": "2018-02-11T00:00:00Z"
+                },
+                "message": "This is an example payload for Automations."
+            },
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_battery_cover_removed",
+        "alertType": "Sensor battery cover removed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.048717Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor battery cover removed",
+            "alertTypeId": "sensor_battery_cover_removed",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_battery_cover_replaced",
+        "alertType": "Sensor battery cover replaced",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.049316Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor battery cover replaced",
+            "alertTypeId": "sensor_battery_cover_replaced",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_battery_improved",
+        "alertType": "Sensor battery improved",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.050351Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor battery improved",
+            "alertTypeId": "sensor_battery_improved",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_battery_low",
+        "alertType": "Sensor battery low",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.050939Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor battery low",
+            "alertTypeId": "sensor_battery_low",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_magnetic_tampering_detected",
+        "alertType": "Sensor magnetic tampering detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.052080Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor magnetic tampering detected",
+            "alertTypeId": "sensor_magnetic_tampering_detected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_magnetic_tampering_reset",
+        "alertType": "Sensor magnetic tampering stopped",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.052912Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor magnetic tampering stopped",
+            "alertTypeId": "sensor_magnetic_tampering_reset",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_power_saving_schedule_failure_event",
+        "alertType": "Sensor power schedule failed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.053568Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor power schedule failed",
+            "alertTypeId": "sensor_power_saving_schedule_failure_event",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_power_saving_schedule_success_event",
+        "alertType": "Sensor power schedule succeeded",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.054332Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor power schedule succeeded",
+            "alertTypeId": "sensor_power_saving_schedule_success_event",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_probe_cable_disconnected",
+        "alertType": "Sensor probe cable disconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.055091Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor probe cable disconnected",
+            "alertTypeId": "sensor_probe_cable_disconnected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_probe_cable_reconnected",
+        "alertType": "Sensor probe cable reconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.055826Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor probe cable reconnected",
+            "alertTypeId": "sensor_probe_cable_reconnected",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_usb_power_cable_disconnected",
+        "alertType": "USB power cable was disconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.056434Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "USB power cable was disconnected",
+            "alertTypeId": "sensor_usb_power_cable_disconnected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_usb_power_cable_reconnected",
+        "alertType": "USB power cable was connected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.056956Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "USB power cable was connected",
+            "alertTypeId": "sensor_usb_power_cable_reconnected",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_water_cable_disconnected",
+        "alertType": "Sensor water cable disconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.060430Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor water cable disconnected",
+            "alertTypeId": "sensor_water_cable_disconnected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "sensor_water_cable_reconnected",
+        "alertType": "Sensor water cable reconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.061142Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My sensor",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MT",
+            "alertId": "0000000000000000",
+            "alertType": "Sensor water cable reconnected",
+            "alertTypeId": "sensor_water_cable_reconnected",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "settings_changed",
+        "alertType": "Settings changed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.062937Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Settings changed",
+            "alertTypeId": "settings_changed",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "name": "Routing and DHCP",
+                "url": "/manage/configure/switch_l3",
+                "changes": {
+                    "createStaticRoute": {
+                        "label": "Added static route on SP-Warehouse",
+                        "newText": "10.10.10.0/24 -> 172.16.254.253",
+                        "changedBy": "miles@meraki.com",
+                        "oldText": "",
+                        "ssidId": "My SSID"
+                    }
+                },
+                "userId": "0000000000000000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "started_reporting",
+        "alertType": "APs came up",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.064415Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "APs came up",
+            "alertTypeId": "started_reporting",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "stopped_reporting",
+        "alertType": "APs went down",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.065397Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "APs went down",
+            "alertTypeId": "stopped_reporting",
+            "alertLevel": "critical",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "udld_error",
+        "alertType": "UDLD error",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.066088Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "UDLD error",
+            "alertTypeId": "udld_error",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "errorType": "Unidirectional link (outbound fault)",
+                "action": "none",
+                "port": {
+                    "port": 52,
+                    "moduleSlot": 0,
+                    "modulePid": ""
+                }
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "unreachable_radius_server",
+        "alertType": "RADIUS authentication server unreachable",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.067069Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "RADIUS authentication server unreachable",
+            "alertTypeId": "unreachable_radius_server",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "shardId": "207",
+                "isSpare": true,
+                "machineIp": "192.168.1.2",
+                "ssid": "My SSID",
+                "srvIp": "server.example.com",
+                "port": "1812"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "uplink_ip6_conflict",
+        "alertType": "Uplink IPv6 duplicate address detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.068006Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Uplink IPv6 duplicate address detected",
+            "alertTypeId": "uplink_ip6_conflict",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "conflictingIp": "192.168.1.2",
+                "contendingMac": "00:11:22:33:44:55"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "usage_alert",
+        "alertType": "Network usage alert",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.068762Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Network usage alert",
+            "alertTypeId": "usage_alert",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "usageThreshold": "104857600",
+                "kbTotal": "115892215",
+                "period": "1200"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "analyzed_app_network_insight_performance_alert",
+        "alertType": "Translation missing: en.alerts.analyzed_app_network_insight_performance_alert",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.072889Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Translation missing: en.alerts.analyzed_app_network_insight_performance_alert",
+            "alertTypeId": "analyzed_app_network_insight_performance_alert",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "ip6_conflict",
+        "alertType": "IPv6 duplicate address detected on WAN uplinks",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.074199Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "IPv6 duplicate address detected on WAN uplinks",
+            "alertTypeId": "ip6_conflict",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "conflictingIp": "fe80:0:0:0:1430:aac1:6826:75ab",
+                "contendingMac": "00:11:22:33:44:55"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "ip_conflict",
+        "alertType": "Client IP conflict detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.074830Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Client IP conflict detected",
+            "alertTypeId": "ip_conflict",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "conflictingIp": "192.168.1.2",
+                "contendingMac": "00:11:22:33:44:55"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "mi_alert",
+        "alertType": "Insight Alert",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.075376Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Insight Alert",
+            "alertTypeId": "mi_alert",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "motion_alert",
+        "alertType": "Motion detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.076083Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My camera",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MV",
+            "alertId": "0000000000000000",
+            "alertType": "Motion detected",
+            "alertTypeId": "motion_alert",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "imageUrl": "https://XXXXXXXXXXXXXXXXXXXXXXXXXXX.jpg",
+                "timestamp": 1563499479.547,
+                "motionRecapEnabled": true,
+                "motionDetectorAllowsRecap": true,
+                "isSpyglass": false,
+                "imageEnabled": true
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "new_splash_signup",
+        "alertType": "New splash user registered",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.076943Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "New splash user registered",
+            "alertTypeId": "new_splash_signup",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "userEmail": "miles@meraki.com",
+                "userName": "milesmeraki",
+                "ssidId": "My SSID"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "node_hardware_failure",
+        "alertType": "Camera may have critical hardware failure",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.077625Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My camera",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MV",
+            "alertId": "0000000000000000",
+            "alertType": "Camera may have critical hardware failure",
+            "alertTypeId": "node_hardware_failure",
+            "alertLevel": "critical",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_enrollment",
+        "alertType": "Clients have enrolled in one of your networks",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.078440Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Clients have enrolled in one of your networks",
+            "alertTypeId": "pcc_enrollment",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "deviceId": "0000000000000000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_expired_apns_cert",
+        "alertType": "MDM certificate will expire soon",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.079193Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "MDM certificate will expire soon",
+            "alertTypeId": "pcc_expired_apns_cert",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "expiry": "2018-02-11T00:00:00Z",
+                "networkId": "1254235",
+                "topic": "com.apple.mgmt.External.e9908a35-405d-4b25-b513-fa55431d1374"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_outage_begin",
+        "alertType": "Clients went down",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.079784Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Clients went down",
+            "alertTypeId": "pcc_outage_begin",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_outage_end",
+        "alertType": "Clients came up",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.080380Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Clients came up",
+            "alertTypeId": "pcc_outage_end",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_security_compliance",
+        "alertType": "Clients are compliant with their security policy",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.081094Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Clients are compliant with their security policy",
+            "alertTypeId": "pcc_security_compliance",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "pccSecurityPolicyId": "0000000000000000",
+                "pccSecurityAlertConfigId": "0000000000000000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_security_violation",
+        "alertType": "Clients are violating their security policy",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.081856Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Clients are violating their security policy",
+            "alertTypeId": "pcc_security_violation",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "pccSecurityPolicyId": "0000000000000000",
+                "pccSecurityAlertConfigId": "0000000000000000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_sw_found",
+        "alertType": "Matching software installations found",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.082636Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Matching software installations found",
+            "alertTypeId": "pcc_sw_found",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "swFoundRegex": ".*",
+                "installs": [
+                    {
+                        "swName": "TrackAbout",
+                        "swVendor": "iTunes Store",
+                        "pccName": "Miles Meraki iPhone",
+                        "swVersion": "7.313.132",
+                        "swInstallDate": "2019-07-17"
+                    }
+                ]
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "pcc_unmanaged",
+        "alertType": "Meraki Management profile removed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.083384Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Meraki Management profile removed",
+            "alertTypeId": "pcc_unmanaged",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "pccName": "iPhone",
+                "wifiMac": "00:11:22:33:44:55",
+                "serialNumber": "F5XKHEBX"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "port_cable_error",
+        "alertType": "Cable error detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.084110Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Cable error detected",
+            "alertTypeId": "port_cable_error",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "portNum": 3,
+                "description": "Gigabit link negotiation failed",
+                "status": "10 Gbps",
+                "prevStatus": "100 Gbps",
+                "portDesc": "Corp Access"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "port_connected",
+        "alertType": "Switch port connected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.084826Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Switch port connected",
+            "alertTypeId": "port_connected",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "portNum": 3,
+                "description": "Switch port is up at 10 Gbps",
+                "status": "10 Gbps",
+                "prevStatus": "down",
+                "portDesc": "Corp Access"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "port_disconnected",
+        "alertType": "Switch port disconnected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.085582Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Switch port disconnected",
+            "alertTypeId": "port_disconnected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "portNum": 3,
+                "description": "Switch port is down",
+                "status": "down",
+                "prevStatus": "100 Gbps",
+                "portDesc": "Corp Access"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "port_speed_change",
+        "alertType": "Switch port link speed changed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.086322Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Switch port link speed changed",
+            "alertTypeId": "port_speed_change",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "portNum": 3,
+                "description": "10 Gbps to 100 Gbps",
+                "status": "100 Gbps",
+                "prevStatus": "10 Gbps",
+                "portDesc": "Corp Access"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "power_supply_down",
+        "alertType": "Power supply went down",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.086892Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Power supply went down",
+            "alertTypeId": "power_supply_down",
+            "alertLevel": "critical",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "num": 2
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "power_supply_up",
+        "alertType": "Power supply came up",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.087429Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Power supply came up",
+            "alertTypeId": "power_supply_up",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "num": 2
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "prefix_starvation",
+        "alertType": "VLAN prefix shortage detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.088294Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "VLAN prefix shortage detected",
+            "alertTypeId": "prefix_starvation",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "vlan": 100,
+                "pvdId": "wan0_id",
+                "contendingMac": "00:11:22:33:44:55",
+                "occurredAt": "Feb 11, 2018"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "rogue_ap_association",
+        "alertType": "Client connected to another network",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.088917Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Client connected to another network",
+            "alertTypeId": "rogue_ap_association",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "mac": "00:11:22:33:44:55",
+                "foreignBssid": "E2:55:7D:26:09:C0"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "rogue_dhcp",
+        "alertType": "Rogue DHCP server detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.089558Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Rogue DHCP server detected",
+            "alertTypeId": "rogue_dhcp",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "eth": "bb:bb:bb:11:11:11",
+                "ip": "10.20.2.62",
+                "subnet": "0.0.0.0/0",
+                "vlan": "3"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "rps_backup",
+        "alertType": "Running on backup power",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.090353Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Running on backup power",
+            "alertTypeId": "rps_backup",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "num": 0
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "rps_base_supply_up",
+        "alertType": "Returned to using primary power",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.091117Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Returned to using primary power",
+            "alertTypeId": "rps_base_supply_up",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "num": 0
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "amp_malware_detected",
+        "alertType": "Malware download detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.091885Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Malware download detected",
+            "alertTypeId": "amp_malware_detected",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "eventType": "amp_malware_detected",
+                "sha256": "ddcb8f357d86d11dfa3409f71a966e5076240445ca9825fb72e7386efc5582e4",
+                "disposition": 3
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "bluetooth_in",
+        "alertType": "Bluetooth Clients have become visible",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.092568Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Bluetooth Clients have become visible",
+            "alertTypeId": "bluetooth_in",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "mac": "00:11:22:33:44:55",
+                "name": "",
+                "rowStartedAt": {
+                    "millisFromEpoch": 1563208308228
+                },
+                "bluetoothClientId": "0000000000000000",
+                "rssi": -94,
+                "seenAt": {
+                    "millisFromEpoch": 1563519260925
+                }
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "bluetooth_out",
+        "alertType": "Bluetooth Clients have gone out of range",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.093386Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Bluetooth Clients have gone out of range",
+            "alertTypeId": "bluetooth_out",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "mac": "00:11:22:33:44:55",
+                "name": "",
+                "rowStartedAt": {
+                    "millisFromEpoch": 1563208308228
+                },
+                "bluetoothClientId": "0000000000000000",
+                "rssi": -94,
+                "seenAt": {
+                    "millisFromEpoch": 1563519260925
+                }
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "cellular_down",
+        "alertType": "Cellular went down",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.094325Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Cellular went down",
+            "alertTypeId": "cellular_down",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "bytesIn": "1861",
+                "bytesOut": "1880",
+                "connectTime": "2",
+                "provider": "Purview Wireless",
+                "model": "UML290VW",
+                "local": "192.168.1.2",
+                "remote": "1.2.3.5",
+                "connection": "LTE"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "cellular_up",
+        "alertType": "Cellular came up",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.096131Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Cellular came up",
+            "alertTypeId": "cellular_up",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "provider": "Purview Wireless",
+                "model": "UML290VW",
+                "local": "192.168.1.2",
+                "remote": "1.2.3.5",
+                "connection": "LTE"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "client_connectivity",
+        "alertType": "Client connectivity changed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.105591Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Client connectivity changed",
+            "alertTypeId": "client_connectivity",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "mac": "00:11:22:33:44:55",
+                "ip": "192.168.1.2",
+                "connected": "true",
+                "clientName": "Cisco Meraki valued client",
+                "clientUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "cloud_archive_alert",
+        "alertType": "Potential Cloud Archive Issue",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.106367Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My camera",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MV",
+            "alertId": "0000000000000000",
+            "alertType": "Potential Cloud Archive Issue",
+            "alertTypeId": "cloud_archive_alert",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "dhcp6na_renumber",
+        "alertType": "DHCPv6-NA renumber detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.107126Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "DHCPv6-NA renumber detected",
+            "alertTypeId": "dhcp6na_renumber",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "dhcp6pd_renumber",
+        "alertType": "DHCPv6-PD renumber detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.107874Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "DHCPv6-PD renumber detected",
+            "alertTypeId": "dhcp6pd_renumber",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "dhcp_alerts",
+        "alertType": "New DHCP server detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.108717Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "New DHCP server detected",
+            "alertTypeId": "dhcp_alerts",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "mac": "00:11:22:33:44:55",
+                "ip": "192.168.1.2",
+                "vlan": "104",
+                "subnet": "192.168.1.0/24"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "dhcp_no_leases",
+        "alertType": "DHCP leases exhausted",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.109557Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "DHCP leases exhausted",
+            "alertTypeId": "dhcp_no_leases",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "network": "192.168.1.0/24'192.168.1.254"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "failover_event",
+        "alertType": "Uplink status changed",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.110415Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My switch",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MS",
+            "alertId": "0000000000000000",
+            "alertType": "Uplink status changed",
+            "alertTypeId": "failover_event",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "uplink": "0"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "firewall_test_failed",
+        "alertType": "Unreachable devices detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.111192Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My appliance",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MX",
+            "alertId": "0000000000000000",
+            "alertType": "Unreachable devices detected",
+            "alertTypeId": "firewall_test_failed",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "failingNodes": "Inside AP\nRecycle Shed AP"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "gateway_to_repeater",
+        "alertType": "Gateway to repeater",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.112047Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Gateway to repeater",
+            "alertTypeId": "gateway_to_repeater",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "geofencing_in",
+        "alertType": "Clients have re-entered their geofenced area",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.112609Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Clients have re-entered their geofenced area",
+            "alertTypeId": "geofencing_in",
+            "alertLevel": "informational",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "geofencing_out",
+        "alertType": "Clients have violated their geofencing policy",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.113232Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Clients have violated their geofencing policy",
+            "alertTypeId": "geofencing_out",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {},
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "foreign_ap",
+        "alertType": "Air Marshal - Rogue AP detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.114675Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "",
+            "deviceMac": "",
+            "deviceName": "",
+            "deviceUrl": "",
+            "deviceTags": [],
+            "deviceModel": "",
+            "alertId": "0000000000000000",
+            "alertType": "Air Marshal - Rogue AP detected",
+            "alertTypeId": "foreign_ap",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "minFirstSeen": 0,
+                "maxLastSeen": 10,
+                "ssidName": "My SSID"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    },
+    {
+        "alertTypeId": "rogue_ap",
+        "alertType": "Rogue AP detected",
+        "example": {
+            "version": "0.1",
+            "sharedSecret": "secret",
+            "sentAt": "2026-06-11T10:35:50.115327Z",
+            "organizationId": "2930418",
+            "organizationName": "My organization",
+            "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+            "networkId": "N_24329156",
+            "networkName": "Main Office",
+            "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+            "networkTags": [],
+            "deviceSerial": "Q234-ABCD-5678",
+            "deviceMac": "00:11:22:33:44:55",
+            "deviceName": "My access point",
+            "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+            "deviceTags": [
+                "tag1",
+                "tag2"
+            ],
+            "deviceModel": "MR",
+            "alertId": "0000000000000000",
+            "alertType": "Rogue AP detected",
+            "alertTypeId": "rogue_ap",
+            "alertLevel": "warning",
+            "occurredAt": "2018-02-11T00:00:00.123450Z",
+            "alertData": {
+                "rssi": "1126462856796059000"
+            },
+            "enrollmentString": "my-enrollment-string",
+            "notes": "Additional description of the network",
+            "productTypes": [
+                "appliance",
+                "switch",
+                "wireless"
+            ],
+            "encryptedId": "6GREra"
+        }
+    }
+]

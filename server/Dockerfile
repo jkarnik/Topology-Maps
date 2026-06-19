@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r server/requirements.txt -r collector/requireme
 
 EXPOSE 8000
 
-CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["newrelic-admin", "run-program", "uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,1555 @@
+{
+  "type": "api",
+  "title": "Get Organization Webhooks Alert Types",
+  "meta": {
+    "id": "/apps/pubhub/media/Meraki-Dashboard-API-v1-Documentation/330196e2f4f355017f9042dd85a1845ee664b552/5c63a5d4-9452-397a-85eb-8b6fec45147e",
+    "info": {
+      "title": "Meraki Dashboard API",
+      "description": "A RESTful API to programmatically manage and monitor Cisco Meraki networks at scale.\n\n> Date: 03 June, 2026\n>\n> [Recent Updates](https://meraki.io/whats-new/)\n\n---\n\n[API Documentation](https://meraki.io/api)\n\n[Community Support](https://meraki.io/community)\n\n[Meraki Homepage](https://www.meraki.com)\n",
+      "contact": {
+        "name": "Meraki Developer Community",
+        "url": "https://meraki.io/community"
+      },
+      "version": "1.71.0"
+    },
+    "security": [
+      {
+        "meraki_api_key": []
+      },
+      {
+        "bearerAuth": []
+      }
+    ],
+    "tags": [
+      {
+        "name": "organizations"
+      },
+      {
+        "name": "networks"
+      },
+      {
+        "name": "devices"
+      },
+      {
+        "name": "insight"
+      },
+      {
+        "name": "wireless"
+      },
+      {
+        "name": "camera"
+      },
+      {
+        "name": "appliance"
+      },
+      {
+        "name": "switch"
+      },
+      {
+        "name": "cellularGateway"
+      },
+      {
+        "name": "sm"
+      },
+      {
+        "name": "sensor"
+      },
+      {
+        "name": "administered"
+      },
+      {
+        "name": "campusGateway"
+      },
+      {
+        "name": "wirelessController"
+      },
+      {
+        "name": "spaces"
+      },
+      {
+        "name": "accessControlLists"
+      },
+      {
+        "name": "accessPolicies"
+      },
+      {
+        "name": "account"
+      },
+      {
+        "name": "accounts"
+      },
+      {
+        "name": "acls"
+      },
+      {
+        "name": "actionBatches"
+      },
+      {
+        "name": "adaptivePolicy"
+      },
+      {
+        "name": "adaptivePolicyGroups"
+      },
+      {
+        "name": "addresses"
+      },
+      {
+        "name": "admins"
+      },
+      {
+        "name": "airMarshal"
+      },
+      {
+        "name": "alertTypes"
+      },
+      {
+        "name": "alerts"
+      },
+      {
+        "name": "allowlist"
+      },
+      {
+        "name": "alternateManagementInterface"
+      },
+      {
+        "name": "analytics"
+      },
+      {
+        "name": "api"
+      },
+      {
+        "name": "apiRequests"
+      },
+      {
+        "name": "apnsCert"
+      },
+      {
+        "name": "appliances"
+      },
+      {
+        "name": "applicationCategories"
+      },
+      {
+        "name": "applicationUsage"
+      },
+      {
+        "name": "applications"
+      },
+      {
+        "name": "areas"
+      },
+      {
+        "name": "arpInspection"
+      },
+      {
+        "name": "arpTable"
+      },
+      {
+        "name": "artifacts"
+      },
+      {
+        "name": "assets"
+      },
+      {
+        "name": "assignments"
+      },
+      {
+        "name": "authenticationToken"
+      },
+      {
+        "name": "authorities"
+      },
+      {
+        "name": "autoLocate"
+      },
+      {
+        "name": "autoRf"
+      },
+      {
+        "name": "availabilities"
+      },
+      {
+        "name": "bands"
+      },
+      {
+        "name": "bandwidthUsageHistory"
+      },
+      {
+        "name": "bgp"
+      },
+      {
+        "name": "billing"
+      },
+      {
+        "name": "blink"
+      },
+      {
+        "name": "bluetooth"
+      },
+      {
+        "name": "bluetoothClients"
+      },
+      {
+        "name": "bonjourForwarding"
+      },
+      {
+        "name": "boundaries"
+      },
+      {
+        "name": "brandingPolicies"
+      },
+      {
+        "name": "bulk"
+      },
+      {
+        "name": "bulkCreate"
+      },
+      {
+        "name": "bulkDelete"
+      },
+      {
+        "name": "bulkUpdate"
+      },
+      {
+        "name": "byBoundary"
+      },
+      {
+        "name": "byClient"
+      },
+      {
+        "name": "byDevice"
+      },
+      {
+        "name": "byEnergyUsage"
+      },
+      {
+        "name": "byInterval"
+      },
+      {
+        "name": "byMetric"
+      },
+      {
+        "name": "byModel"
+      },
+      {
+        "name": "byNetwork"
+      },
+      {
+        "name": "byPipeline"
+      },
+      {
+        "name": "bySite"
+      },
+      {
+        "name": "byStatus"
+      },
+      {
+        "name": "bySwitch"
+      },
+      {
+        "name": "byType"
+      },
+      {
+        "name": "byUsage"
+      },
+      {
+        "name": "byUtilization"
+      },
+      {
+        "name": "byVlan"
+      },
+      {
+        "name": "bypassActivationLockAttempts"
+      },
+      {
+        "name": "cableTest"
+      },
+      {
+        "name": "callbacks"
+      },
+      {
+        "name": "captures"
+      },
+      {
+        "name": "categories"
+      },
+      {
+        "name": "cellular"
+      },
+      {
+        "name": "cellularFirewallRules"
+      },
+      {
+        "name": "cellularUsageHistory"
+      },
+      {
+        "name": "certificates"
+      },
+      {
+        "name": "certs"
+      },
+      {
+        "name": "changeHistory"
+      },
+      {
+        "name": "channelUtilization"
+      },
+      {
+        "name": "channelUtilizationHistory"
+      },
+      {
+        "name": "channels"
+      },
+      {
+        "name": "claim"
+      },
+      {
+        "name": "claimKey"
+      },
+      {
+        "name": "clientCountHistory"
+      },
+      {
+        "name": "clients"
+      },
+      {
+        "name": "clusters"
+      },
+      {
+        "name": "commands"
+      },
+      {
+        "name": "communicationPlans"
+      },
+      {
+        "name": "compliance"
+      },
+      {
+        "name": "configTemplates"
+      },
+      {
+        "name": "configurationChanges"
+      },
+      {
+        "name": "configure"
+      },
+      {
+        "name": "configuredDevices"
+      },
+      {
+        "name": "connectionStats"
+      },
+      {
+        "name": "connections"
+      },
+      {
+        "name": "connectivity"
+      },
+      {
+        "name": "connectivityEvents"
+      },
+      {
+        "name": "connectivityMonitoringDestinations"
+      },
+      {
+        "name": "connectors"
+      },
+      {
+        "name": "contentFiltering"
+      },
+      {
+        "name": "controller"
+      },
+      {
+        "name": "coterm"
+      },
+      {
+        "name": "cpu"
+      },
+      {
+        "name": "crls"
+      },
+      {
+        "name": "current"
+      },
+      {
+        "name": "customAnalytics"
+      },
+      {
+        "name": "customPerformanceClasses"
+      },
+      {
+        "name": "cycle"
+      },
+      {
+        "name": "data"
+      },
+      {
+        "name": "dataRateHistory"
+      },
+      {
+        "name": "delegated"
+      },
+      {
+        "name": "deltas"
+      },
+      {
+        "name": "deployable"
+      },
+      {
+        "name": "deployed"
+      },
+      {
+        "name": "deployments"
+      },
+      {
+        "name": "desktopLogs"
+      },
+      {
+        "name": "details"
+      },
+      {
+        "name": "detections"
+      },
+      {
+        "name": "deviceCommandLogs"
+      },
+      {
+        "name": "deviceProfiles"
+      },
+      {
+        "name": "deviceTypeGroupPolicies"
+      },
+      {
+        "name": "dhcp"
+      },
+      {
+        "name": "dhcpServerPolicy"
+      },
+      {
+        "name": "discovery"
+      },
+      {
+        "name": "disenrollments"
+      },
+      {
+        "name": "dns"
+      },
+      {
+        "name": "domains"
+      },
+      {
+        "name": "doorLocks"
+      },
+      {
+        "name": "downloadUrl"
+      },
+      {
+        "name": "dscpTaggingOptions"
+      },
+      {
+        "name": "dscpToCosMappings"
+      },
+      {
+        "name": "eapOverride"
+      },
+      {
+        "name": "earlyAccess"
+      },
+      {
+        "name": "electronicShelfLabel"
+      },
+      {
+        "name": "eligible"
+      },
+      {
+        "name": "enrollments"
+      },
+      {
+        "name": "entitlements"
+      },
+      {
+        "name": "entries"
+      },
+      {
+        "name": "eox"
+      },
+      {
+        "name": "esims"
+      },
+      {
+        "name": "ethernet"
+      },
+      {
+        "name": "eventTypes"
+      },
+      {
+        "name": "events"
+      },
+      {
+        "name": "failedConnections"
+      },
+      {
+        "name": "failover"
+      },
+      {
+        "name": "features"
+      },
+      {
+        "name": "fields"
+      },
+      {
+        "name": "firewall"
+      },
+      {
+        "name": "firewalledServices"
+      },
+      {
+        "name": "firmware"
+      },
+      {
+        "name": "firmwareUpgrades"
+      },
+      {
+        "name": "floorPlans"
+      },
+      {
+        "name": "gateways"
+      },
+      {
+        "name": "geolocations"
+      },
+      {
+        "name": "global"
+      },
+      {
+        "name": "group"
+      },
+      {
+        "name": "groupPolicies"
+      },
+      {
+        "name": "groups"
+      },
+      {
+        "name": "health"
+      },
+      {
+        "name": "healthByTime"
+      },
+      {
+        "name": "historical"
+      },
+      {
+        "name": "history"
+      },
+      {
+        "name": "hotspot20"
+      },
+      {
+        "name": "httpServers"
+      },
+      {
+        "name": "identities"
+      },
+      {
+        "name": "identityPsks"
+      },
+      {
+        "name": "idps"
+      },
+      {
+        "name": "inboundCellularFirewallRules"
+      },
+      {
+        "name": "inboundFirewallRules"
+      },
+      {
+        "name": "integrate"
+      },
+      {
+        "name": "integration"
+      },
+      {
+        "name": "integrations"
+      },
+      {
+        "name": "interfaces"
+      },
+      {
+        "name": "internetPolicies"
+      },
+      {
+        "name": "intrusion"
+      },
+      {
+        "name": "inventory"
+      },
+      {
+        "name": "ipsec"
+      },
+      {
+        "name": "ipv6"
+      },
+      {
+        "name": "isolation"
+      },
+      {
+        "name": "jobs"
+      },
+      {
+        "name": "keys"
+      },
+      {
+        "name": "l2"
+      },
+      {
+        "name": "l3"
+      },
+      {
+        "name": "l3FirewallRules"
+      },
+      {
+        "name": "l7FirewallRules"
+      },
+      {
+        "name": "lan"
+      },
+      {
+        "name": "latencyHistory"
+      },
+      {
+        "name": "latencyStats"
+      },
+      {
+        "name": "latest"
+      },
+      {
+        "name": "leds"
+      },
+      {
+        "name": "licenses"
+      },
+      {
+        "name": "licensing"
+      },
+      {
+        "name": "lines"
+      },
+      {
+        "name": "linkAggregations"
+      },
+      {
+        "name": "linkLayer"
+      },
+      {
+        "name": "live"
+      },
+      {
+        "name": "liveTools"
+      },
+      {
+        "name": "lldpCdp"
+      },
+      {
+        "name": "load"
+      },
+      {
+        "name": "local"
+      },
+      {
+        "name": "localOverrides"
+      },
+      {
+        "name": "location"
+      },
+      {
+        "name": "loginSecurity"
+      },
+      {
+        "name": "logs"
+      },
+      {
+        "name": "lookups"
+      },
+      {
+        "name": "lossAndLatencyHistory"
+      },
+      {
+        "name": "macTable"
+      },
+      {
+        "name": "malware"
+      },
+      {
+        "name": "managementInterface"
+      },
+      {
+        "name": "manufacturers"
+      },
+      {
+        "name": "masks"
+      },
+      {
+        "name": "me"
+      },
+      {
+        "name": "memory"
+      },
+      {
+        "name": "merakiAuthUsers"
+      },
+      {
+        "name": "meshStatuses"
+      },
+      {
+        "name": "migrations"
+      },
+      {
+        "name": "mode"
+      },
+      {
+        "name": "models"
+      },
+      {
+        "name": "monitor"
+      },
+      {
+        "name": "monitoredMediaServers"
+      },
+      {
+        "name": "moves"
+      },
+      {
+        "name": "mqtt"
+      },
+      {
+        "name": "mqttBrokers"
+      },
+      {
+        "name": "mtu"
+      },
+      {
+        "name": "multicast"
+      },
+      {
+        "name": "multicastForwarding"
+      },
+      {
+        "name": "multicastRouting"
+      },
+      {
+        "name": "nat"
+      },
+      {
+        "name": "netflow"
+      },
+      {
+        "name": "networkAdapters"
+      },
+      {
+        "name": "networkHealth"
+      },
+      {
+        "name": "objectDetectionModels"
+      },
+      {
+        "name": "onboarding"
+      },
+      {
+        "name": "oneToManyNatRules"
+      },
+      {
+        "name": "oneToOneNatRules"
+      },
+      {
+        "name": "openRoaming"
+      },
+      {
+        "name": "openapiSpec"
+      },
+      {
+        "name": "optIns"
+      },
+      {
+        "name": "order"
+      },
+      {
+        "name": "orders"
+      },
+      {
+        "name": "ospf"
+      },
+      {
+        "name": "overview"
+      },
+      {
+        "name": "overviews"
+      },
+      {
+        "name": "packetCapture"
+      },
+      {
+        "name": "packetLoss"
+      },
+      {
+        "name": "packets"
+      },
+      {
+        "name": "payloadTemplates"
+      },
+      {
+        "name": "peers"
+      },
+      {
+        "name": "performance"
+      },
+      {
+        "name": "performanceHistory"
+      },
+      {
+        "name": "permissions"
+      },
+      {
+        "name": "pii"
+      },
+      {
+        "name": "piiKeys"
+      },
+      {
+        "name": "ping"
+      },
+      {
+        "name": "pingDevice"
+      },
+      {
+        "name": "pipelines"
+      },
+      {
+        "name": "policies"
+      },
+      {
+        "name": "policy"
+      },
+      {
+        "name": "policyObjects"
+      },
+      {
+        "name": "portForwardingRules"
+      },
+      {
+        "name": "portSchedules"
+      },
+      {
+        "name": "ports"
+      },
+      {
+        "name": "power"
+      },
+      {
+        "name": "powerModules"
+      },
+      {
+        "name": "prefixes"
+      },
+      {
+        "name": "priorities"
+      },
+      {
+        "name": "profiles"
+      },
+      {
+        "name": "provisioning"
+      },
+      {
+        "name": "qosRules"
+      },
+      {
+        "name": "qualityAndRetention"
+      },
+      {
+        "name": "qualityRetentionProfiles"
+      },
+      {
+        "name": "radio"
+      },
+      {
+        "name": "radsec"
+      },
+      {
+        "name": "ratePlans"
+      },
+      {
+        "name": "readings"
+      },
+      {
+        "name": "receivers"
+      },
+      {
+        "name": "recent"
+      },
+      {
+        "name": "records"
+      },
+      {
+        "name": "redundancy"
+      },
+      {
+        "name": "regions"
+      },
+      {
+        "name": "relationships"
+      },
+      {
+        "name": "rendezvousPoints"
+      },
+      {
+        "name": "requests"
+      },
+      {
+        "name": "responseCodes"
+      },
+      {
+        "name": "rest"
+      },
+      {
+        "name": "restrictions"
+      },
+      {
+        "name": "rfProfiles"
+      },
+      {
+        "name": "roles"
+      },
+      {
+        "name": "rollbacks"
+      },
+      {
+        "name": "routing"
+      },
+      {
+        "name": "routingTable"
+      },
+      {
+        "name": "rrm"
+      },
+      {
+        "name": "rules"
+      },
+      {
+        "name": "rulesets"
+      },
+      {
+        "name": "saml"
+      },
+      {
+        "name": "samlRoles"
+      },
+      {
+        "name": "sase"
+      },
+      {
+        "name": "scanning"
+      },
+      {
+        "name": "schedules"
+      },
+      {
+        "name": "sdwan"
+      },
+      {
+        "name": "search"
+      },
+      {
+        "name": "security"
+      },
+      {
+        "name": "securityCenters"
+      },
+      {
+        "name": "seen"
+      },
+      {
+        "name": "sense"
+      },
+      {
+        "name": "sentry"
+      },
+      {
+        "name": "servers"
+      },
+      {
+        "name": "serviceProviders"
+      },
+      {
+        "name": "settings"
+      },
+      {
+        "name": "signalQualityHistory"
+      },
+      {
+        "name": "sims"
+      },
+      {
+        "name": "singleLan"
+      },
+      {
+        "name": "siteToSite"
+      },
+      {
+        "name": "siteToSiteVpn"
+      },
+      {
+        "name": "sites"
+      },
+      {
+        "name": "slas"
+      },
+      {
+        "name": "smDevicesForKey"
+      },
+      {
+        "name": "smOwnersForKey"
+      },
+      {
+        "name": "snmp"
+      },
+      {
+        "name": "softwares"
+      },
+      {
+        "name": "splash"
+      },
+      {
+        "name": "splashAuthorizationStatus"
+      },
+      {
+        "name": "splashLoginAttempts"
+      },
+      {
+        "name": "split"
+      },
+      {
+        "name": "ssids"
+      },
+      {
+        "name": "stacks"
+      },
+      {
+        "name": "staged"
+      },
+      {
+        "name": "stages"
+      },
+      {
+        "name": "staticRoutes"
+      },
+      {
+        "name": "statics"
+      },
+      {
+        "name": "stats"
+      },
+      {
+        "name": "status"
+      },
+      {
+        "name": "statuses"
+      },
+      {
+        "name": "stormControl"
+      },
+      {
+        "name": "stp"
+      },
+      {
+        "name": "subnetPool"
+      },
+      {
+        "name": "subnets"
+      },
+      {
+        "name": "subscription"
+      },
+      {
+        "name": "subscriptions"
+      },
+      {
+        "name": "summaries"
+      },
+      {
+        "name": "summary"
+      },
+      {
+        "name": "swap"
+      },
+      {
+        "name": "swaps"
+      },
+      {
+        "name": "switches"
+      },
+      {
+        "name": "syslogServers"
+      },
+      {
+        "name": "system"
+      },
+      {
+        "name": "targetGroups"
+      },
+      {
+        "name": "taxonomy"
+      },
+      {
+        "name": "themes"
+      },
+      {
+        "name": "thirdPartyVPNPeers"
+      },
+      {
+        "name": "throughputTest"
+      },
+      {
+        "name": "top"
+      },
+      {
+        "name": "topology"
+      },
+      {
+        "name": "towers"
+      },
+      {
+        "name": "traffic"
+      },
+      {
+        "name": "trafficAnalysis"
+      },
+      {
+        "name": "trafficHistory"
+      },
+      {
+        "name": "trafficShaping"
+      },
+      {
+        "name": "transceivers"
+      },
+      {
+        "name": "trustedAccessConfigs"
+      },
+      {
+        "name": "trustedServers"
+      },
+      {
+        "name": "types"
+      },
+      {
+        "name": "umbrella"
+      },
+      {
+        "name": "update"
+      },
+      {
+        "name": "upgrades"
+      },
+      {
+        "name": "uplink"
+      },
+      {
+        "name": "uplinkBandwidth"
+      },
+      {
+        "name": "uplinkSelection"
+      },
+      {
+        "name": "uplinks"
+      },
+      {
+        "name": "uplinksLossAndLatency"
+      },
+      {
+        "name": "usage"
+      },
+      {
+        "name": "usageHistories"
+      },
+      {
+        "name": "usageHistory"
+      },
+      {
+        "name": "userAccessDevices"
+      },
+      {
+        "name": "utilization"
+      },
+      {
+        "name": "v4"
+      },
+      {
+        "name": "video"
+      },
+      {
+        "name": "videoLink"
+      },
+      {
+        "name": "vlanAssignments"
+      },
+      {
+        "name": "vlanProfiles"
+      },
+      {
+        "name": "vlans"
+      },
+      {
+        "name": "vmx"
+      },
+      {
+        "name": "vpn"
+      },
+      {
+        "name": "vpnExclusions"
+      },
+      {
+        "name": "vpnFirewallRules"
+      },
+      {
+        "name": "vppAccounts"
+      },
+      {
+        "name": "vrfs"
+      },
+      {
+        "name": "wakeOnLan"
+      },
+      {
+        "name": "warmSpare"
+      },
+      {
+        "name": "warnings"
+      },
+      {
+        "name": "webhookTests"
+      },
+      {
+        "name": "webhooks"
+      },
+      {
+        "name": "wirelessControllers"
+      },
+      {
+        "name": "wirelessProfiles"
+      },
+      {
+        "name": "wlanLists"
+      },
+      {
+        "name": "xdr"
+      },
+      {
+        "name": "zigbee"
+      },
+      {
+        "name": "zones"
+      }
+    ],
+    "x-parser-conf": {
+      "overview": {
+        "markdownPath": "docs/overview.md"
+      },
+      "theme": "meraki",
+      "serverConfig": true,
+      "meta": {
+        "useProxy": true
+      },
+      "httpBearer": {
+        "bearerToken": "75dd5334bef4d2bc96f26138c163c0a3fa0b5ca6"
+      },
+      "labelConfig": {
+        "endpoint": {
+          "field": "operationId",
+          "format": "startCase"
+        }
+      },
+      "groupBy": {
+        "$remoteModule": "config/group_platform.js"
+      },
+      "sortBy": {
+        "$remoteModule": "config/sort_by.js"
+      },
+      "exampleAsDefault": true,
+      "expand": 3,
+      "sampleCode": {
+        "python": {
+          "folder": "meraki/sdk/python",
+          "name": "Meraki Python Library",
+          "highlight": "python"
+        }
+      },
+      "variables": {
+        "organizationId": "1215707",
+        "networkId": "N_784752235069315754",
+        "serial": "QBSB-VQ3J-XZ54"
+      }
+    },
+    "openapi": "3.0.1",
+    "servers": [
+      {
+        "url": "https://api.meraki.com/{basePath}",
+        "variables": {
+          "basePath": {
+            "default": "api/v1"
+          }
+        }
+      }
+    ],
+    "securitySchemes": {
+      "meraki_api_key": {
+        "type": "apiKey",
+        "name": "X-Cisco-Meraki-API-Key",
+        "in": "header"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key"
+      }
+    }
+  },
+  "spec": {
+    "description": "Return a list of alert types to be used with managing webhook alerts",
+    "operationId": "getOrganizationWebhooksAlertTypes",
+    "parameters": [
+      {
+        "name": "organizationId",
+        "in": "path",
+        "description": "Organization ID",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      {
+        "name": "productType",
+        "in": "query",
+        "description": "Filter sample alerts to a specific product type",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "appliance",
+            "camera",
+            "cellularGateway",
+            "platform",
+            "sensor",
+            "sm",
+            "switch",
+            "wireless"
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful operation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "alertTypeId": {
+                  "type": "string",
+                  "description": "The type ID of Meraki alert"
+                },
+                "alertType": {
+                  "type": "string",
+                  "description": "The type of Meraki alert"
+                },
+                "example": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "description": "Version of the alert"
+                    },
+                    "sharedSecret": {
+                      "type": "string",
+                      "description": "Shared secret for the alert"
+                    },
+                    "sentAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the alert notification was sent, in ISO8601 format"
+                    },
+                    "alertId": {
+                      "type": "string",
+                      "description": "ID for the alert instance"
+                    },
+                    "alertLevel": {
+                      "type": "string",
+                      "enum": [
+                        "critical",
+                        "informational",
+                        "warning"
+                      ],
+                      "description": "Severity level of the alert"
+                    },
+                    "occurredAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the alert occurred, in ISO8601 format"
+                    },
+                    "alertData": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "Data for the specific alert. Contents depend on the type of the alert"
+                    },
+                    "organizationId": {
+                      "type": "string",
+                      "description": "ID of the organization associated with the alert"
+                    },
+                    "organizationName": {
+                      "type": "string",
+                      "description": "Name of the organization associated with the alert"
+                    },
+                    "organizationUrl": {
+                      "type": "string",
+                      "description": "URL of the organization associated with the alert"
+                    },
+                    "deviceSerial": {
+                      "type": "string",
+                      "description": "Serial for the device associated with the alert"
+                    },
+                    "deviceMac": {
+                      "type": "string",
+                      "description": "Mac address for the device associated with the alert"
+                    },
+                    "deviceName": {
+                      "type": "string",
+                      "description": "Name of the device associated with the alert"
+                    },
+                    "deviceUrl": {
+                      "type": "string",
+                      "description": "URL of the device associated with the alert"
+                    },
+                    "deviceTags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "List of tags for the device associated with the alert"
+                    },
+                    "deviceModel": {
+                      "type": "string",
+                      "description": "Model of the device associated with the alert"
+                    },
+                    "networkId": {
+                      "type": "string",
+                      "description": "ID of the network associated with the alert"
+                    },
+                    "networkName": {
+                      "type": "string",
+                      "description": "Name of the network associated with the alert"
+                    },
+                    "networkUrl": {
+                      "type": "string",
+                      "description": "URL of the network associated with the alert"
+                    },
+                    "enrollmentString": {
+                      "type": "string",
+                      "description": "Enrollment string of the network associated with the alert"
+                    },
+                    "notes": {
+                      "type": "string",
+                      "description": "Notes for the network associated with the alert"
+                    },
+                    "productTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "appliance",
+                          "camera",
+                          "campusGateway",
+                          "cellularGateway",
+                          "secureConnect",
+                          "sensor",
+                          "switch",
+                          "systemsManager",
+                          "wireless",
+                          "wirelessController"
+                        ]
+                      },
+                      "description": "List of product types that are part of the network associated with the alert"
+                    },
+                    "encryptedId": {
+                      "type": "string",
+                      "description": "Encrypted ID of the network associated with the alert"
+                    }
+                  },
+                  "description": "Example alert type"
+                }
+              }
+            },
+            "example": {
+              "alertTypeId": "stopped_reporting",
+              "alertType": "APs went down",
+              "example": {
+                "version": "0.1",
+                "sharedSecret": "secret",
+                "sentAt": "2018-02-11T00:00:00.090210Z",
+                "alertId": "0000000000000000",
+                "alertLevel": "warning",
+                "occurredAt": "2018-02-11T00:00:00.090210Z",
+                "organizationId": "2930418",
+                "organizationName": "My organization",
+                "organizationUrl": "https://dashboard.meraki.com/o/VjjsAd/manage/organization/overview",
+                "deviceSerial": "Q234-ABCD-5678",
+                "deviceMac": "00:11:22:33:44:55",
+                "deviceName": "My AP",
+                "deviceUrl": "https://n1.meraki.com//n//manage/nodes/new_list/000000000000",
+                "deviceTags": [
+                  "tag1",
+                  "tag2"
+                ],
+                "deviceModel": "MR34",
+                "networkId": "N_24329156",
+                "networkName": "Main Office",
+                "networkUrl": "https://n1.meraki.com//n//manage/nodes/list",
+                "enrollmentString": "my-enrollment-string",
+                "notes": "Additional description of the network",
+                "productTypes": [
+                  "appliance",
+                  "switch",
+                  "wireless"
+                ],
+                "encryptedId": "6GREra"
+              }
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      {
+        "oauth2": [
+          "dashboard:general:telemetry:read"
+        ]
+      }
+    ],
+    "summary": "Return a list of alert types to be used with managing webhook alerts",
+    "tags": [
+      "organizations",
+      "monitor",
+      "webhooks",
+      "alertTypes"
+    ],
+    "__originalOperationId": "getOrganizationWebhooksAlertTypes",
+    "method": "get",
+    "path": "/organizations/{organizationId}/webhooks/alertTypes",
+    "sampleCode": {
+      "Meraki Python Library": {
+        "code": "import meraki\n\n# Defining your API key as a variable in source code is discouraged.\n# This API key is for a read-only docs-specific environment.\n# In your own code, use an environment variable as shown under the Usage section\n# @ https://github.com/meraki/dashboard-api-python/\n\nAPI_KEY = 'your-key-here'\n\ndashboard = meraki.DashboardAPI(API_KEY)\n\norganization_id = '549236'\n\nresponse = dashboard.organizations.getOrganizationWebhooksAlertTypes(\n    organization_id\n)\n\nprint(response)",
+        "highlight": "python"
+      }
+    }
+  }
+}

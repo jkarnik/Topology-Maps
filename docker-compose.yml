@@ -28,6 +28,10 @@ services:
       - SIMULATOR_HOST=simulator
       - SIMULATOR_REST_PORT=8001
       - MERAKI_API_KEY=${MERAKI_API_KEY:-}
+      - NEW_RELIC_LICENSE_KEY=${NR_LICENSE_KEY}
+      - NEW_RELIC_APP_NAME=topology-maps-server
+      - NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+      - NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true
     volumes:
       # Persist the SQLite topology/config cache across container
       # restarts and redeploys.  Matches the DB_PATH in server/db.py.
