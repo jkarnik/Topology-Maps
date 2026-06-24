@@ -11,6 +11,20 @@ log = logging.getLogger(__name__)
 
 PUSH_INTERVAL = 300  # seconds
 
+# New Relic background-task instrumentation. The agent is started by
+# `newrelic-admin run-program` in the container; locally (and in tests)
+# the package is absent, so fall back to a no-op decorator.
+try:
+    import newrelic.agent
+
+    background_task = newrelic.agent.background_task
+except ImportError:  # pragma: no cover - exercised only in the container
+    def background_task(*args, **kwargs):
+        def _decorator(func):
+            return func
+
+        return _decorator
+
 
 def _validate_env() -> None:
     missing = [v for v in ("NR_LICENSE_KEY", "NR_ACCOUNT_ID") if not os.environ.get(v)]
@@ -19,6 +33,7 @@ def _validate_env() -> None:
         sys.exit(1)
 
 
+@background_task()
 def run_once() -> int:
     import push_all_devices
     return push_all_devices.main()

@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r simulator/requirements.txt
 EXPOSE 10161-10167/udp
 EXPOSE 8001
 
-CMD ["python", "-m", "simulator.main"]
+CMD ["newrelic-admin", "run-program", "python", "-m", "simulator.main"]

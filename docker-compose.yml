@@ -12,6 +12,11 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    environment:
+      - NEW_RELIC_LICENSE_KEY=${NR_LICENSE_KEY}
+      - NEW_RELIC_APP_NAME=topology-maps-simulator
+      - NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+      - NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true
     networks:
       - topology-net
 
@@ -74,6 +79,10 @@ services:
     environment:
       - NR_LICENSE_KEY=${NR_LICENSE_KEY}
       - NR_ACCOUNT_ID=${NR_ACCOUNT_ID}
+      - NEW_RELIC_LICENSE_KEY=${NR_LICENSE_KEY}
+      - NEW_RELIC_APP_NAME=topology-maps-ingest
+      - NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+      - NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true
     volumes:
       - topology-data:/app/data
     networks:
