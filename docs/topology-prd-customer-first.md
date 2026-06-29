@@ -85,7 +85,7 @@ wireless) and already use the observability platform for monitoring.
 - **A single failure buries them in alerts.** When a switch fails, every access point and device
   beneath it alarms at once. The customer gets dozens of simultaneous alerts with no indication that
   they share one cause — so they chase symptoms instead of fixing the switch.
-- Inventory (which device, which port, which site, which VLAN) is disconnected from the live map.
+- Inventory (which device, which port, which site) is disconnected from the live map.
 
 **The desired outcome:** one always-current topology view, in the observability platform, that
 mirrors how the customer actually thinks about their network — and that they can filter, drill into,
