@@ -56,14 +56,25 @@ Nothing in this document should be read as prescribing a specific entity type, r
 API, rendering surface, or correlation algorithm. It defines the customer's requirements; the
 technical choices are engineering's (§10).
 
+### Scope — site-level topology only
+
+This PRD covers topology **within a site** (a single location / network): the devices at that site
+and how they connect, stack, and depend on one another. **Inter-site connectivity is explicitly out
+of scope** — how sites connect to each other via VPN tunnels, SD-WAN, or backbone/WAN routers is not
+part of this work. The top of every map is the site's edge device; the WAN beyond it is not modeled.
+
 ## 2. The Customer & Their Problem
 
 **Who:** Network and IT operations teams who run multi-site networks (firewalls/routers, switches,
 wireless) and already use the observability platform for monitoring.
 
-**The job to be done:** *"When something is wrong, or when I'm planning a change, I want to see my
-network the way it is physically wired and logically organized — without exporting to a separate
-tool or holding the diagram in my head."*
+**The jobs to be done:**
+
+- *"When something is wrong, or when I'm planning a change, I want to see my network the way it is
+  physically wired and logically organized — without exporting to a separate tool or holding the
+  diagram in my head."*
+- *"When one device fails and sets off dozens of alarms, I want a single incident that tells me the
+  real root cause — not an alert storm I have to triage symptom by symptom."*
 
 **Today's pain:**
 
@@ -91,8 +102,7 @@ and trust.
 - The customer can see **how things are connected**, down to which port on each device a cable uses.
 - Devices that are physically or logically **grouped** (a switch stack, a chassis and its modules)
   appear as a single, expandable unit — not scattered.
-- The customer can **filter and search** the map by the attributes they care about (site, role,
-  VLAN, model, status).
+- The customer can **narrow the map** to a single site, or to just the parts currently alerting.
 - The map is **always current** — it reflects what the network looks like now, not last quarter.
 
 **Correlation outcomes:**
@@ -107,6 +117,8 @@ and trust.
 
 - Not changing or controlling the network (read-only; observability and export only).
 - Not replacing the customer's configuration or provisioning tooling.
+- **Not modeling inter-site / WAN connectivity** (VPN tunnels, SD-WAN, backbone routers) — this PRD
+  is site-level topology only (see §1 Scope).
 - Not defining the customer's alert conditions, thresholds, or SLOs — this PRD covers how topology
   **feeds** correlation, not which alerts exist or how they're configured.
 - Not prescribing the rendering technology, correlation algorithm, or data model (engineering's
@@ -164,6 +176,16 @@ devices, thousands of ports) must stay legible.
 Each thing on the map should show what it is (role/type), what it's called, and whether it's healthy,
 so the customer can spot trouble without clicking into each node.
 
+### 4.6 Filtering the map
+
+The customer needs only two ways to narrow the map:
+
+- **By site** — focus on a single location's topology.
+- **By active, ongoing alerts** — show only the parts of the network currently alerting/degraded, so
+  during an incident they can cut straight to what's affected.
+
+Other filters (by model, vendor, VLAN, etc.) are not required and are out of scope.
+
 ## 5. How the Customer Understands Their Network
 
 The customer thinks about their network in terms of a few simple, intuitive relationships. The
@@ -171,18 +193,26 @@ platform must be able to represent **all** of these faithfully. Whether existing
 relationship types cover them, or new ones are needed, is an engineering/platform decision (§10) —
 but the customer's mental model below is the requirement.
 
-### 5.1 The three relationships the customer has in mind
+### 5.1 The four relationships the customer has in mind
 
-- **"Is part of / contains"** — one thing is physically a piece of another and can't exist without
-  it. A port is part of a switch; a line card is part of a chassis; a device belongs to a site.
-  *Test the customer applies: if you remove it from its parent, does it stop being a working thing
-  on its own? If yes, it's a part.*
-- **"Is connected to"** — two independent devices joined by a link (a cable or a wireless
-  association). Neither owns the other; they're peers. This includes both up-the-hierarchy links and
-  side-to-side redundant links.
-- **"Manages / controls"** — one independent device controls another independent device. The active
-  member of a stack controls the other members; a primary firewall controls its standby. Both still
-  exist on their own, but one is in charge.
+- **"Contains" — a site holds devices.** A site contains the devices located in it. This is about
+  *where a device lives*, not what it's built from. The device is independently real (it could be
+  moved to another site and still be the same device), but at any time it belongs to exactly one
+  site. *Containment is reserved for the site → device relationship.*
+- **"Is part of" — a component of a device.** A port is part of its switch; a line card is part of
+  its chassis. The component **cannot exist or function on its own** — remove it and it's a dead
+  piece. *Test: take it out of its parent — is it still a working thing? If no, it "is part of."*
+- **"Is connected to" — cabled or wireless peers.** Two independent devices joined by a link: a cable
+  between two ports, or a wireless association. Neither owns the other. Covers both up-the-hierarchy
+  links (uplinks) and side-to-side redundant links.
+- **"Manages / controls" — one device runs another.** One independent device controls another. The
+  active member of a switch stack controls the other members; a primary firewall controls its
+  standby. Both still exist on their own, but one is in charge.
+
+**Stacks vs. line cards — why they differ.** A *line card* is **part of** its chassis: it can't work
+outside it. A *stack member* is a complete switch that works on its own and is merely **managed** by
+the stack's active member. They can look like the same "grouped device" on the map, but the
+relationship underneath is different — and the difference is real, not cosmetic.
 
 ### 5.2 Sites are the top-level container
 
@@ -211,9 +241,10 @@ cause, with the dependent alerts grouped inside it — instead of a storm of equ
 The relationships in §5 are **directional**: they encode which thing depends on which. The customer's
 mental rule, which the engine should follow:
 
-- **Dependency flows downward.** A child depends on its parent (a port on its switch, an AP on its
-  port, a contained device on its container). A downstream device depends on the upstream device(s)
-  that connect it toward the core.
+- **Dependency flows downward.** A component depends on the device it's *part of* (a port on its
+  switch, a line card on its chassis). A *connected* device depends on what links it toward the core
+  (an AP on the switch it's cabled to; a downstream switch on its uplink). Site *containment* is
+  organizational — it groups devices for navigation; it is not itself a failure dependency.
 - **A parent failing makes its dependents "expected to fail."** If a switch is down, the ports, cards,
   APs, and downstream devices that depend on it are expected to be unreachable. Their alerts are
   **symptoms**, not separate problems.
@@ -223,6 +254,10 @@ mental rule, which the engine should follow:
 - **Redundancy stops the propagation.** If a dependent device has another *working* path to the core
   (a redundant uplink, a sibling/second connection), it is **not** expected to fail — so its alert
   must **not** be suppressed. Over-suppression that hides a real second failure is as bad as the storm.
+- **A grouped unit fails as a unit, not by member.** A stack is one logical unit; downstream things
+  depend on the stack, not a specific member. Because the active member *manages* internally
+  redundant members, losing one member should fail over — only losing the whole stack propagates
+  downward.
 - **Independent failures stay independent.** Two unrelated devices failing at the same time, with no
   dependency between them, should remain two incidents. The engine suppresses noise, never signal.
 
