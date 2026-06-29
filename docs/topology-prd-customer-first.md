@@ -5,22 +5,44 @@
 > **Date:** 2026-06-29
 > **Audience:** Engineering team (and, where needed, the New Relic platform team)
 
-This PRD describes **what the customer wants** from a network topology experience inside their
-observability platform — stated from first principles, in terms of outcomes and desired experience,
-**not** implementation. *How* to deliver it is engineering's call: with existing platform
-primitives, or by partnering with the New Relic platform team to introduce new kinds of entities
-and relationships where today's primitives don't fit.
+This PRD describes **what the customer wants** from network topology inside their observability
+platform — stated from first principles, in terms of outcomes and desired experience, **not**
+implementation. *How* to deliver it is engineering's call: with existing platform primitives, or by
+partnering with the New Relic platform team to introduce new kinds of entities and relationships
+where today's primitives don't fit.
 
-A prior internal project prototyped much of this and produced concrete technical recommendations.
-That work is **not** the requirement — it is captured in the **Appendix** as reference only.
+Topology serves **two equally important purposes** (see §1):
+
+1. **A map the customer can see and trust** — understand their network at a glance.
+2. **The dependency graph that powers alert correlation and noise suppression** — so a single
+   failure produces a single root-cause incident, not an alert storm.
+
+Both depend on the same underlying model being correct.
 
 ---
 
 ## 1. Purpose & Framing
 
+Network topology in the observability platform exists to serve two purposes that matter equally.
+
+### Purpose 1 — See and understand the network
+
 The customer wants to understand their physical and logical network at a glance, inside the same
-platform where they already watch performance and health. This PRD defines that experience purely
-in terms of what the customer should be able to see, do, and trust.
+platform where they already watch performance and health: the layered hierarchy, what connects to
+what, grouped devices, all current and trustworthy.
+
+### Purpose 2 — Power alert correlation & noise suppression
+
+The same topology is the **dependency graph** New Relic's correlation engine uses to make sense of
+failures. When a switch goes down, every access point and device beneath it goes down too — which on
+its own would create an **alert storm** of dozens of independent alerts. With topology, the engine
+recognizes that the switch is the **root cause**, raises a **single incident** for it, **groups** the
+downstream alerts inside that incident, and attributes the root cause correctly. The customer sees
+one actionable problem instead of fifty symptoms.
+
+These purposes reinforce each other: both require the relationships between devices to be modeled
+**correctly and directionally** (what depends on what), not just drawn. A model good enough to
+correlate failures is also the model that renders an honest map.
 
 **Division of responsibility:**
 
@@ -30,9 +52,9 @@ in terms of what the customer should be able to see, do, and trust.
   the **New Relic platform team to define new kinds of entities and relationships** purpose-built
   for network topology. Either path is acceptable as long as the customer outcomes are met.
 
-Nothing in the body of this document should be read as prescribing a specific entity type,
-relationship type, API, or rendering surface. Where the prior prototype made such choices, they are
-in the Appendix as a starting reference — useful, but not binding.
+Nothing in this document should be read as prescribing a specific entity type, relationship type,
+API, rendering surface, or correlation algorithm. It defines the customer's requirements; the
+technical choices are engineering's (§10).
 
 ## 2. The Customer & Their Problem
 
@@ -49,6 +71,9 @@ tool or holding the diagram in my head."*
   of which sit next to the telemetry that tells them something is broken.
 - When a device or link degrades, they can't immediately see what's upstream, downstream, or
   redundant — so blast radius and root cause are guesswork.
+- **A single failure buries them in alerts.** When a switch fails, every access point and device
+  beneath it alarms at once. The customer gets dozens of simultaneous alerts with no indication that
+  they share one cause — so they chase symptoms instead of fixing the switch.
 - Inventory (which device, which port, which site, which VLAN) is disconnected from the live map.
 
 **The desired outcome:** one always-current topology view, in the observability platform, that
@@ -70,12 +95,22 @@ and trust.
   VLAN, model, status).
 - The map is **always current** — it reflects what the network looks like now, not last quarter.
 
+**Correlation outcomes:**
+
+- When one device fails and takes others down with it, the customer gets **one incident** for the
+  root cause, with the downstream alerts **grouped inside it** — not an alert storm.
+- The incident **names the real root cause** (the failed switch), not a random symptom.
+- Genuinely independent failures still surface as their own incidents — the engine suppresses noise,
+  not signal.
+
 ### Non-Goals
 
 - Not changing or controlling the network (read-only; observability and export only).
 - Not replacing the customer's configuration or provisioning tooling.
-- Not defining alerting, SLOs, or golden metrics here — only the topology experience.
-- Not prescribing the rendering technology or data model (engineering's decision; see §10).
+- Not defining the customer's alert conditions, thresholds, or SLOs — this PRD covers how topology
+  **feeds** correlation, not which alerts exist or how they're configured.
+- Not prescribing the rendering technology, correlation algorithm, or data model (engineering's
+  decision; see §10).
 
 ## 4. What the Customer Wants to See
 
@@ -113,8 +148,10 @@ Some things are physically several boxes but operate as one, and the customer th
 - A **modular chassis and its line cards** should appear as one device that can be expanded to see
   its cards, and each card expanded to see its ports.
 
-Internal wiring that only exists to make the group work (e.g., stacking cables) should not clutter
-the map.
+Internal wiring that only exists to make the group work (e.g., stacking cables between members)
+should be **hidden while the group is collapsed**, so the default view stays clean — but **visible
+when the customer explodes/expands the group**. Exploding a stack should reveal the member chassis
+*and* the stacking links between them; the detail is there when wanted, out of the way when not.
 
 ### 4.4 Drill-down without losing the big picture
 
@@ -147,46 +184,77 @@ but the customer's mental model below is the requirement.
   member of a stack controls the other members; a primary firewall controls its standby. Both still
   exist on their own, but one is in charge.
 
-### 5.2 Parent, child, sibling — in the customer's words
+### 5.2 Sites are the top-level container
 
-- **Parent:** the thing one level up that either *contains* this thing or *is in charge of* it.
-- **Child:** the thing one level down that is *part of* its parent or *controlled by* it. Everything
-  has a single clear parent in the structure (a port belongs to one switch, a stack member to one
-  controller).
-- **Sibling:** things at the same level — either sharing a parent, or peers connected to each other
-  with no one in charge. Redundant core switches are siblings.
+Every device — and everything inside it — lives within a **site** (a location / network). The site
+is itself an entity, the root of that location's hierarchy, not just a label or a filter. The
+customer navigates site-first: choose a site, then see its devices and how they're structured
+beneath it. A device belongs to exactly one site.
 
-### 5.3 Why this distinction matters to the customer
+## 6. Alert Correlation & Noise Suppression
 
-Getting these right is not pedantry — it's what makes the map *trustworthy*. If the platform shows a
-switch as "part of" another switch when it's really just cabled to it, the customer can no longer
-trust the map to answer "what's actually inside this device?" or "what happens if this one fails?"
-The relationships are the difference between a pretty picture and a correct one.
+This is the second purpose, and it depends entirely on the relationships in §5 being correct and
+directional. The topology **is** the dependency graph the correlation engine reasons over.
 
-> **Engineering note:** if the platform's existing relationship vocabulary can't express all three of
-> these honestly (containment, connection, control) for network entities, that is a strong signal to
-> engage the New Relic platform team about first-class network entity/relationship types — rather
-> than forcing one concept to stand in for another. See Appendix C–D for what the prototype did here.
+### 6.1 The outcome the customer wants
 
-## 6. What the Customer Wants to Filter & Search By
+When one failure causes many alerts, the customer should get **one incident** for the underlying
+cause, with the dependent alerts grouped inside it — instead of a storm of equal-looking alerts.
 
-A static picture isn't enough — the customer needs to slice the map. They expect to filter, search,
-and group by the attributes that matter operationally. At minimum:
+> **Concretely:** a core switch fails. Every access point and downstream device that reaches the
+> network only through that switch stops reporting and alarms. Instead of ~50 separate incidents, the
+> customer gets **one incident — "Core switch X down"** — with the 50 downstream alerts grouped under
+> it, and the switch correctly named as the root cause.
 
-- **Where:** site / location / network.
-- **What:** device role (router, core, distribution, access, AP, client), vendor, model.
-- **Identity:** name, serial, management IP, MAC.
-- **Logical segmentation:** VLAN / subnet.
-- **Connectivity:** which port, link speed, link type (uplink, access, trunk, wireless), and the
-  device/port on the far end of each link.
-- **Grouping membership:** which stack a switch belongs to and its role (active vs member); which
-  chassis a card or port belongs to.
-- **Health:** operational/administrative status.
+### 6.2 How failure should propagate through the topology
 
-Whatever the underlying representation, every entity (device, port, card, stack, site, VLAN) must
-carry enough descriptive metadata that the customer can answer questions like *"show me all access
-switches in the London site on VLAN 30 that are degraded"* without leaving the map. The customer
-shouldn't have to know how the data is stored — they just expect to filter by these things.
+The relationships in §5 are **directional**: they encode which thing depends on which. The customer's
+mental rule, which the engine should follow:
+
+- **Dependency flows downward.** A child depends on its parent (a port on its switch, an AP on its
+  port, a contained device on its container). A downstream device depends on the upstream device(s)
+  that connect it toward the core.
+- **A parent failing makes its dependents "expected to fail."** If a switch is down, the ports, cards,
+  APs, and downstream devices that depend on it are expected to be unreachable. Their alerts are
+  **symptoms**, not separate problems.
+- **The root cause is the highest-up entity whose own failure explains the rest.** The incident is
+  attributed to it; the dependent (downstream) alerts are suppressed into that one incident rather
+  than raised on their own.
+- **Redundancy stops the propagation.** If a dependent device has another *working* path to the core
+  (a redundant uplink, a sibling/second connection), it is **not** expected to fail — so its alert
+  must **not** be suppressed. Over-suppression that hides a real second failure is as bad as the storm.
+- **Independent failures stay independent.** Two unrelated devices failing at the same time, with no
+  dependency between them, should remain two incidents. The engine suppresses noise, never signal.
+
+### 6.3 What this requires of the model
+
+For the engine to do the above, the topology must provide:
+
+- **Directional relationships** — every dependency edge knows which side is the depended-upon
+  (upstream/parent) and which is the dependent (downstream/child). Adjacency alone is not enough.
+- **Redundant paths represented** — when a device has more than one way to reach the core, all paths
+  exist in the model so the engine can tell "still reachable" from "isolated."
+- **A health signal per entity** the engine can read to know what's actually alarming.
+
+### 6.4 Worked example
+
+```
+Core switch X  ── down ──▶ root cause, ONE incident: "Core switch X down"
+   ├─ AP-1 .. AP-20  (reach the network only via X)         → expected down → grouped, suppressed
+   ├─ Access switch Y (single uplink to X)                  → expected down → grouped, suppressed
+   │     └─ its clients                                      → expected down → grouped, suppressed
+   └─ Access switch Z (redundant uplink to core switch X2)  → still reachable → NOT suppressed
+```
+
+Without topology, this is 20+ equal incidents and no root cause. With it, it's one incident, correct
+cause, and switch Z's situation (if it *does* have a problem) is still visible.
+
+### 6.5 Engineering owns the mechanism
+
+This section defines the **behavior** the customer needs, not the algorithm. Whether it's delivered
+by New Relic's existing correlation/incident-intelligence capabilities reading these relationships, or
+needs new platform support, is engineering's call (§10) — provided the propagation behavior in §6.2
+holds.
 
 ## 7. Freshness & Trust
 
@@ -223,121 +291,34 @@ We've met the customer's need when:
 1. A network operator opens the topology view and, without training, recognizes their network and
    its layered structure.
 2. They can trace any connection end-to-end, including the port on each side.
-3. Stacks and modular chassis show as single, expandable units.
-4. They can filter the map to a site, role, VLAN, or status and get a clean sub-view.
-5. The map reflects a real change in the network within one refresh cycle, and never shows a
+3. Stacks and modular chassis show as single, expandable units, and exploding them reveals members
+   and their internal links.
+4. The map reflects a real change in the network within one refresh cycle, and never shows a
    connection or grouping that isn't real.
-6. Anyone querying the underlying data (not just the picture) gets an accurate description of the
+5. Anyone querying the underlying data (not just the picture) gets an accurate description of the
    network — the structure is correct in the data, not faked for the rendering.
+6. **When a device fails and takes its dependents down, the customer gets one incident naming the
+   root cause, with the downstream alerts grouped inside it** — not a storm of equal alerts.
+7. **A dependent device that still has a working (redundant) path is not swept into the suppression**,
+   and genuinely independent failures remain separate incidents.
 
 ## 10. A Note to Engineering
 
 You own the "how." This section sets expectations, not implementation.
 
-- **Use whatever delivers the outcomes.** If existing platform entities, relationships, and rendering
-  surfaces can satisfy §4–§9 honestly, great. If they can't, that's not a reason to compromise the
-  customer experience — it's a reason to escalate.
+- **Use whatever delivers the outcomes.** If existing platform entities, relationships, rendering
+  surfaces, and correlation capabilities can satisfy §4–§9 honestly, great. If they can't, that's not
+  a reason to compromise the customer experience — it's a reason to escalate.
 - **Engage the New Relic platform team when the primitives don't fit.** Network topology may warrant
   **first-class entity and relationship types** (e.g., a true "network device," "port," "stack," and
-  native containment/connection/management relationships with topology-aware rendering). Treat
-  building these — in partnership with the platform team — as a legitimate, expected option, not a
-  last resort.
-- **Do not fake structure to satisfy the renderer.** The customer (and anyone querying the data)
-  must get a truthful model (§5.3, §9.6). If a rendering surface can only show hierarchy by
-  misrepresenting relationships, prefer a surface you control, or push the platform team for proper
-  support — don't corrupt the data.
-- **Reuse the prototype where it helps.** The Appendix documents a working prototype, the lessons
-  from it, and concrete recommendations (including a model that worked with today's primitives and
-  the open questions that remain). Use it as a head start, and as evidence when making the case to
-  the platform team — but the body of this PRD, not the Appendix, is the requirement.
+  native, directional containment/connection/management relationships with topology-aware rendering
+  *and* correlation support). Treat building these — in partnership with the platform team — as a
+  legitimate, expected option, not a last resort.
+- **Do not fake structure to satisfy the renderer.** The customer, anyone querying the data, **and the
+  correlation engine** must get a truthful, directional model (§5, §6.3). If a rendering surface can
+  only show hierarchy by misrepresenting relationships, prefer a surface you control, or push the
+  platform team for proper support — don't corrupt the data. A faked relationship doesn't just
+  mislead the map; it produces wrong root-cause correlation.
 
 Where you land on these choices, write it up so product and the platform team can see the tradeoffs.
 
----
-
-# Appendix — Prior Project: What We Built & Recommend
-
-_Reference material from the internal prototype. Informative, not normative. The full prototype-era
-spec (which assumed today's New Relic primitives) is preserved at_
-[`docs/topology-prd.md`](topology-prd.md).
-
-## A. Context — what the prototype did
-
-An internal project built a working topology web UI from Meraki/SNMP discovery (router/firewall →
-switches → APs → clients, with switch stacks folded into single nodes) and then attempted to
-reproduce that experience inside New Relic by pushing custom entities and user-defined relationships
-via NerdGraph. The web UI met the §4 experience; reproducing it in New Relic surfaced the lessons in
-B–F below.
-
-## B. Key learnings
-
-- **The web UI looks right because it controls its own layout.** The good hierarchy is a property of
-  a renderer we own, not of the data.
-- **New Relic's native entity map cannot be styled.** It auto-lays-out; the only lever over its
-  shape is containment nesting. So the native map won't match the web UI without distorting the data.
-- **The prototype faked hierarchy** by overloading the "contains" relationship onto switch-to-switch
-  uplinks (a spanning-tree guess). This is the dishonest shortcut we want to avoid.
-- **Relationship type must follow meaning, not rendering.** Choosing a type to trick the layout
-  corrupts the data for anyone querying it.
-- **User-defined relationships persist; auto relationships expire** (≈75 min TTL). Topology
-  relationships should be explicit and reconciled (created and deleted) on each sweep.
-
-## C. Recommended entity & relationship mapping (with today's primitives)
-
-The prototype's rule for choosing a relationship — **"can it exist on its own?"**:
-
-- Physically part of the parent, can't exist alone → **containment** (`CONTAINS`).
-- A separate device the parent controls → **management** (`MANAGES`).
-- Cabled peers, no one in charge → **connection** (`CONNECTS_TO`).
-
-Cheat-sheet the prototype landed on (maps the §5 mental model onto current NR types):
-
-| Customer concept | Pair | NR type used |
-|---|---|---|
-| part of | Site → device; chassis → line card; switch/card → port; port → AP | `CONTAINS` |
-| connected to | switch ↔ switch (uplink & lateral); client ↔ AP | `CONNECTS_TO` |
-| manages | stack active → members; primary firewall → secondary | `MANAGES` |
-
-## D. Approaches we rejected
-
-- **`CALLS`** (service-to-service / APM semantics) — wrong meaning for network gear, and our devices
-  are custom Kentik/Meraki entity types, not service entities; likely rejected and pollutes APM views.
-- **`IS`** (same real-world thing) — would merge a primary/secondary pair into one entity. Never use
-  for distinct devices.
-- **Overloading `CONTAINS` on uplinks** — the layout hack; abandoned. Uplinks are connections.
-
-## E. Recommended architecture
-
-Separate the **data** from the **picture**:
-
-- **Data layer:** an honest entity/relationship model in New Relic (containment / connection /
-  management), queryable and trustworthy — nothing shaped to please a renderer.
-- **Presentation layer:** render the controlled, tiered, grouped layout in a **surface we own** (a
-  topology nerdlet that can reuse the web UI's layout logic), since the native map can't be styled.
-  This is consistent with the existing config nerdpack in the repo.
-
-> This is the prototype's recommendation **given today's primitives**. If the platform team builds
-> first-class network topology entities/relationships with topology-aware rendering (see §10), some
-> of this separation may no longer be necessary — which is exactly the kind of tradeoff worth raising.
-
-## F. Verification & open technical questions
-
-- **`MANAGES` support is unverified** for these custom entity types via the user-defined mutation
-  (`CONTAINS`/`CONNECTS_TO` are proven). Confirm against the NerdGraph schema; a read-only probe that
-  attempts one `MANAGES` relationship and reports acceptance is the cheapest check. Fallback if
-  unsupported: containment for stacks + a tag-only marker for HA pairs.
-- **Tier assignment in flat (Meraki) networks** — how to assign role/tier when there's no true core
-  or distribution layer (by uplink depth, model, or explicit tag).
-- **Where edge/port detail lives** — on relationship attributes, on port entities, or both.
-- **Scale targets** — confirm the largest expected device/port counts to size the renderer.
-
-## G. Existing code references
-
-- Tier ranks, stack folding, AP-to-parent mapping — [`ui/src/utils/layoutEngine.ts`](../ui/src/utils/layoutEngine.ts)
-- Tier positions and core-collapse behavior — [`ui/src/components/HybridView.tsx`](../ui/src/components/HybridView.tsx)
-- Device/link types — [`ui/src/types/topology.ts`](../ui/src/types/topology.ts)
-- Entity push + event types/tags — [`nr_ingest/push_all_devices.py`](../nr_ingest/push_all_devices.py)
-- Relationship create/delete via NerdGraph — [`nr_ingest/create_relationships.py`](../nr_ingest/create_relationships.py)
-- NR entity/relationship reference — [`docs/reference/new-relic-entity-types.md`](reference/new-relic-entity-types.md)
-- Map freshness behavior — [`docs/nr-ingest-status.md`](nr-ingest-status.md)
-- Full prototype-era spec (assumes today's primitives) — [`docs/topology-prd.md`](topology-prd.md)
