@@ -186,6 +186,15 @@ The customer needs only two ways to narrow the map:
 
 Other filters (by model, vendor, VLAN, etc.) are not required and are out of scope.
 
+### 4.7 Distinct iconography per device type
+
+Each type of device must have its own clear, recognizable icon — router/firewall, core switch,
+distribution switch, access switch, access point, and end device should each look visually distinct,
+and grouped units (a stack, a modular chassis) should be visually identifiable as such. The customer
+should be able to tell what a node is **at a single glance**, from its icon alone, without reading
+the label. Iconography must be consistent across the whole map so the same device type always looks
+the same.
+
 ## 5. How the Customer Understands Their Network
 
 The customer thinks about their network in terms of a few simple, intuitive relationships. The
