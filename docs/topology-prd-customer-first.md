@@ -171,10 +171,18 @@ The customer wants to start at the whole-network view and progressively drill in
 card → port → connected device — collapsing detail they don't need. Large networks (many hundreds of
 devices, thousands of ports) must stay legible.
 
-### 4.5 Status and identity at a glance
+### 4.5 Identity, iconography, and status at a glance
 
-Each thing on the map should show what it is (role/type), what it's called, and whether it's healthy,
-so the customer can spot trouble without clicking into each node.
+Each node should show what it is, what it's called, and whether it's healthy — so the customer can
+read the map without clicking into every node:
+
+- **Distinct iconography per device type.** Router/firewall, core switch, distribution switch, access
+  switch, access point, and end device must each look visually distinct, and grouped units (a stack,
+  a modular chassis) must be identifiable as such. The customer should be able to tell what a node is
+  **at a single glance**, from its icon alone, without reading the label. Iconography must be
+  consistent across the whole map so the same device type always looks the same.
+- **Name and role** are visible on or beside the node.
+- **Health/status** is surfaced on the node (healthy vs. degraded/alerting).
 
 ### 4.6 Filtering the map
 
@@ -185,15 +193,6 @@ The customer needs only two ways to narrow the map:
   during an incident they can cut straight to what's affected.
 
 Other filters (by model, vendor, VLAN, etc.) are not required and are out of scope.
-
-### 4.7 Distinct iconography per device type
-
-Each type of device must have its own clear, recognizable icon — router/firewall, core switch,
-distribution switch, access switch, access point, and end device should each look visually distinct,
-and grouped units (a stack, a modular chassis) should be visually identifiable as such. The customer
-should be able to tell what a node is **at a single glance**, from its icon alone, without reading
-the label. Iconography must be consistent across the whole map so the same device type always looks
-the same.
 
 ## 5. How the Customer Understands Their Network
 
