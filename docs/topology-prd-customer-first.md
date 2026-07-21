@@ -128,7 +128,25 @@ and trust.
 
 Described as the customer would describe it. (Layout intent — engineering chooses how to render it.)
 
-### 4.1 A top-down map that matches the layers of the network
+The experience has **two levels**: a **landing world map** of all the customer's sites (§4.1), and —
+on clicking a site — the **detailed topology map** of that site (§4.2 onward).
+
+### 4.1 The landing view — a world map of sites
+
+The experience opens on a **world map** that places every site at its geographic location, so the
+customer sees their whole footprint and where trouble is at a glance:
+
+- **Marker size reflects site size** — a larger site (more devices) shows as a larger marker.
+- **Marker color reflects site health** — healthy sites read as calm (e.g. green), and a site with
+  active/ongoing alerts escalates toward red, so a problem site stands out immediately.
+- **Clicking a site opens that site's topology map** — the detailed, layered view described in the
+  rest of this section.
+
+The world map shows *where sites are and how they're doing*; it does **not** draw links between sites
+(inter-site connectivity is out of scope — §1). It is the navigational and health-overview entry
+point into the per-site topology.
+
+### 4.2 A top-down map that matches the layers of the network
 
 The customer reads their network from the top down and wants the map to do the same:
 
@@ -141,7 +159,7 @@ The customer reads their network from the top down and wants the map to do the s
   look natural.
 - A device should never appear above the thing it hangs off of.
 
-### 4.2 Connections that show both ends, including the port
+### 4.3 Connections that show both ends, including the port
 
 When two devices are connected, the customer wants to see the cable **and which port it uses on each
 end** — e.g., "core switch port 1/0/1 connects to distribution switch port 2/0/24." Port-level detail
@@ -151,7 +169,7 @@ on hover/selection, ideally inline when zoomed in).
 Redundant or cross-links between peer devices should be visible too, and visually distinguishable
 from the main "up the hierarchy" connections.
 
-### 4.3 Grouped devices shown as one unit
+### 4.4 Grouped devices shown as one unit
 
 Some things are physically several boxes but operate as one, and the customer thinks of them as one:
 
@@ -165,13 +183,13 @@ should be **hidden while the group is collapsed**, so the default view stays cle
 when the customer explodes/expands the group**. Exploding a stack should reveal the member chassis
 *and* the stacking links between them; the detail is there when wanted, out of the way when not.
 
-### 4.4 Drill-down without losing the big picture
+### 4.5 Drill-down without losing the big picture
 
-The customer wants to start at the whole-network view and progressively drill in — site → device →
-card → port → connected device — collapsing detail they don't need. Large networks (many hundreds of
-devices, thousands of ports) must stay legible.
+The customer wants to progressively drill in and back out — world map → site → device → card → port
+→ connected device — collapsing detail they don't need at each level. Large networks (many hundreds
+of devices, thousands of ports) must stay legible.
 
-### 4.5 Identity, iconography, and status at a glance
+### 4.6 Identity, iconography, and status at a glance
 
 Each node should show what it is, what it's called, and whether it's healthy — so the customer can
 read the map without clicking into every node:
@@ -184,7 +202,7 @@ read the map without clicking into every node:
 - **Name and role** are visible on or beside the node.
 - **Health/status** is surfaced on the node (healthy vs. degraded/alerting).
 
-### 4.6 Filtering the map
+### 4.7 Filtering the map
 
 The customer needs only two ways to narrow the map:
 
