@@ -107,3 +107,34 @@ def test_save_snapshot_without_org_id_still_works(patched_db):
     result = patched_db.load_snapshot()
     assert result is not None
     assert result.get("orgId") is None
+
+
+def test_load_sites_snapshot_returns_none_when_empty(patched_db):
+    assert patched_db.load_sites_snapshot() is None
+
+
+def test_save_and_load_sites_snapshot_round_trips(patched_db):
+    sites = [
+        {
+            "network_id": "N_1", "name": "Dallas DC", "lat": 32.78, "lng": -96.80,
+            "device_count": 84, "health_bucket": "orange", "unhealthy_pct": 0.34,
+            "mapped": True,
+        },
+    ]
+    patched_db.save_sites_snapshot(sites)
+    result = patched_db.load_sites_snapshot()
+    assert result == sites
+
+
+def test_save_sites_snapshot_overwrites_previous(patched_db):
+    patched_db.save_sites_snapshot([
+        {"network_id": "N_1", "name": "Old", "device_count": 1, "health_bucket": "unknown",
+         "mapped": False, "lat": None, "lng": None, "unhealthy_pct": None},
+    ])
+    patched_db.save_sites_snapshot([
+        {"network_id": "N_2", "name": "New", "device_count": 2, "health_bucket": "green",
+         "mapped": False, "lat": None, "lng": None, "unhealthy_pct": 0.0},
+    ])
+    result = patched_db.load_sites_snapshot()
+    assert len(result) == 1
+    assert result[0]["network_id"] == "N_2"

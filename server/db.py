@@ -270,3 +270,30 @@ def load_snapshot() -> Optional[dict[str, Any]]:
         "topology": topology,
         "lastUpdated": meta.get("lastUpdated"),
     }
+
+
+# --------------------------------------------------------------------------- #
+# Sites cache (world map landing view) — single JSON blob in `meta`.
+# Kept independent of save_snapshot/load_snapshot above: the sites list has
+# a different lifecycle (fetched once on landing) and a much lighter
+# payload than the per-network topology cache, so it doesn't need its own
+# table — one `meta` row is enough.
+# --------------------------------------------------------------------------- #
+
+
+def save_sites_snapshot(sites: list[dict[str, Any]]) -> None:
+    """Persist the world-map sites list, replacing whatever was stored."""
+    with _write_lock:
+        _conn().execute(
+            "INSERT INTO meta(key, value) VALUES ('sites', ?) "
+            "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (json.dumps(sites),),
+        )
+
+
+def load_sites_snapshot() -> Optional[list[dict[str, Any]]]:
+    """Return the persisted sites list, or None if nothing stored yet."""
+    raw = meta_get("sites")
+    if raw is None:
+        return None
+    return json.loads(raw)
