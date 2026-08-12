@@ -2,8 +2,6 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { MerakiSite } from '../types/meraki';
 import { HEALTH_COLORS, HEALTH_LABELS } from '../lib/healthColors';
 import {
-  MAX_RADIUS,
-  MIN_RADIUS,
   WORLD_LAND_PATH,
   WORLD_VIEWBOX,
   project,
@@ -47,7 +45,7 @@ const ZOOM_BUTTON_STYLE: React.CSSProperties = {
  */
 function updateCircleVisual(circle: SVGCircleElement, zoomScale: number, isHovered: boolean) {
   const baseRadius = Number(circle.dataset.baseRadius);
-  const r = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, baseRadius / zoomScale));
+  const r = baseRadius / zoomScale;
   circle.setAttribute('r', String(r));
   circle.setAttribute('stroke', isHovered ? 'var(--text-primary)' : 'var(--bg-primary)');
   circle.setAttribute('stroke-width', String((isHovered ? 2 : 1) / zoomScale));
@@ -194,7 +192,7 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
         style={{ width: '100%', height: '100%', display: 'block', cursor: 'grab' }}
       >
         <g ref={mapGroupRef}>
-          <path d={WORLD_LAND_PATH} fill="var(--bg-tertiary)" stroke="var(--border-subtle)" strokeWidth={1} />
+          <path d={WORLD_LAND_PATH} fill="var(--bg-tertiary)" stroke="var(--border-subtle)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
 
           {mappedSites.map((site) => {
             const { x, y } = project(site.lat as number, site.lng as number);

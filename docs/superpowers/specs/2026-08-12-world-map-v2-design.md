@@ -119,12 +119,15 @@ transform after that).
 
 On every `d3-zoom` transform event, in addition to updating the `<g>`
 transform, each circle's `r` attribute is recomputed as
-`baseRadius / zoomScale` (clamped to `[MIN_RADIUS, MAX_RADIUS]`, same
-constants as today), where `baseRadius` is still `radiusForDeviceCount(...)`
-— i.e., "size reflects device count" continues to hold at the base (1x)
-zoom level, but the *rendered* size at any zoom is corrected so it doesn't
-grow with the map. This is the standard "non-scaling stroke/marker" pattern
-for D3 zoomable maps.
+`baseRadius / zoomScale`, with no further clamping — `baseRadius` is
+already clamped to `[MIN_RADIUS, MAX_RADIUS]` by `radiusForDeviceCount(...)`
+before this correction ever sees it, so re-clamping the *corrected* radius
+would defeat the correction (once `baseRadius / zoomScale` drops below
+`MIN_RADIUS`, a clamp pins `r` at `MIN_RADIUS` and the on-screen size
+starts growing linearly with zoom again). i.e., "size reflects device
+count" continues to hold at the base (1x) zoom level, and the *rendered*
+size at any zoom stays corrected so it doesn't grow with the map. This is
+the standard "non-scaling stroke/marker" pattern for D3 zoomable maps.
 
 Circle styling:
 - `fill-opacity: 0.82` (health color still clearly readable, but a
