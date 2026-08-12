@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { MerakiSite } from '../types/meraki';
 import { HEALTH_COLORS, HEALTH_LABELS } from '../lib/healthColors';
 import {
@@ -53,6 +53,18 @@ function updateCircleVisual(circle: SVGCircleElement, zoomScale: number, isHover
   circle.setAttribute('stroke-width', String((isHovered ? 2 : 1) / zoomScale));
 }
 
+/**
+ * Positions the tooltip element at `circleEl`'s live on-screen position,
+ * relative to `containerEl` — computed from actual rendered geometry so
+ * it's correct regardless of the map's current pan/zoom transform.
+ */
+function positionTooltip(tooltipEl: HTMLDivElement, containerEl: HTMLDivElement, circleEl: SVGCircleElement) {
+  const circleRect = circleEl.getBoundingClientRect();
+  const containerRect = containerEl.getBoundingClientRect();
+  tooltipEl.style.left = `${circleRect.left + circleRect.width / 2 - containerRect.left}px`;
+  tooltipEl.style.top = `${circleRect.top - containerRect.top}px`;
+}
+
 function centeredMessage(text: string, color = 'var(--text-muted)') {
   return (
     <div className="flex items-center justify-center h-full">
@@ -76,6 +88,9 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
   const svgRef = useRef<SVGSVGElement>(null);
   const mapGroupRef = useRef<SVGGElement>(null);
   const zoomControllerRef = useRef<WorldMapZoomController | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const hoveredCircleElRef = useRef<SVGCircleElement | null>(null);
 
   const mappedSites = useMemo(
     () => sites.filter((s) => s.mapped && s.lat !== null && s.lng !== null),
@@ -103,6 +118,9 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
       groupEl.querySelectorAll<SVGCircleElement>('circle[data-network-id]').forEach((circle) => {
         updateCircleVisual(circle, transform.k, circle.dataset.networkId === hoveredIdRef.current);
       });
+      if (hoveredCircleElRef.current && tooltipRef.current && containerRef.current) {
+        positionTooltip(tooltipRef.current, containerRef.current, hoveredCircleElRef.current);
+      }
     });
     zoomControllerRef.current = controller;
 
@@ -111,6 +129,15 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
       zoomControllerRef.current = null;
     };
   }, [mappedSites]);
+
+  // Position the tooltip once React has actually mounted its DOM node for
+  // the currently-hovered site — the mouse-enter handler below fires before
+  // that commit, so `tooltipRef.current` isn't available there yet.
+  useLayoutEffect(() => {
+    if (hoveredId && hoveredCircleElRef.current && tooltipRef.current && containerRef.current) {
+      positionTooltip(tooltipRef.current, containerRef.current, hoveredCircleElRef.current);
+    }
+  }, [hoveredId]);
 
   // `isConfigured` only flips true after an async status check, so gate the
   // message on there being nothing to show — otherwise a fresh load flashes
@@ -129,19 +156,18 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
   }
 
   const hoveredSite = sites.find((s) => s.network_id === hoveredId) ?? null;
-  const hoveredPoint = hoveredSite?.lat != null && hoveredSite?.lng != null
-    ? project(hoveredSite.lat, hoveredSite.lng)
-    : null;
 
   const handleCircleEnter = (networkId: string, circleEl: SVGCircleElement) => {
     setHoveredId(networkId);
     hoveredIdRef.current = networkId;
+    hoveredCircleElRef.current = circleEl;
     updateCircleVisual(circleEl, currentScaleRef.current, true);
   };
 
   const handleCircleLeave = (networkId: string, circleEl: SVGCircleElement) => {
     setHoveredId((id) => (id === networkId ? null : id));
     if (hoveredIdRef.current === networkId) hoveredIdRef.current = null;
+    if (hoveredCircleElRef.current === circleEl) hoveredCircleElRef.current = null;
     updateCircleVisual(circleEl, currentScaleRef.current, false);
   };
 
@@ -151,6 +177,7 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
   // inside its container.
   return (
     <div
+      ref={containerRef}
       style={{
         position: 'relative',
         width: '100%',
@@ -187,24 +214,30 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
                 style={{ cursor: 'pointer' }}
                 onMouseEnter={(e) => handleCircleEnter(site.network_id, e.currentTarget)}
                 onMouseLeave={(e) => handleCircleLeave(site.network_id, e.currentTarget)}
-                onClick={() =>
-                  onSelectSite(site.network_id, {
-                    xPct: (x / WORLD_VIEWBOX.width) * 100,
-                    yPct: (y / WORLD_VIEWBOX.height) * 100,
-                  })
-                }
+                onClick={(e) => {
+                  const containerRect = containerRef.current?.getBoundingClientRect();
+                  const circleRect = e.currentTarget.getBoundingClientRect();
+                  const origin = containerRect
+                    ? {
+                        xPct: ((circleRect.left + circleRect.width / 2 - containerRect.left) / containerRect.width) * 100,
+                        yPct: ((circleRect.top + circleRect.height / 2 - containerRect.top) / containerRect.height) * 100,
+                      }
+                    : { xPct: 50, yPct: 50 };
+                  onSelectSite(site.network_id, origin);
+                }}
               />
             );
           })}
         </g>
       </svg>
 
-      {hoveredSite && hoveredPoint && (
+      {hoveredSite && (
         <div
+          ref={tooltipRef}
           style={{
             position: 'absolute',
-            left: `${(hoveredPoint.x / WORLD_VIEWBOX.width) * 100}%`,
-            top: `${(hoveredPoint.y / WORLD_VIEWBOX.height) * 100}%`,
+            left: 0,
+            top: 0,
             transform: 'translate(-50%, -140%)',
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-subtle)',
