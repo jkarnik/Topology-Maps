@@ -21,5 +21,5 @@ const MAX_RADIUS = 26;
 export function radiusForDeviceCount(deviceCount: number, maxDeviceCount: number): number {
   if (maxDeviceCount <= 0) return MIN_RADIUS;
   const scale = Math.sqrt(Math.max(deviceCount, 0) / maxDeviceCount);
-  return MIN_RADIUS + scale * (MAX_RADIUS - MIN_RADIUS);
+  return Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, MIN_RADIUS + scale * (MAX_RADIUS - MIN_RADIUS)));
 }
