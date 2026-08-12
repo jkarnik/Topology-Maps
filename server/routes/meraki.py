@@ -345,6 +345,37 @@ async def get_l3_topology(network: Optional[str] = Query(None, description="Netw
 
 
 # ---------------------------------------------------------------------------
+# GET /api/meraki/sites
+# ---------------------------------------------------------------------------
+
+
+@router.get("/sites")
+async def get_sites():
+    """Return one aggregated entry per network for the world map landing view.
+
+    Reuses org devices, availabilities, and networks — no new Meraki API
+    surface beyond what /topology/l2 and /networks already fetch.
+    """
+    org_id = await _get_org_id()
+    client = _get_client()
+
+    try:
+        devices, networks, availabilities = await asyncio.gather(
+            client.get_org_devices(org_id),
+            client.get_org_networks(org_id),
+            client.get_org_device_availabilities(org_id),
+        )
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=exc.response.status_code,
+            detail=f"Meraki API error: {exc.response.text}",
+        ) from exc
+
+    sites = _transformer.build_sites(networks, devices, availabilities)
+    return {"sites": [s.model_dump() for s in sites]}
+
+
+# ---------------------------------------------------------------------------
 # GET /api/meraki/devices/{serial}
 # ---------------------------------------------------------------------------
 
@@ -560,3 +591,32 @@ def save_cache(payload: dict[str, Any] = Body(...)):
             detail=f"Failed to persist snapshot: {exc}",
         ) from exc
     return {"saved": True, "rows": rows}
+
+
+# ---------------------------------------------------------------------------
+# GET  /api/meraki/sites/cache/load
+# POST /api/meraki/sites/cache/save
+# ---------------------------------------------------------------------------
+# Same server-side persistence pattern as /cache/load and /cache/save above,
+# but for the lightweight sites list only — kept independent so the world
+# map can paint from cache without touching the (much heavier) per-network
+# topology cache.
+
+
+@router.get("/sites/cache/load")
+def load_sites_cache():
+    """Return the persisted sites list, or 404 if empty."""
+    sites = db.load_sites_snapshot()
+    if sites is None:
+        raise HTTPException(status_code=404, detail="No cached sites")
+    return {"sites": sites}
+
+
+@router.post("/sites/cache/save")
+def save_sites_cache(payload: dict[str, Any] = Body(...)):
+    """Replace the persisted sites list with the given snapshot."""
+    sites = payload.get("sites")
+    if not isinstance(sites, list):
+        raise HTTPException(status_code=400, detail="Expected {'sites': [...]}")
+    db.save_sites_snapshot(sites)
+    return {"saved": True, "rows": len(sites)}
