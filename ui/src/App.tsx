@@ -44,12 +44,33 @@ function App() {
     setMerakiInitialized(true);
 
     if (meraki.networks.length === 0) {
-      meraki.fetchNetworks();
+      // Seed file first: it's the only path that hydrates isConfigured /
+      // cacheRef / networks from the server-side snapshot without hitting the
+      // live Meraki API. Fall back to the live networks list if it misses.
+      meraki.loadSeedFile().then((seedOk) => {
+        if (!seedOk) meraki.fetchNetworks();
+      });
     }
     merakiSites.loadCached().then((hit) => {
       if (!hit) merakiSites.refresh();
     });
   }, [dataSource, merakiInitialized]);
+
+  // The TopBar network dropdown is a shortcut straight to a site's topology,
+  // so picking one has to leave the world map too.
+  const handleNetworkChange = (id: string | null) => {
+    meraki.setSelectedNetwork(id);
+    if (id) setMerakiView('site');
+  };
+
+  // Opening Meraki always lands on the world map, so leaving Meraki resets the
+  // drilled-in site view.
+  const handleDataSourceChange = (next: DataSource) => {
+    if (dataSource === 'meraki' && next !== 'meraki') {
+      setMerakiView('map');
+    }
+    setDataSource(next);
+  };
 
   const handleSelectSite = (networkId: string, origin: { xPct: number; yPct: number }) => {
     setTransitionOrigin(origin);
@@ -89,7 +110,7 @@ function App() {
     <div className="h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
       <TopBar
         dataSource={dataSource}
-        onDataSourceChange={setDataSource}
+        onDataSourceChange={handleDataSourceChange}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         isConnected={topo.isConnected}
@@ -100,10 +121,10 @@ function App() {
         onSimulationStop={sim.stop}
         merakiNetworks={meraki.networks}
         selectedNetwork={meraki.selectedNetwork}
-        onNetworkChange={meraki.setSelectedNetwork}
-        isRefreshing={meraki.isRefreshing}
-        lastUpdated={meraki.lastUpdated}
-        onRefresh={meraki.refresh}
+        onNetworkChange={handleNetworkChange}
+        isRefreshing={showWorldMap ? merakiSites.isLoading : meraki.isRefreshing}
+        lastUpdated={showWorldMap ? merakiSites.lastUpdated : meraki.lastUpdated}
+        onRefresh={showWorldMap ? merakiSites.refresh : meraki.refresh}
         onSaveSnapshot={meraki.saveSnapshot}
         merakiView={merakiView}
         onBackToMap={handleBackToMap}
@@ -116,6 +137,10 @@ function App() {
             style={{
               position: 'absolute',
               inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--bg-primary)',
               transformOrigin: `${transitionOrigin.xPct}% ${transitionOrigin.yPct}%`,
               transform: isTransitioning ? 'scale(2.4)' : 'scale(1)',
               opacity: isTransitioning ? 0 : 1,

@@ -45,7 +45,10 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
     [sites],
   );
 
-  if (!isConfigured) {
+  // `isConfigured` only flips true after an async status check, so gate the
+  // message on there being nothing to show — otherwise a fresh load flashes
+  // "not configured" and cached sites get hidden behind it.
+  if (!isConfigured && sites.length === 0) {
     return centeredMessage('Meraki API key is not configured.');
   }
   if (isLoading && sites.length === 0) {
@@ -63,8 +66,21 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
     ? project(hoveredSite.lat, hoveredSite.lng)
     : null;
 
+  // The container box must match the viewBox aspect ratio: percentage-positioned
+  // overlays (tooltip, unmapped panel) and the click handler's viewBox-derived
+  // xPct/yPct only share a coordinate space when the SVG isn't letterboxed
+  // inside its container.
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: 'var(--bg-primary)', overflow: 'hidden' }}>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        maxHeight: '100%',
+        aspectRatio: `${WORLD_VIEWBOX.width} / ${WORLD_VIEWBOX.height}`,
+        background: 'var(--bg-primary)',
+        overflow: 'hidden',
+      }}
+    >
       <svg
         viewBox={`0 0 ${WORLD_VIEWBOX.width} ${WORLD_VIEWBOX.height}`}
         preserveAspectRatio="xMidYMid meet"

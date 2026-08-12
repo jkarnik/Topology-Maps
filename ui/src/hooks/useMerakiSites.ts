@@ -32,14 +32,17 @@ export function useMerakiSites(): UseMerakiSitesReturn {
   );
 
   const loadCached = useCallback(async (): Promise<boolean> => {
-    if (bootCache) return true; // already hydrated synchronously above
+    // An empty snapshot is not a hit — reporting success on `{sites: []}` would
+    // strand the caller on an empty cache instead of falling through to refresh().
+    if (bootCache && bootCache.sites.length > 0) return true; // hydrated synchronously above
     try {
       const resp = await fetch('/api/meraki/sites/cache/load', { cache: 'no-store' });
       if (!resp.ok) return false;
       const data = (await resp.json()) as { sites: MerakiSite[] };
-      setSites(data.sites ?? []);
+      const nextSites = data.sites ?? [];
+      setSites(nextSites);
       setHasFetched(true);
-      return true;
+      return nextSites.length > 0;
     } catch {
       return false;
     }
