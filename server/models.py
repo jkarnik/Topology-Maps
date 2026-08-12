@@ -133,6 +133,27 @@ class L3Topology(BaseModel):
     routes: list[Route] = Field(default_factory=list)
 
 
+# --- Site Models (world map landing view) ---
+
+class HealthBucket(str, Enum):
+    GREEN = "green"
+    YELLOW = "yellow"
+    ORANGE = "orange"
+    RED = "red"
+    UNKNOWN = "unknown"
+
+
+class Site(BaseModel):
+    network_id: str
+    name: str
+    lat: Optional[float] = None
+    lng: Optional[float] = None
+    device_count: int = 0
+    health_bucket: HealthBucket = HealthBucket.UNKNOWN
+    unhealthy_pct: Optional[float] = None
+    mapped: bool = False
+
+
 # --- Connection Edit ---
 
 class PortRef(BaseModel):

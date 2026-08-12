@@ -9,11 +9,13 @@ from server.models import (
     DeviceStatus,
     DeviceType,
     Edge,
+    HealthBucket,
     L2Topology,
     L3Topology,
     LinkProtocol,
     Route,
     RoutingPolicy,
+    Site,
     Subnet,
 )
 
@@ -357,6 +359,88 @@ class MerakiTransformer:
 
         return L3Topology(subnets=subnets, routes=routes)
 
+    # ------------------------------------------------------------------
+    # Sites (world map landing view)
+    # ------------------------------------------------------------------
+
+    def build_sites(
+        self,
+        networks: list[dict],
+        devices: list[dict],
+        availabilities: list[dict],
+    ) -> list[Site]:
+        """Aggregate one Site summary per network for the world map view.
+
+        Args:
+            networks: List of network objects from GET /organizations/{id}/networks.
+            devices: List of device objects from GET /organizations/{id}/devices.
+                Location is resolved from each device's `lat`/`lng` fields,
+                which Meraki populates when an address is configured.
+            availabilities: List of availability objects from
+                GET /organizations/{id}/devices/availabilities.
+
+        Returns:
+            One Site per input network, in the same order.
+        """
+        devices_by_network: dict[str, list[dict]] = {}
+        for dev in devices:
+            net_id = dev.get("networkId")
+            if not net_id:
+                continue
+            devices_by_network.setdefault(net_id, []).append(dev)
+
+        status_by_serial: dict[str, str] = {
+            a["serial"]: a.get("status", "")
+            for a in availabilities
+            if "serial" in a
+        }
+
+        sites: list[Site] = []
+        for net in networks:
+            net_id = net.get("id")
+            if not net_id:
+                continue
+            net_devices = devices_by_network.get(net_id, [])
+
+            lat: Optional[float] = None
+            lng: Optional[float] = None
+            for dev in net_devices:
+                dev_lat, dev_lng = dev.get("lat"), dev.get("lng")
+                if dev_lat is not None and dev_lng is not None:
+                    lat, lng = dev_lat, dev_lng
+                    break
+
+            online = alerting = offline = 0
+            for dev in net_devices:
+                serial = dev.get("serial")
+                status = status_by_serial.get(serial, "") if serial else ""
+                if status == "online":
+                    online += 1
+                elif status == "alerting":
+                    alerting += 1
+                elif status == "offline":
+                    offline += 1
+                # "dormant" and unknown/missing statuses are excluded from
+                # the denominator entirely — see docstring above.
+
+            denominator = online + alerting + offline
+            unhealthy_pct = (alerting + offline) / denominator if denominator else None
+
+            sites.append(
+                Site(
+                    network_id=net_id,
+                    name=net.get("name", net_id),
+                    lat=lat,
+                    lng=lng,
+                    device_count=len(net_devices),
+                    health_bucket=_health_bucket(unhealthy_pct),
+                    unhealthy_pct=unhealthy_pct,
+                    mapped=lat is not None and lng is not None,
+                )
+            )
+
+        return sites
+
 
 # ------------------------------------------------------------------
 # Private helpers
@@ -385,3 +469,20 @@ def _detect_protocol(end_a: dict, end_b: dict) -> LinkProtocol:
         if (end.get("discovered") or {}).get("lldp"):
             return LinkProtocol.LLDP
     return LinkProtocol.LLDP  # default to LLDP for wired links
+
+
+def _health_bucket(unhealthy_pct: Optional[float]) -> HealthBucket:
+    """Bucket a site's unhealthy-device ratio into the 5-tier health scale.
+
+    Boundaries: 0% -> green, (0%, 25%] -> yellow, (25%, 60%] -> orange,
+    >60% -> red. No data at all (ratio is None) -> unknown.
+    """
+    if unhealthy_pct is None:
+        return HealthBucket.UNKNOWN
+    if unhealthy_pct == 0:
+        return HealthBucket.GREEN
+    if unhealthy_pct <= 0.25:
+        return HealthBucket.YELLOW
+    if unhealthy_pct <= 0.60:
+        return HealthBucket.ORANGE
+    return HealthBucket.RED
