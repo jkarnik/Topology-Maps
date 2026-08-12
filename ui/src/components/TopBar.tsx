@@ -22,6 +22,8 @@ interface TopBarProps {
   lastUpdated: Date | null;
   onRefresh: () => void;
   onSaveSnapshot: () => Promise<boolean>;
+  merakiView: 'map' | 'site';
+  onBackToMap: () => void;
 }
 
 /** Convert seconds to "M:SS" format */
@@ -66,6 +68,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   lastUpdated,
   onRefresh,
   onSaveSnapshot,
+  merakiView,
+  onBackToMap,
 }) => {
   const accentColor = dataSource === 'simulated' ? 'var(--accent-cyan)' : 'var(--accent-amber)';
 
@@ -99,11 +103,35 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Network filter — Meraki only */}
       {dataSource === 'meraki' && (
-        <NetworkFilter
-          networks={merakiNetworks}
-          value={selectedNetwork}
-          onChange={onNetworkChange}
-        />
+        <>
+          {merakiView === 'site' && (
+            <button
+              onClick={onBackToMap}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                height: '32px',
+                padding: '0 12px',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              ◀ World Map
+            </button>
+          )}
+          <NetworkFilter
+            networks={merakiNetworks}
+            value={selectedNetwork}
+            onChange={onNetworkChange}
+          />
+        </>
       )}
 
       {/* Center: View mode pills — not applicable to Configs workspace */}
