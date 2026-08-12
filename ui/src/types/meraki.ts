@@ -39,3 +39,20 @@ export interface MerakiDeviceDetail {
   clients: Record<string, unknown>[];
   switch_ports: Record<string, unknown>[];
 }
+
+export type HealthBucket = 'green' | 'yellow' | 'orange' | 'red' | 'unknown';
+
+/**
+ * One aggregated entry per Meraki network for the world map landing view.
+ * Mirrors the backend `Site` model (server/models.py).
+ */
+export interface MerakiSite {
+  network_id: string;
+  name: string;
+  lat: number | null;
+  lng: number | null;
+  device_count: number;
+  health_bucket: HealthBucket;
+  unhealthy_pct: number | null;
+  mapped: boolean;
+}
