@@ -44,6 +44,12 @@ def _row_for_org(conn, org_id: str, name: Optional[str]) -> dict:
            ORDER BY id DESC LIMIT 1""",
         (org_id,),
     ).fetchone()
+    last_sync = conn.execute(
+        """SELECT completed_at FROM config_sweep_runs
+           WHERE org_id=? AND status='complete'
+           ORDER BY completed_at DESC LIMIT 1""",
+        (org_id,),
+    ).fetchone()
     active = conn.execute(
         """SELECT id FROM config_sweep_runs
            WHERE org_id=? AND status IN ('queued','running')
@@ -55,7 +61,7 @@ def _row_for_org(conn, org_id: str, name: Optional[str]) -> dict:
         "name": name,
         "observation_count": obs_count,
         "baseline_state": last_baseline["status"] if last_baseline else "none",
-        "last_baseline_at": last_baseline["completed_at"] if last_baseline else None,
+        "last_baseline_at": last_sync["completed_at"] if last_sync else None,
         "active_sweep_run_id": active["id"] if active else None,
     }
 
@@ -122,6 +128,10 @@ async def get_status(org_id: str) -> dict:
         "SELECT status, completed_at FROM config_sweep_runs WHERE org_id=? AND kind='baseline' ORDER BY id DESC LIMIT 1",
         (org_id,),
     ).fetchone()
+    last_sync = conn.execute(
+        "SELECT completed_at FROM config_sweep_runs WHERE org_id=? AND status='complete' ORDER BY completed_at DESC LIMIT 1",
+        (org_id,),
+    ).fetchone()
     active = conn.execute(
         "SELECT id, kind, status FROM config_sweep_runs WHERE org_id=? AND status IN ('queued','running') ORDER BY id DESC LIMIT 1",
         (org_id,),
@@ -129,7 +139,7 @@ async def get_status(org_id: str) -> dict:
     conn.close()
     return {
         "baseline_state": last["status"] if last else "none",
-        "last_sync": last["completed_at"] if last else None,
+        "last_sync": last_sync["completed_at"] if last_sync else None,
         "active_sweep": dict(active) if active else None,
     }
 
