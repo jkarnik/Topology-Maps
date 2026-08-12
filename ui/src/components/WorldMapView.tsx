@@ -1,8 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MerakiSite } from '../types/meraki';
 import { HEALTH_COLORS, HEALTH_LABELS } from '../lib/healthColors';
-import { WORLD_VIEWBOX, project, radiusForDeviceCount } from '../lib/worldProjection';
-import { WORLD_OUTLINE_PATHS } from '../assets/worldOutline';
+import {
+  MAX_RADIUS,
+  MIN_RADIUS,
+  WORLD_LAND_PATH,
+  WORLD_VIEWBOX,
+  project,
+  radiusForDeviceCount,
+} from '../lib/worldProjection';
+import { attachWorldMapZoom, WorldMapZoomController } from '../lib/worldMapZoom';
 
 interface WorldMapViewProps {
   sites: MerakiSite[];
@@ -15,6 +22,36 @@ interface WorldMapViewProps {
 const LEGEND_BUCKETS: MerakiSite['health_bucket'][] = ['green', 'yellow', 'orange', 'red', 'unknown'];
 
 const CENTER_ORIGIN = { xPct: 50, yPct: 50 };
+
+const ZOOM_BUTTON_STYLE: React.CSSProperties = {
+  width: '26px',
+  height: '26px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'var(--bg-tertiary)',
+  border: '1px solid var(--border-subtle)',
+  borderRadius: '6px',
+  color: 'var(--text-secondary)',
+  cursor: 'pointer',
+  fontFamily: "'JetBrains Mono', monospace",
+  fontSize: '14px',
+  fontWeight: 600,
+};
+
+/**
+ * Applies zoom-corrected radius/stroke to one site circle DOM node directly
+ * (no React re-render) — called on every d3-zoom transform tick and on
+ * hover enter/leave, so a circle's visual state is always a pure function
+ * of (baseRadius, current zoom scale, is-this-circle-hovered).
+ */
+function updateCircleVisual(circle: SVGCircleElement, zoomScale: number, isHovered: boolean) {
+  const baseRadius = Number(circle.dataset.baseRadius);
+  const r = Math.max(MIN_RADIUS, Math.min(MAX_RADIUS, baseRadius / zoomScale));
+  circle.setAttribute('r', String(r));
+  circle.setAttribute('stroke', isHovered ? 'var(--text-primary)' : 'var(--bg-primary)');
+  circle.setAttribute('stroke-width', String((isHovered ? 2 : 1) / zoomScale));
+}
 
 function centeredMessage(text: string, color = 'var(--text-muted)') {
   return (
@@ -34,6 +71,11 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
   onSelectSite,
 }) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const hoveredIdRef = useRef<string | null>(null);
+  const currentScaleRef = useRef(1);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const mapGroupRef = useRef<SVGGElement>(null);
+  const zoomControllerRef = useRef<WorldMapZoomController | null>(null);
 
   const mappedSites = useMemo(
     () => sites.filter((s) => s.mapped && s.lat !== null && s.lng !== null),
@@ -44,6 +86,31 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
     () => sites.reduce((max, s) => Math.max(max, s.device_count), 1),
     [sites],
   );
+
+  // d3-zoom owns the continuous pan/zoom transform imperatively (see
+  // lib/worldMapZoom.ts) — routing every zoom/pan/pinch tick through a
+  // React re-render would be visibly less smooth. React only re-mounts
+  // this effect (resetting to the fitted view) when the site list itself
+  // changes, e.g. after a refresh poll.
+  useEffect(() => {
+    const svgEl = svgRef.current;
+    const groupEl = mapGroupRef.current;
+    if (!svgEl || !groupEl) return;
+
+    const controller = attachWorldMapZoom(svgEl, (transform) => {
+      groupEl.setAttribute('transform', transform.toString());
+      currentScaleRef.current = transform.k;
+      groupEl.querySelectorAll<SVGCircleElement>('circle[data-network-id]').forEach((circle) => {
+        updateCircleVisual(circle, transform.k, circle.dataset.networkId === hoveredIdRef.current);
+      });
+    });
+    zoomControllerRef.current = controller;
+
+    return () => {
+      controller.destroy();
+      zoomControllerRef.current = null;
+    };
+  }, [mappedSites]);
 
   // `isConfigured` only flips true after an async status check, so gate the
   // message on there being nothing to show — otherwise a fresh load flashes
@@ -66,6 +133,18 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
     ? project(hoveredSite.lat, hoveredSite.lng)
     : null;
 
+  const handleCircleEnter = (networkId: string, circleEl: SVGCircleElement) => {
+    setHoveredId(networkId);
+    hoveredIdRef.current = networkId;
+    updateCircleVisual(circleEl, currentScaleRef.current, true);
+  };
+
+  const handleCircleLeave = (networkId: string, circleEl: SVGCircleElement) => {
+    setHoveredId((id) => (id === networkId ? null : id));
+    if (hoveredIdRef.current === networkId) hoveredIdRef.current = null;
+    updateCircleVisual(circleEl, currentScaleRef.current, false);
+  };
+
   // The container box must match the viewBox aspect ratio: percentage-positioned
   // overlays (tooltip, unmapped panel) and the click handler's viewBox-derived
   // xPct/yPct only share a coordinate space when the SVG isn't letterboxed
@@ -82,38 +161,42 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
       }}
     >
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${WORLD_VIEWBOX.width} ${WORLD_VIEWBOX.height}`}
         preserveAspectRatio="xMidYMid meet"
-        style={{ width: '100%', height: '100%', display: 'block' }}
+        style={{ width: '100%', height: '100%', display: 'block', cursor: 'grab' }}
       >
-        {WORLD_OUTLINE_PATHS.map((d, i) => (
-          <path key={i} d={d} fill="var(--bg-tertiary)" stroke="var(--border-subtle)" strokeWidth={1} />
-        ))}
+        <g ref={mapGroupRef}>
+          <path d={WORLD_LAND_PATH} fill="var(--bg-tertiary)" stroke="var(--border-subtle)" strokeWidth={1} />
 
-        {mappedSites.map((site) => {
-          const { x, y } = project(site.lat as number, site.lng as number);
-          const r = radiusForDeviceCount(site.device_count, maxDeviceCount);
-          return (
-            <circle
-              key={site.network_id}
-              cx={x}
-              cy={y}
-              r={r}
-              fill={HEALTH_COLORS[site.health_bucket]}
-              stroke={hoveredId === site.network_id ? 'var(--text-primary)' : 'none'}
-              strokeWidth={2}
-              style={{ cursor: 'pointer' }}
-              onMouseEnter={() => setHoveredId(site.network_id)}
-              onMouseLeave={() => setHoveredId((id) => (id === site.network_id ? null : id))}
-              onClick={() =>
-                onSelectSite(site.network_id, {
-                  xPct: (x / WORLD_VIEWBOX.width) * 100,
-                  yPct: (y / WORLD_VIEWBOX.height) * 100,
-                })
-              }
-            />
-          );
-        })}
+          {mappedSites.map((site) => {
+            const { x, y } = project(site.lat as number, site.lng as number);
+            const baseRadius = radiusForDeviceCount(site.device_count, maxDeviceCount);
+            return (
+              <circle
+                key={site.network_id}
+                data-network-id={site.network_id}
+                data-base-radius={baseRadius}
+                cx={x}
+                cy={y}
+                r={baseRadius}
+                fill={HEALTH_COLORS[site.health_bucket]}
+                fillOpacity={0.82}
+                stroke="var(--bg-primary)"
+                strokeWidth={1}
+                style={{ cursor: 'pointer' }}
+                onMouseEnter={(e) => handleCircleEnter(site.network_id, e.currentTarget)}
+                onMouseLeave={(e) => handleCircleLeave(site.network_id, e.currentTarget)}
+                onClick={() =>
+                  onSelectSite(site.network_id, {
+                    xPct: (x / WORLD_VIEWBOX.width) * 100,
+                    yPct: (y / WORLD_VIEWBOX.height) * 100,
+                  })
+                }
+              />
+            );
+          })}
+        </g>
       </svg>
 
       {hoveredSite && hoveredPoint && (
@@ -139,6 +222,26 @@ export const WorldMapView: React.FC<WorldMapViewProps> = ({
           {hoveredSite.unhealthy_pct ? `, ${Math.round(hoveredSite.unhealthy_pct * 100)}% alerting` : ''}
         </div>
       )}
+
+      {/* Zoom controls */}
+      <div style={{ position: 'absolute', right: '14px', bottom: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <button
+          type="button"
+          aria-label="Zoom in"
+          onClick={() => zoomControllerRef.current?.zoomIn()}
+          style={ZOOM_BUTTON_STYLE}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          aria-label="Zoom out"
+          onClick={() => zoomControllerRef.current?.zoomOut()}
+          style={ZOOM_BUTTON_STYLE}
+        >
+          −
+        </button>
+      </div>
 
       {/* Legend */}
       <div
