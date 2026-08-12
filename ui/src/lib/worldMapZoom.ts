@@ -1,5 +1,6 @@
 import { select } from 'd3-selection';
 import { zoom as d3Zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
+import { WORLD_VIEWBOX } from './worldProjection';
 
 export type { ZoomTransform };
 
@@ -31,8 +32,21 @@ export function attachWorldMapZoom(
   onTransform: (transform: ZoomTransform) => void,
 ): WorldMapZoomController {
   const selection = select<SVGSVGElement, unknown>(svgEl);
+  const worldExtent: [[number, number], [number, number]] = [
+    [0, 0],
+    [WORLD_VIEWBOX.width, WORLD_VIEWBOX.height],
+  ];
   const behavior = d3Zoom<SVGSVGElement, unknown>()
     .scaleExtent(SCALE_EXTENT)
+    // Without an explicit extent/translateExtent, d3-zoom leaves panning
+    // unconstrained at any scale (including the scale-1 floor) — the
+    // scaleExtent floor alone only stops zooming out further, it does not
+    // stop dragging the world off-screen. Pinning both extents to the
+    // viewBox keeps the fitted view's edges as the pan boundary, so at
+    // scale 1 the map can't be dragged at all, and at higher scales you
+    // can pan up to (but not past) the world's edges.
+    .extent(worldExtent)
+    .translateExtent(worldExtent)
     .on('zoom', (event) => onTransform(event.transform));
 
   selection.call(behavior);
