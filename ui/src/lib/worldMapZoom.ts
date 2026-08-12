@@ -1,0 +1,46 @@
+import { select } from 'd3-selection';
+import { zoom as d3Zoom, zoomIdentity, type ZoomTransform } from 'd3-zoom';
+
+export type { ZoomTransform };
+
+/**
+ * 1 = the fitted "see the whole world" state (also the floor, so the user
+ * can't pan into empty space past the world's edges while zoomed out).
+ * 20 is deep enough to separate any realistically-close sites.
+ */
+const SCALE_EXTENT: [number, number] = [1, 20];
+
+/** Multiplier applied per +/- button click. */
+const ZOOM_STEP = 1.4;
+
+export interface WorldMapZoomController {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  destroy: () => void;
+}
+
+/**
+ * Attaches d3-zoom (scroll, drag, pinch, double-click — all d3-zoom
+ * defaults, no custom gesture code) to `svgEl` and reports every zoom
+ * transform via `onTransform`. Fires `onTransform` once immediately with
+ * the identity transform so callers can size circles correctly before
+ * the user has interacted at all.
+ */
+export function attachWorldMapZoom(
+  svgEl: SVGSVGElement,
+  onTransform: (transform: ZoomTransform) => void,
+): WorldMapZoomController {
+  const selection = select<SVGSVGElement, unknown>(svgEl);
+  const behavior = d3Zoom<SVGSVGElement, unknown>()
+    .scaleExtent(SCALE_EXTENT)
+    .on('zoom', (event) => onTransform(event.transform));
+
+  selection.call(behavior);
+  behavior.transform(selection, zoomIdentity);
+
+  return {
+    zoomIn: () => behavior.scaleBy(selection, ZOOM_STEP),
+    zoomOut: () => behavior.scaleBy(selection, 1 / ZOOM_STEP),
+    destroy: () => selection.on('.zoom', null),
+  };
+}
