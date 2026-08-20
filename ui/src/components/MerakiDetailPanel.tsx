@@ -78,7 +78,7 @@ const statusLabel: Record<DeviceStatus, string> = {
 const typeLabel: Record<DeviceType, string> = {
   firewall: 'Firewall',
   core_switch: 'Core Switch',
-  floor_switch: 'Floor Switch',
+  floor_switch: 'Distribution Switch',
   access_point: 'Access Point',
   endpoint: 'Endpoint',
 };

@@ -2,7 +2,10 @@ import { Node, Edge as RFEdge } from '@xyflow/react';
 import { L2Topology, Device, DeviceType } from '../types/topology';
 
 // Layout constants
-const TIER_GAP_Y = 180;       // Vertical gap between tiers
+// Firewalls render as a 190px-tall hexagon (DeviceNode.tsx) — the gap must
+// clear that or the source/target handles invert and the bezier edge
+// loops back on itself instead of curving down to the next tier.
+const TIER_GAP_Y = 220;       // Vertical gap between tiers
 const NODE_GAP_X = 80;        // Horizontal gap between nodes in same tier
 const ENDPOINT_GAP_X = 30;    // Tighter gap for endpoint nodes
 const STACK_NODE_W = 220;     // Width for switchStackNode (and non-stacked floor switches)
@@ -64,11 +67,17 @@ export function layoutL2Topology(
   }
 
   // ----- Stack grouping -----
+  // Meraki stack names are only unique within a network — "Core Stack" is
+  // a generic convention many sites reuse — so the All-Networks view must
+  // key on (network, stack_name) or it merges different sites' stacks
+  // into one virtual node.
+  const stackKey = (device: Device): string => `${device.network_id ?? ''}::${device.stack_name}`;
   const stackGroups = new Map<string, Device[]>();
   for (const device of devices) {
     if (device.stack_name) {
-      if (!stackGroups.has(device.stack_name)) stackGroups.set(device.stack_name, []);
-      stackGroups.get(device.stack_name)!.push(device);
+      const key = stackKey(device);
+      if (!stackGroups.has(key)) stackGroups.set(key, []);
+      stackGroups.get(key)!.push(device);
     }
   }
 
@@ -93,26 +102,41 @@ export function layoutL2Topology(
 
   const sortedTierKeys = [...tiers.keys()].sort((a, b) => a - b);
 
-  // ----- Build switch units for floor_switch tier -----
-  const floorSwitchTierDevices = tiers.get(TIER_ORDER.floor_switch) ?? [];
-  const switchUnits: SwitchUnit[] = [];
-  {
+  // ----- Build switch units for any tier with stacked switches -----
+  // Meraki stacks exist at both the core and distribution layer, so this
+  // groups whichever tier's devices share a stack_name (e.g. a "Core
+  // Stack" pair as well as per-floor "Dist" stacks) into one visual unit —
+  // not just the floor_switch tier. Devices resolve to a virtual node ID
+  // when stacked, so building this per-tier keeps edge resolution below
+  // consistent with the nodes actually rendered for that tier.
+  function buildSwitchUnits(tierDevices: Device[]): SwitchUnit[] {
+    const units: SwitchUnit[] = [];
     const seenVirtualIds = new Set<string>();
-    for (const d of floorSwitchTierDevices) {
+    for (const d of tierDevices) {
       const vId = resolveId(d.id);
       if (seenVirtualIds.has(vId)) continue;
       seenVirtualIds.add(vId);
       if (d.stack_name) {
-        const members = stackGroups.get(d.stack_name) ?? [d];
-        switchUnits.push({ virtualId: vId, members, stackName: d.stack_name });
+        const members = stackGroups.get(stackKey(d)) ?? [d];
+        units.push({ virtualId: vId, members, stackName: d.stack_name });
       } else {
-        switchUnits.push({ virtualId: vId, members: [d], stackName: null });
+        units.push({ virtualId: vId, members: [d], stackName: null });
       }
     }
-    switchUnits.sort((a, b) => a.virtualId.localeCompare(b.virtualId));
+    units.sort((a, b) => a.virtualId.localeCompare(b.virtualId));
+    return units;
+  }
+
+  const tierSwitchUnits = new Map<number, SwitchUnit[]>();
+  for (const tierKey of sortedTierKeys) {
+    const tierDevices = tiers.get(tierKey)!;
+    if (tierDevices.some(d => d.stack_name)) {
+      tierSwitchUnits.set(tierKey, buildSwitchUnits(tierDevices));
+    }
   }
 
   // ----- AP parent mapping (for sort) -----
+  const floorSwitchTierDevices = tiers.get(TIER_ORDER.floor_switch) ?? [];
   const floorSwitchDeviceIds = new Set(floorSwitchTierDevices.map(d => d.id));
   const apDeviceIds = new Set((tiers.get(TIER_ORDER.access_point) ?? []).map(d => d.id));
   const apToParentSwitch = new Map<string, string>();
@@ -130,10 +154,11 @@ export function layoutL2Topology(
   for (const tierKey of sortedTierKeys) {
     const tierDevices = tiers.get(tierKey)!;
     const representativeType = tierDevices[0]?.type ?? 'endpoint';
+    const switchUnitsForTier = tierSwitchUnits.get(tierKey);
     let width: number;
 
-    if (representativeType === 'floor_switch') {
-      width = switchUnits.length * STACK_NODE_W + Math.max(0, switchUnits.length - 1) * NODE_GAP_X;
+    if (switchUnitsForTier) {
+      width = switchUnitsForTier.length * STACK_NODE_W + Math.max(0, switchUnitsForTier.length - 1) * NODE_GAP_X;
     } else {
       const isSmallType = representativeType === 'endpoint' || representativeType === 'access_point';
       const gap = isSmallType ? ENDPOINT_GAP_X : NODE_GAP_X;
@@ -153,13 +178,14 @@ export function layoutL2Topology(
     let tierDevices = tiers.get(tierKey)!;
     const representativeType = tierDevices[0]?.type ?? 'endpoint';
     const y = i * TIER_GAP_Y;
+    const switchUnitsForTier = tierSwitchUnits.get(tierKey);
 
-    if (representativeType === 'floor_switch') {
-      const tierWidth = switchUnits.length * STACK_NODE_W + Math.max(0, switchUnits.length - 1) * NODE_GAP_X;
+    if (switchUnitsForTier) {
+      const tierWidth = switchUnitsForTier.length * STACK_NODE_W + Math.max(0, switchUnitsForTier.length - 1) * NODE_GAP_X;
       const startX = (maxTierWidth - tierWidth) / 2;
 
-      for (let j = 0; j < switchUnits.length; j++) {
-        const unit = switchUnits[j];
+      for (let j = 0; j < switchUnitsForTier.length; j++) {
+        const unit = switchUnitsForTier[j];
         const x = startX + j * (STACK_NODE_W + NODE_GAP_X);
         if (unit.stackName) {
           nodes.push({
@@ -176,7 +202,7 @@ export function layoutL2Topology(
             type: 'deviceNode',
             position: { x, y },
             data: { device },
-            style: { width: STACK_NODE_W, height: NODE_DIMENSIONS.floor_switch.height },
+            style: { width: STACK_NODE_W, height: NODE_DIMENSIONS[device.type].height },
           });
         }
       }
@@ -229,11 +255,24 @@ export function layoutL2Topology(
   const nodeIds = new Set(nodes.map(n => n.id));
   const seenEdgePairs = new Set<string>();
   const edges: RFEdge[] = [];
+  const deviceTierById = new Map<string, number>();
+  for (const device of devices) {
+    deviceTierById.set(device.id, TIER_ORDER[device.type] ?? 4);
+  }
 
   for (const e of connections) {
     if (e.protocol === 'stack') continue;
-    const src = resolveId(e.source);
-    const tgt = resolveId(e.target);
+    // LLDP direction reflects whichever side happened to report the link,
+    // not visual hierarchy — a link can come in as core→firewall just as
+    // easily as firewall→core. Every node only exposes a Bottom-exit /
+    // Top-entry handle, so normalize to the higher tier as source or the
+    // edge is forced to loop back on itself to satisfy the handle
+    // directions.
+    const srcTier = deviceTierById.get(e.source) ?? 0;
+    const tgtTier = deviceTierById.get(e.target) ?? 0;
+    const [higherId, lowerId] = srcTier <= tgtTier ? [e.source, e.target] : [e.target, e.source];
+    const src = resolveId(higherId);
+    const tgt = resolveId(lowerId);
     if (src === tgt) continue;
     if (!nodeIds.has(src) || !nodeIds.has(tgt)) continue;
     const pairKey = [src, tgt].sort().join('--');

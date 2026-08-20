@@ -146,9 +146,20 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
   const [refreshProgress, setRefreshProgress] = useState(0);
   const [refreshTotal, setRefreshTotal] = useState(0);
   const [remainingSeconds] = useState<number | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(
+  const [lastUpdated, setLastUpdatedState] = useState<Date | null>(
     bootCache?.lastUpdated ? new Date(bootCache.lastUpdated) : null,
   );
+  // A caller that chains `refresh(...).then(() => saveSnapshot())` invokes
+  // saveSnapshot from a closure captured before the refresh started — by
+  // the time it runs, `lastUpdated` state has moved on, but that closure's
+  // copy hasn't. Mirror it into a ref, updated synchronously alongside the
+  // state, so saveSnapshot always persists the value as of its own call
+  // time rather than whichever render happened to create its closure.
+  const lastUpdatedRef = useRef(lastUpdated);
+  const setLastUpdated = useCallback((value: Date | null) => {
+    lastUpdatedRef.current = value;
+    setLastUpdatedState(value);
+  }, []);
   const [clientCounts] = useState<Record<string, number>>({});
 
   // --- Config state ---------------------------------------------------------
@@ -654,7 +665,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       networks,
       selectedNetwork,
       topology: Object.fromEntries(cacheRef.current),
-      lastUpdated: lastUpdated ? lastUpdated.toISOString() : null,
+      lastUpdated: lastUpdatedRef.current ? lastUpdatedRef.current.toISOString() : null,
     };
     let body: string;
     try {
@@ -682,7 +693,7 @@ export function useMerakiTopology(): UseMerakiTopologyReturn {
       console.error('[saveSnapshot] fetch failed:', err);
       return false;
     }
-  }, [networks, orgId, orgName, selectedNetwork, lastUpdated]);
+  }, [networks, orgId, orgName, selectedNetwork]);
 
   // -------------------------------------------------------------------------
   // getDeviceDetail — cache-first device detail (clients + switch ports)

@@ -82,6 +82,20 @@ function App() {
     }, 400);
   };
 
+  // The World Map's refresh button used to only re-fetch the lightweight
+  // sites summary (health/device counts for the pins) — it never touched
+  // each network's own topology cache, so a fix to how devices are
+  // classified could sit stale on every site until someone drilled in and
+  // refreshed it individually. Pull every network's topology, persist it
+  // server-side, and refresh the pins together so "refresh" on the map is
+  // actually global.
+  const handleWorldMapRefresh = async () => {
+    await Promise.all([
+      meraki.refresh(null).then(() => meraki.saveSnapshot()),
+      merakiSites.refresh(),
+    ]);
+  };
+
   const handleBackToMap = () => {
     setIsTransitioning(true);
     window.setTimeout(() => {
@@ -122,9 +136,9 @@ function App() {
         merakiNetworks={meraki.networks}
         selectedNetwork={meraki.selectedNetwork}
         onNetworkChange={handleNetworkChange}
-        isRefreshing={showWorldMap ? merakiSites.isLoading : meraki.isRefreshing}
+        isRefreshing={showWorldMap ? (merakiSites.isLoading || meraki.isRefreshing) : meraki.isRefreshing}
         lastUpdated={showWorldMap ? merakiSites.lastUpdated : meraki.lastUpdated}
-        onRefresh={showWorldMap ? merakiSites.refresh : meraki.refresh}
+        onRefresh={showWorldMap ? handleWorldMapRefresh : meraki.refresh}
         onSaveSnapshot={meraki.saveSnapshot}
         merakiView={merakiView}
         onBackToMap={handleBackToMap}

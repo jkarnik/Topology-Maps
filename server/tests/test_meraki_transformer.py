@@ -127,6 +127,20 @@ class TestDeviceTypeMapping:
         node = next(n for n in topo.nodes if n.id == "Q2AP-3333-CCCC")
         assert node.type == DeviceType.ACCESS_POINT
 
+    def test_switch_named_core_maps_to_core_switch(self):
+        core_switch_device = {**SWITCH_DEVICE, "name": "HYD9T-15-Core01"}
+        t = MerakiTransformer()
+        topo = t.build_l2([core_switch_device], ALL_AVAILABILITIES, NO_UPLINKS, [])
+        node = next(n for n in topo.nodes if n.id == "Q2SW-2222-BBBB")
+        assert node.type == DeviceType.CORE_SWITCH
+
+    def test_switch_named_dist_maps_to_floor_switch(self):
+        dist_switch_device = {**SWITCH_DEVICE, "name": "HYD9T-15M-Dist01"}
+        t = MerakiTransformer()
+        topo = t.build_l2([dist_switch_device], ALL_AVAILABILITIES, NO_UPLINKS, [])
+        node = next(n for n in topo.nodes if n.id == "Q2SW-2222-BBBB")
+        assert node.type == DeviceType.FLOOR_SWITCH
+
 
 # ---------------------------------------------------------------------------
 # Status mapping

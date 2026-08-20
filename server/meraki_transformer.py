@@ -105,6 +105,8 @@ class MerakiTransformer:
 
             product_type = dev.get("productType", "")
             device_type = DEVICE_TYPE_MAP.get(product_type, DeviceType.ENDPOINT)
+            if product_type == "switch" and "core" in (dev.get("name") or "").lower():
+                device_type = DeviceType.CORE_SWITCH
 
             avail_obj = avail_by_serial.get(serial, {})
             raw_status = avail_obj.get("status", "offline")

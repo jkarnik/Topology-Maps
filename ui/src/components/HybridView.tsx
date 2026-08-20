@@ -210,10 +210,13 @@ const nodeTypes = {
    ================================================================ */
 
 const TIER_0_Y = 0;       // Firewalls/FortiGate pair
-const TIER_1_Y = 180;     // Core switches (or floor switches if no core)
-const TIER_2_Y = 360;     // Floor switches (skipped when no core switches)
-const TIER_AP_Y = 530;    // Access points (between switches and VLANs)
-const TIER_VLAN_Y_BASE = 700; // VLAN group boxes (shifts up when no core)
+// Firewalls render as a 190px-tall hexagon (DeviceNode.tsx), so TIER_1_Y
+// needs enough clearance below that or the source/target handles invert
+// and the bezier edge loops back on itself instead of curving down.
+const TIER_1_Y = 220;     // Core switches (or floor switches if no core)
+const TIER_2_Y = 400;     // Floor switches (skipped when no core switches)
+const TIER_AP_Y = 570;    // Access points (between switches and VLANs)
+const TIER_VLAN_Y_BASE = 740; // VLAN group boxes (shifts up when no core)
 
 const VLAN_BOX_W = 240;
 const VLAN_BOX_H = 130;
@@ -265,12 +268,20 @@ function buildHybridGraph(
   }
 
   /* ------ Stack grouping ------ */
-  // Group floor switches by stack_name into virtual StackNodes
+  // Group switches by stack_name into virtual StackNodes. Meraki stacks
+  // exist at both the core and distribution layer (e.g. a "Core Stack"
+  // pair as well as per-floor "Dist" stacks), so this covers both tiers.
+  // Stack names are only unique within a network — "Core Stack" is a
+  // generic convention many sites reuse — so the All-Networks view must
+  // key on (network, stack_name) or it merges different sites' stacks
+  // into one virtual node.
+  const stackKey = (device: Device): string => `${device.network_id ?? ''}::${device.stack_name}`;
   const stackGroups = new Map<string, Device[]>();
-  for (const d of floorSwitches) {
+  for (const d of [...coreSwitches, ...floorSwitches]) {
     if (d.stack_name) {
-      if (!stackGroups.has(d.stack_name)) stackGroups.set(d.stack_name, []);
-      stackGroups.get(d.stack_name)!.push(d);
+      const key = stackKey(d);
+      if (!stackGroups.has(key)) stackGroups.set(key, []);
+      stackGroups.get(key)!.push(d);
     }
   }
 
@@ -350,23 +361,67 @@ function buildHybridGraph(
 
   const gridTotalWidth = VLAN_COLS * (VLAN_BOX_W + VLAN_H_GAP) - VLAN_H_GAP;
 
+  // Shared shape for a tier position that may be a single device or a
+  // Meraki switch stack rendered as one grouped node.
+  type SwitchUnit =
+    | { kind: 'single'; device: Device }
+    | { kind: 'stack'; virtualId: string; stackName: string; members: Device[] };
+
+  function buildSwitchUnits(devices: Device[]): SwitchUnit[] {
+    const units: SwitchUnit[] = [];
+    const addedStackKeys = new Set<string>();
+    for (const d of devices) {
+      const key = d.stack_name ? stackKey(d) : null;
+      if (key && stackGroups.has(key)) {
+        if (!addedStackKeys.has(key)) {
+          addedStackKeys.add(key);
+          const members = stackGroups.get(key)!;
+          const active = members.find((m) => m.stack_role === 'active') ?? members[0];
+          const virtualId = `stack-${active.id}`;
+          units.push({ kind: 'stack', virtualId, stackName: d.stack_name!, members });
+        }
+      } else {
+        units.push({ kind: 'single', device: d });
+      }
+    }
+    units.sort((a, b) => {
+      const idA = a.kind === 'single' ? a.device.id : a.virtualId;
+      const idB = b.kind === 'single' ? b.device.id : b.virtualId;
+      return idA.localeCompare(idB);
+    });
+    return units;
+  }
+
   /* ------ 3. Tier 1 — Core Switches (only when they exist) ------ */
 
   if (hasCoreSwitches) {
+    const coreSwitchUnits = buildSwitchUnits(coreSwitches);
     const coreCenterX = gridTotalWidth / 2 - 110; // 220/2 = 110
 
-    coreSwitches.forEach((cs, i) => {
-      nodes.push({
-        id: cs.id,
-        type: 'deviceNode',
-        position: { x: coreCenterX + i * 260, y: TIER_1_Y },
-        data: { device: cs },
-        draggable: true,
-      });
+    coreSwitchUnits.forEach((unit, i) => {
+      const x = coreCenterX + i * 260;
+      if (unit.kind === 'single') {
+        nodes.push({
+          id: unit.device.id,
+          type: 'deviceNode',
+          position: { x, y: TIER_1_Y },
+          data: { device: unit.device },
+          draggable: true,
+        });
+      } else {
+        nodes.push({
+          id: unit.virtualId,
+          type: 'switchStackNode',
+          position: { x, y: TIER_1_Y },
+          data: { stackName: unit.stackName, members: unit.members, onSelectMember: onSelectDevice },
+          draggable: true,
+        });
+      }
     });
 
     // Edges: FortiGates -> Core Switch(es) — only where L2 edges exist
     for (const fw of firewalls) {
+      const seenTargets = new Set<string>();
       for (const cs of coreSwitches) {
         const l2Edge = l2.edges.find(
           (e) =>
@@ -374,10 +429,13 @@ function buildHybridGraph(
             (e.source === cs.id && e.target === fw.id),
         );
         if (!l2Edge) continue;
+        const target = resolveId(cs.id);
+        if (seenTargets.has(target)) continue;
+        seenTargets.add(target);
         edges.push({
-          id: `infra-${fw.id}-${cs.id}`,
+          id: `infra-${fw.id}-${target}`,
           source: fw.id,
-          target: cs.id,
+          target,
           style: {
             stroke: 'var(--accent-cyan)',
             strokeWidth: 2,
@@ -403,32 +461,7 @@ function buildHybridGraph(
   /* ------ 4. Floor Switches (Tier 1 when no core, Tier 2 otherwise) ------ */
 
   // Build logical switch units: one entry per non-stacked switch or per stack group
-  type SwitchUnit =
-    | { kind: 'single'; device: Device }
-    | { kind: 'stack'; virtualId: string; stackName: string; members: Device[] };
-
-  const switchUnits: SwitchUnit[] = [];
-  const addedStackNames = new Set<string>();
-
-  for (const fs of floorSwitches) {
-    if (fs.stack_name && stackGroups.has(fs.stack_name)) {
-      if (!addedStackNames.has(fs.stack_name)) {
-        addedStackNames.add(fs.stack_name);
-        const members = stackGroups.get(fs.stack_name)!;
-        const active = members.find((m) => m.stack_role === 'active') ?? members[0];
-        const virtualId = `stack-${active.id}`;
-        switchUnits.push({ kind: 'stack', virtualId, stackName: fs.stack_name, members });
-      }
-    } else {
-      switchUnits.push({ kind: 'single', device: fs });
-    }
-  }
-
-  switchUnits.sort((a, b) => {
-    const idA = a.kind === 'single' ? a.device.id : a.virtualId;
-    const idB = b.kind === 'single' ? b.device.id : b.virtualId;
-    return idA.localeCompare(idB);
-  });
+  const switchUnits = buildSwitchUnits(floorSwitches);
 
   const fsSpacing = 210;
   const fsTotalWidth =
@@ -461,9 +494,13 @@ function buildHybridGraph(
   });
 
   if (hasCoreSwitches) {
-    // Edges: Core Switches -> Floor Switches (only where L2 edges exist)
+    // Edges: Core Switches -> Floor Switches (only where L2 edges exist).
+    // Dedup globally on the resolved (source, target) pair — a stacked
+    // core switch's members can each have their own LLDP link to the same
+    // floor stack, which would otherwise draw a duplicate edge.
+    const seenPairs = new Set<string>();
     for (const cs of coreSwitches) {
-      const seenTargets = new Set<string>();
+      const source = resolveId(cs.id);
       for (const fs of floorSwitches) {
         const l2Edge = l2.edges.find(
           (e) =>
@@ -472,11 +509,13 @@ function buildHybridGraph(
         );
         if (!l2Edge) continue;
         const target = resolveId(fs.id);
-        if (seenTargets.has(target)) continue;
-        seenTargets.add(target);
+        if (source === target) continue;
+        const pairKey = `${source}--${target}`;
+        if (seenPairs.has(pairKey)) continue;
+        seenPairs.add(pairKey);
         edges.push({
-          id: `infra-${cs.id}-${target}`,
-          source: cs.id,
+          id: `infra-${pairKey}`,
+          source,
           target,
           style: {
             stroke: 'var(--accent-cyan)',
