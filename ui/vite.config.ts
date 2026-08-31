@@ -7,12 +7,12 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api/meraki/refresh': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8090',
         headers: { 'Accept': 'text/event-stream' },
       },
-      '/api': 'http://localhost:8000',
+      '/api': 'http://localhost:8090',
       '/ws': {
-        target: 'ws://localhost:8000',
+        target: 'ws://localhost:8090',
         ws: true,
       },
     },

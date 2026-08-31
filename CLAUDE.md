@@ -23,7 +23,7 @@ Three Docker services, each on a fixed port:
 | Service | Port | Role |
 |---------|------|------|
 | `simulator` | 8001 (REST), 10161-10167 (SNMP/UDP) | Fake SNMP agents + roaming simulator |
-| `server` | 8000 | FastAPI + collector + WebSocket |
+| `server` | 8090 (host) → 8000 (container) | FastAPI + collector + WebSocket |
 | `ui` | 80 | React + Vite + Tailwind + React Flow |
 
 ```

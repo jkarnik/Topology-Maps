@@ -251,7 +251,7 @@ The `collector/` package uses `pysnmp` to walk devices on `127.0.0.1:10161–101
 
 ## 4. Internal REST & WebSocket API
 
-All routes are served by FastAPI on port 8000. The UI runs on port 80 (nginx proxy) and calls the server directly during development (`vite.config.ts` proxies `/api` and `/ws` to `localhost:8000`).
+All routes are served by FastAPI, exposed on host port 8090 (container port 8000). The UI runs on port 80 (nginx proxy) and calls the server directly during development (`vite.config.ts` proxies `/api` and `/ws` to `localhost:8090`).
 
 ### 4a. SNMP topology routes (`/api/topology`, `/api/devices`)
 
@@ -457,7 +457,7 @@ docker compose up --build
 # Backend tests only (no Docker needed)
 python3 -m pytest
 
-# UI hot-reload dev server (port 5173, proxies API to localhost:8000)
+# UI hot-reload dev server (port 5173, proxies API to localhost:8090)
 cd ui && npm run dev
 ```
 
